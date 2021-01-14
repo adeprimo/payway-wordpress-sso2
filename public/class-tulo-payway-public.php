@@ -103,6 +103,12 @@ class Tulo_Payway_Server_Public {
 
     public function has_access($post_id = null, $restrictions = null)
     {
+        // Early return if the user has no products
+        $tulo_payway = new Tulo_Payway_Server();
+
+        // no session id at the moment, lets identify
+        // $tulo_payway->request_identify_session();
+
         if($restrictions == null) {
             $restrictions = Tulo_Payway_Server_Public::get_post_restrictions($post_id);
         }
@@ -115,9 +121,6 @@ class Tulo_Payway_Server_Public {
         if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
             return true;
         }
-
-        // Early return if the user has no products
-        $tulo_payway = new Tulo_Payway_Server();
 
         if(!$tulo_payway->user_has_subscription()) {
             return false;
@@ -147,6 +150,10 @@ class Tulo_Payway_Server_Public {
         global $post;
         $post_id = intval( $post->ID );
 
+        //if (is_admin()) {
+        //    return $classes;
+        //}
+
         if($this->has_access($post_id, $restrictions)) {
             $classes[] = 'tulo_access';
         } else {
@@ -155,9 +162,9 @@ class Tulo_Payway_Server_Public {
 
         return $classes;
     }
+    
     public function content_filter($content)
     {
-
         if($this->has_access())
             return $content;
 

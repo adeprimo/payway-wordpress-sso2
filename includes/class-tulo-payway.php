@@ -1,4 +1,5 @@
 <?php
+use \Firebase\JWT\JWT;
 
 /**
  * The file that defines the core plugin class
@@ -116,6 +117,11 @@ class Tulo_Payway_Server {
            * The class responsible for defining all actions that occur in the admin area.
           */
           require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-tulo-payway-admin.php';
+
+          /**
+           * Load other dependencies
+           */
+          require_once plugin_dir_path( dirname( __FILE__ ) ) . 'vendor/autoload.php';
 
           /**
            * The class responsible for defining all actions that occur in the public-facing
@@ -507,7 +513,8 @@ class Tulo_Payway_Server {
           return $response;
      }
 
-     private function identify_session() {
+     public function request_identify_session() {
+          //echo "SSO2: identify session";
           $url = Tulo_Payway_Server::get_sso2_url("identify");
           $client_id = get_option('tulo_server_client_id');
           $client_secret = get_option('tulo_server_secret');
@@ -522,9 +529,17 @@ class Tulo_Payway_Server {
                "exp" => $time + 10,
                "iat" => $time
           );
+
+          $token = JWT::encode($payload, $client_secret);
+          $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
+          $continueUrl = sprintf("%s://%s/%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
+
+          $url = sprintf("%s?t=%s&r=%s", $url, $token, $continueUrl);
+          header("Location: ".$url);
+          die();
      }
 
-     private function get_session_status() {
+     private function request_session_status() {
           $url = Tulo_Payway_Server::get_sso2_url("sessionstatus");
           $client_id = get_option('tulo_server_client_id');
           $client_secret = get_option('tulo_server_secret');
