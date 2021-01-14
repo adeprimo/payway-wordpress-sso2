@@ -1,0 +1,275 @@
+<?php
+
+/**
+ * The public-facing functionality of the plugin.
+ *
+ * @link       http://example.com
+ * @since      1.0.0
+ *
+ * @package    Tulo_Payway_Server
+ * @subpackage Tulo_Payway_Server/public
+ */
+
+/**
+ * The public-facing functionality of the plugin.
+ *
+ * Defines the plugin name, version, and two examples hooks for how to
+ * enqueue the admin-specific stylesheet and JavaScript.
+ *
+ * @package    Tulo_Payway_Server
+ * @subpackage Tulo_Payway_Server/public
+ * @author     Your Name <email@example.com>
+ */
+class Tulo_Payway_Server_Public {
+
+    /**
+     * The version of this plugin.
+     * @var      string    $version    The current version of this plugin.
+     */
+    private $version;
+
+    /**
+     * Initialize the class and set its properties.
+     * @param      string    $plugin_name       The name of the plugin.
+     * @param      string    $version    The version of this plugin.
+     */
+    public function __construct( $version ) {
+
+        $this->version = $version;
+
+    }
+
+    public static function get_product_shop_url($product)
+    {
+        $orgid = get_option('tulo_organisation_id');
+        $thisuri = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $thisuri = urlencode($thisuri);
+        switch(get_option('tulo_environment'))
+        {
+            case 'stage':
+                return 'https://'.$orgid.'.payway-portal.stage.adeprimo.se/v2/shop/'.$product.'?returnUrl='.$thisuri;
+            case 'test':
+                return 'https://'.$orgid.'.payway-portal.test.adeprimo.se/v2/shop/'.$product.'?returnUrl='.$thisuri;
+            default:
+                return 'https://'.$orgid.'.portal.worldoftulo.com/v2/shop/'.$product.'?returnUrl='.$thisuri;
+        }
+    }
+
+    public function enqueue_scripts() {
+        wp_enqueue_style('tulo-admin', plugin_dir_url( __FILE__ ) . 'css/tulo-public.css', array(),  $this->version);
+        wp_enqueue_script( Tulo_Payway_Server::instance()->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-tulo.js', array(), $this->version, false );
+
+        wp_localize_script( Tulo_Payway_Server::instance()->plugin_name, 'tulo_params', array('url' => admin_url('admin-ajax.php')));
+        wp_localize_script( Tulo_Payway_Server::instance()->plugin_name, 'tulo_settings', array(
+            'clientid' => get_option('tulo_client_id'),
+            'redirecturi' => get_option('tulo_redirect_uri'),
+            'env' => get_option('tulo_environment'),
+            'oid' => get_option('tulo_organisation_id')
+        ));
+    }
+
+    public function register_session() {
+        if( !session_id() )
+        {
+            session_start();
+        }
+    }
+
+    public static function get_post_restrictions($post_id = null)
+    {
+        if( !$post_id )
+        {
+            global $post;
+
+            if( $post )
+            {
+                $post_id = intval( $post->ID );
+            }
+        }
+        $restrictions = get_post_meta( $post_id, Tulo_Payway_Server::$post_meta_key, true );
+        return $restrictions;
+    }
+
+    public static function get_whitelisted_ips()
+    {
+        $ips = explode("\n", get_option('tulo_whitelist_ip'));
+
+        foreach ($ips as $key => $value) {
+        $ips[$key] = trim($value);
+        }
+
+        return $ips;
+    }
+
+    public function has_access($post_id = null, $restrictions = null)
+    {
+        if($restrictions == null) {
+            $restrictions = Tulo_Payway_Server_Public::get_post_restrictions($post_id);
+        }
+
+        if(empty($restrictions)) {
+            return true;
+        }
+
+        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
+        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+            return true;
+        }
+
+        // Early return if the user has no products
+        $tulo_payway = new Tulo_Payway_Server();
+
+        if(!$tulo_payway->user_has_subscription()) {
+            return false;
+        }
+
+        $user_products = $tulo_payway->get_user_active_products()['data']->item->active_products;
+
+        foreach($restrictions as $restriction)
+        {
+            foreach($user_products as $product)
+            {
+                if($restriction->productid == $product) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function post_class_filter($classes)
+    {
+        $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
+        if(empty($restrictions)) {
+            $classes[] = 'tulo_public';
+        }
+
+        global $post;
+        $post_id = intval( $post->ID );
+
+        if($this->has_access($post_id, $restrictions)) {
+            $classes[] = 'tulo_access';
+        } else {
+            $classes[] = 'tulo_no_access';
+        }
+
+        return $classes;
+    }
+    public function content_filter($content)
+    {
+
+        if($this->has_access())
+            return $content;
+
+        do_action('tulo_before_permission_required');
+
+        global $post;
+        $output  = '<div class="paygate">';
+        $output .= '    <div class="info-box-wrapper">';
+        if(!empty($post->post_excerpt))
+        {
+            $output .= '        <div class="info-box article">';
+            $output .= $post->post_excerpt;
+            $output .= '        </div>';
+        }
+
+
+        $output .= '        <div class="info-box permission_required">';
+        $output .= do_shortcode('[tulo_permission_required]');
+        $output .= '        </div>';
+        $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
+
+        foreach($restrictions as $restriction)
+        {
+            $product = $this->find_product($restriction->productid);
+            if($product == null)
+                continue;
+
+            if(empty($product->buyinfo))
+                continue;
+            $output .= '<div class="tulo-product-wrapper info-box">';
+            $output .= $product->buyinfo;
+            $output .= '</div>';
+
+        }
+        $output .= '</div>';
+        $output .= '</div>';
+        do_action('tulo_after_permission_required');
+        return $output;
+    }
+    private $available_products;
+    private function find_product($productid)
+    {
+        if($this->available_products == null)
+            $this->available_products = Tulo_Payway_Server::get_available_products();
+        foreach($this->available_products as $product)
+        {
+            if($productid ==$product->productid)
+                return $product;
+        }
+        return null;
+    }
+
+    public function debug_output()
+    {
+        require_once('partials/debug-tools.php');
+    }
+    public function shortcode_permission_required()
+    {
+        return get_option('tulo_permission_required');
+    }
+    public function shortcode_buy_button($atts)
+    {
+        $retval = '<button class="js-tuloBuy '.$atts['class'].'" data-product="'.$atts['product'].'">';
+        $retval .= __('Buy', 'tulo');
+        $retval .= '</button>';
+        return $retval;
+    }
+    public function shortcode_product_link($atts, $content = null)
+    {
+        $output = '<a href="'.Tulo_Payway_Server_Public::get_product_shop_url($atts['product']).'" class="'.$atts['class'].'">';
+        $output .= $content;
+        $output .= '</a>';
+        return $output;
+    }
+
+    public function ajax_list_products(){
+
+        header('Content-Type: application/json');
+
+        echo json_encode(Tulo_Payway_Server::get_available_products());
+
+        die();
+    }
+
+    public function ajax_login()
+    {
+        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_EMAIL);
+        $password = filter_input(INPUT_POST, 'password');
+        $persist = filter_input(INPUT_POST, 'persist', FILTER_VALIDATE_BOOLEAN);
+
+        if (isset($username) && isset($password) && isset($persist)) {
+            $tulo_payway = new Tulo_Payway_Server();
+            $response = $tulo_payway->login($username, $password, $persist);
+
+            echo json_encode($response);
+        } else {
+            echo json_encode(array(
+                'status' => 400,
+                'error' => 'Make sure all login details are submitted.'
+            ));
+        }
+
+        wp_die();
+    }
+
+    public function ajax_logout()
+    {
+        $tulo_payway = new Tulo_Payway_Server();
+        $response = $tulo_payway->logout();
+
+        echo json_encode($response);
+
+        wp_die();
+    }
+}

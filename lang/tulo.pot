@@ -1,0 +1,149 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Tulo Payway\n"
+"POT-Creation-Date: 2015-10-23 12:11+0200\n"
+"PO-Revision-Date: 2015-10-23 12:12+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.6\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: wp-tulo-payway.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: admin/class-tulo-payway-admin.php:69 admin/class-tulo-payway-admin.php:69
+msgid "Tulo Payway restrictions"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:85
+#: admin/tulo-payway-settings.php:87
+msgid "Environment"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:109
+#: admin/tulo-payway-settings.php:111
+msgid "If permission required"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:110
+#: admin/tulo-payway-settings.php:112
+msgid "Code will be rendered if product is missing:"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:124
+#: admin/tulo-payway-settings.php:126
+msgid "Available products"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:129
+#: admin/tulo-payway-settings.php:131
+msgid "Productname"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:133
+#: admin/tulo-payway-settings.php:135
+msgid "Productkey"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:135
+#: admin/tulo-payway-settings.php:137
+msgid "Delete"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:137
+#: admin/tulo-payway-settings.php:139
+msgid "Buy info"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:138
+#: admin/tulo-payway-settings.php:140
+msgid "Code below will be rendered if this product is required"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:141
+#: admin/tulo-payway-settings.php:143
+msgid "Useful shortodes"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:152
+#: admin/tulo-payway-settings.php:154
+msgid "Add product"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:167
+msgid "Tulo settings"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:173
+#: admin/tulo-payway-settings.php:192
+msgid "Client id"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:174
+#: admin/tulo-payway-settings.php:193
+msgid "Secret"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:175
+#: admin/tulo-payway-settings.php:194
+msgid "Organisation id"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:176
+#: admin/tulo-payway-settings.php:195
+msgid "Redirect url"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:185
+#: admin/tulo-payway-settings.php:204
+#, php-format
+msgid "New %s are restricted"
+msgstr ""
+
+#: admin/partials/tulo-payway-settings.php:197
+#: admin/tulo-payway-settings.php:217
+msgid "Save Changes"
+msgstr ""
+
+#: public/class-tulo-payway-public.php:282
+#: public/class-tulo-payway-public.php:296
+msgid "Buy"
+msgstr ""
+
+#: public/class-tulo-payway-public.php:297
+#: public/class-tulo-payway-public.php:311
+msgid "Log in"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Tulo Payway"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "This plugin integrates with Tulo Payway."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Adeprimo"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://adeprimo.se"
+msgstr ""
+
+#: admin/tulo-payway-settings.php:172
+msgid "Whitelist IP Addresses"
+msgstr ""
+
+#: admin/tulo-payway-settings.php:173
+msgid "Seperate the ip addresses with a new row"
+msgstr ""

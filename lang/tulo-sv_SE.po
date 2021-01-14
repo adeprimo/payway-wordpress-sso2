@@ -1,0 +1,146 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Tulo Payway\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-07-19 14:52+0200\n"
+"PO-Revision-Date: 2019-07-19 14:52+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2.1\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: wp-tulo-payway.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: admin/class-tulo-payway-admin.php:69
+msgid "Tulo Payway restrictions"
+msgstr "Tulo Payway begränsningar"
+
+#: admin/tulo-payway-settings.php:87
+msgid "Environment"
+msgstr "Miljö"
+
+#: admin/tulo-payway-settings.php:112
+msgid "If permission required"
+msgstr "Om behörighet saknas"
+
+#: admin/tulo-payway-settings.php:113
+msgid "Code will be rendered if product is missing:"
+msgstr "Koden kommer att visas om produkten saknas"
+
+#: admin/tulo-payway-settings.php:127
+msgid "Available products"
+msgstr "Tillgängliga produkter"
+
+#: admin/tulo-payway-settings.php:132
+msgid "Productname"
+msgstr "Produktnamn"
+
+#: admin/tulo-payway-settings.php:136
+msgid "Productkey"
+msgstr "Produktnyckel"
+
+#: admin/tulo-payway-settings.php:138
+msgid "Delete"
+msgstr "Radera"
+
+#: admin/tulo-payway-settings.php:140
+msgid "Buy info"
+msgstr "Köpinformation"
+
+#: admin/tulo-payway-settings.php:141
+msgid "Code below will be rendered if this product is required"
+msgstr "Koden kommer att visas om produkten krävs"
+
+#: admin/tulo-payway-settings.php:144
+msgid "Useful shortodes"
+msgstr "Användbara shortodes"
+
+#: admin/tulo-payway-settings.php:153
+msgid "Add product"
+msgstr "Lägg till produkt"
+
+#: admin/tulo-payway-settings.php:171
+msgid "Whitelist IP Addresses"
+msgstr "Vitlista IP-adresser"
+
+#: admin/tulo-payway-settings.php:172
+msgid "Seperate the ip addresses with a new row"
+msgstr "Separera IP-adresser med en ny rad"
+
+#: admin/tulo-payway-settings.php:185
+msgid "Tulo settings"
+msgstr "Tulo inställningar"
+
+#: admin/tulo-payway-settings.php:191
+msgid "Client id"
+msgstr "Klient-ID"
+
+#: admin/tulo-payway-settings.php:192
+msgid "Secret"
+msgstr "Hemlig nyckel"
+
+#: admin/tulo-payway-settings.php:193
+msgid "Organisation id"
+msgstr "Organisationens id"
+
+#: admin/tulo-payway-settings.php:194
+msgid "Account origin"
+msgstr ""
+
+#: admin/tulo-payway-settings.php:203
+#, php-format
+msgid "New %s are restricted"
+msgstr "Nya %s är låsta"
+
+#: admin/tulo-payway-settings.php:216
+msgid "Save Changes"
+msgstr "Spara ändringar"
+
+#: includes/class-tulo-payway.php:687
+msgid "Wrong username or password"
+msgstr "Fel användarnamn eller lösenord"
+
+#: includes/class-tulo-payway.php:689
+msgid "Something went wrong"
+msgstr "Något gick snett"
+
+#: includes/class-tulo-payway.php:696
+msgid "Account locked until"
+msgstr "Kontot är låst till och med"
+
+#: public/class-tulo-payway-public.php:200
+msgid "Buy"
+msgstr "Köp"
+
+#. Plugin Name of the plugin/theme
+msgid "Tulo Payway Server to server"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"This plugin integrates with Tulo Payway via server-to-server communication."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Adeprimo"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://adeprimo.se"
+msgstr ""
+
+#~ msgid "Redirect url"
+#~ msgstr "Omdirigera till URL"
+
+#~ msgid "Log in"
+#~ msgstr "Logga in"
