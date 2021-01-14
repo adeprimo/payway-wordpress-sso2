@@ -1,0 +1,20 @@
+{
+    "name": "adeprimo/payway-wordpress-sso2",
+    "require": {
+        "firebase/php-jwt": "^5.2.0"
+    },
+    "authors": [
+        {
+            "name": "Kari Bengs",
+            "email": "kari.bengs@adeprimo.se"
+        },
+        {
+            "name": "Magnus Rosenquist Hamvall",
+            "email": "magnus.rosenquist@adeprimo.se"
+        },
+        {
+            "name": "Calle Bjernekull",
+            "email": "calle@hjartat.net"
+        }
+    ]
+}

@@ -42,7 +42,7 @@ class Tulo_Payway_Server {
      protected $loader;
 
 
-     public $plugin_name = 'wp_tulo_payway_server';
+     public $plugin_name = 'payway-wordpress-sso2';
 
      /**
      * The current version of the plugin.
@@ -65,7 +65,7 @@ class Tulo_Payway_Server {
      */
      public function __construct() {
 
-          $this->plugin_name = 'wp-tulo-payway-server';
+          $this->plugin_name = 'payway-wordpress-sso2';
           $this->version = '1.0.0';
 
           $this->load_dependencies();
@@ -280,6 +280,17 @@ class Tulo_Payway_Server {
           }
 
           return $url;
+     }
+     
+     private static function get_sso2_url($path) {
+          $url = "";
+          if (get_option('tulo_environment') == 'prod') {
+               $url = "";
+          }
+          else {
+               $url = "https://payway-sso-stage.azurewebsites.net";
+          }
+          return sprintf("%s/%s", $url, $path);
      }
 
      private function get_access_token() {
@@ -496,8 +507,34 @@ class Tulo_Payway_Server {
           return $response;
      }
 
-     private function login_user( $email, $password ) {
-          $url = Tulo_Payway_Server::get_environment_url() . '/api/authorization/access_token';
+     private function identify_session() {
+          $url = Tulo_Payway_Server::get_sso2_url("identify");
+          $client_id = get_option('tulo_server_client_id');
+          $client_secret = get_option('tulo_server_secret');
+          $organisation_id = get_option('tulo_organisation_id');
+
+          $time = time();
+          $payload = array(
+               "cid" => $client_id,
+               "iss" => $organisation_id,
+               "aud" => "pw-sso",
+               "nbf" => $time,
+               "exp" => $time + 10,
+               "iat" => $time
+          );
+     }
+
+     private function get_session_status() {
+          $url = Tulo_Payway_Server::get_sso2_url("sessionstatus");
+          $client_id = get_option('tulo_server_client_id');
+          $client_secret = get_option('tulo_server_secret');
+          $organisation_id = get_option('tulo_organisation_id');
+
+     }
+
+     private function login_user( $email, $password ) {          
+
+          $url = Tulo_Payway_Server::get_sso2_url("authenticate");
           $client_id = get_option('tulo_server_client_id');
           $client_secret = get_option('tulo_server_secret');
           $organisation_id = get_option('tulo_organisation_id');

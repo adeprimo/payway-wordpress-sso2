@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Tulo Payway Server to server
  * Description:       This plugin integrates with Tulo Payway via server-to-server communication.
- * Version:           1.0.1
+ * Version:           1.0.0
  * Author:            Adeprimo
  * Author URI:        http://adeprimo.se
  * Text Domain:       tulo
