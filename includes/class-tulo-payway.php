@@ -124,10 +124,23 @@ class Tulo_Payway_Server {
           require_once plugin_dir_path( dirname( __FILE__ ) ) . 'vendor/autoload.php';
 
           /**
+           * Common functions
+           */
+          require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tulo-payway-common.php';
+
+          /**
            * The class responsible for defining all actions that occur in the public-facing
           * side of the site.
           */
           require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-tulo-payway-public.php';
+          /**
+           * API library
+           */
+          require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tulo-payway-api.php';
+          /**
+           * SSO2 library
+           */
+          require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tulo-payway-sso2.php';
 
           $this->loader = new Tulo_Payway_Server_Loader();
 
@@ -197,6 +210,7 @@ class Tulo_Payway_Server {
           $plugin_public = new Tulo_Payway_Server_Public( $this->get_version() );
           $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
           $this->loader->add_action( 'init', $plugin_public, 'register_session');
+          $this->loader->add_action( 'wp', $plugin_public, 'check_session');
           $this->loader->add_filter('the_content', $plugin_public, 'content_filter' );
           $this->loader->add_filter('post_class', $plugin_public, 'post_class_filter' );
 
@@ -288,16 +302,6 @@ class Tulo_Payway_Server {
           return $url;
      }
      
-     private static function get_sso2_url($path) {
-          $url = "";
-          if (get_option('tulo_environment') == 'prod') {
-               $url = "";
-          }
-          else {
-               $url = "https://payway-sso-stage.azurewebsites.net";
-          }
-          return sprintf("%s/%s", $url, $path);
-     }
 
      private function get_access_token() {
           if ($_SESSION['app_access_token_timeout'] && $_SESSION['app_access_token_timeout'] <= time()) {
@@ -513,39 +517,6 @@ class Tulo_Payway_Server {
           return $response;
      }
 
-     public function request_identify_session() {
-          //echo "SSO2: identify session";
-          $url = Tulo_Payway_Server::get_sso2_url("identify");
-          $client_id = get_option('tulo_server_client_id');
-          $client_secret = get_option('tulo_server_secret');
-          $organisation_id = get_option('tulo_organisation_id');
-
-          $time = time();
-          $payload = array(
-               "cid" => $client_id,
-               "iss" => $organisation_id,
-               "aud" => "pw-sso",
-               "nbf" => $time,
-               "exp" => $time + 10,
-               "iat" => $time
-          );
-
-          $token = JWT::encode($payload, $client_secret);
-          $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
-          $continueUrl = sprintf("%s://%s/%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
-
-          $url = sprintf("%s?t=%s&r=%s", $url, $token, $continueUrl);
-          header("Location: ".$url);
-          die();
-     }
-
-     private function request_session_status() {
-          $url = Tulo_Payway_Server::get_sso2_url("sessionstatus");
-          $client_id = get_option('tulo_server_client_id');
-          $client_secret = get_option('tulo_server_secret');
-          $organisation_id = get_option('tulo_organisation_id');
-
-     }
 
      private function login_user( $email, $password ) {          
 
@@ -709,38 +680,24 @@ class Tulo_Payway_Server {
                $output['status'] = 200;
                $output['data'] = $_SESSION['user_active_products'];
           } else {
-
-               $output = $this->get_user_access_token();
-
-               if ($output['status'] == 200) {
-                    $url = Tulo_Payway_Server::get_environment_url() . '/external/api/v1/me/active_products';
-
-                    $ch = curl_init();
-
-                    curl_setopt_array($ch, array(
-                         CURLOPT_URL => $url,
-                         CURLOPT_RETURNTRANSFER => 1,
-                         CURLOPT_HTTPHEADER => array(
-                              'Accept: application/json',
-                              'Authorization: Bearer ' . $_SESSION['access_token']
-                         )
-                    ));
-
-                    $active_products_response = curl_exec($ch);
-                    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-                    $output['status'] = $httpcode;
-                    $output['data'] = json_decode($active_products_response);
-
-                    if (curl_errno($ch)) {
-                         $error = curl_error($ch);
+               $sso2 = new Tulo_Payway_API_SSO2();
+               // Step 1 - not logged in, first visit
+               //   - identify
+               // Step 2 - we have a session and can login
+               // 
+               if (!isset($_SESSION['sso2_session_id'])) {
+                    // identify                     
+                    //$sso2->identify_session();
+               } else {
+                    if ($_SESSION['sso2_session_status'] == "loggedin") {                         
+                         // get session status and exchange authentication ticket to access-token.
+                         // fetch products with access-token
+                    } else if ($_SESSION['sso2_session_status'] == "anon") {
+                         // login time
+                    } else if ($_SESSION['sso2_session_status'] == "terminated") {
+                         // Delete all info about user and products since we are logged out elsewhere.
                     }
 
-                    curl_close($ch);
-
-                    if ($httpcode == 200) {
-                         $_SESSION['user_active_products'] = $output['data'];
-                    }
                }
           }
 

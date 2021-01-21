@@ -28,6 +28,7 @@ class Tulo_Payway_Server_Public {
      */
     private $version;
 
+    private $common;
     /**
      * Initialize the class and set its properties.
      * @param      string    $plugin_name       The name of the plugin.
@@ -36,7 +37,7 @@ class Tulo_Payway_Server_Public {
     public function __construct( $version ) {
 
         $this->version = $version;
-
+        $this->common = new Tulo_Payway_Server_Common();
     }
 
     public static function get_product_shop_url($product)
@@ -75,6 +76,30 @@ class Tulo_Payway_Server_Public {
         }
     }
 
+    public function check_session($wp) {
+        global $post;
+        if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
+            $this->common->write_log("In check session");
+            $sso = new Tulo_Payway_API_SSO2();
+            if ($sso->session_established()) {
+                $this->common->write_log("Basic SSO2 session established: ".$sso->sso_session_id());
+                if ($sso->session_needs_refresh()) {
+                    $sso->refresh_session();
+                }
+                $status = $sso->get_session_status();
+                if ($status == "loggedin") {                    
+                    $this->common->write_log("Logged in as: ".$sso->get_user_name()." (".$sso->get_user_email().")");
+                } else if ($status == "anon") {
+                    $this->common->write_log("Not logged in, user needs to login if accessing restricted content");                    
+                }
+                
+            } else {
+                $this->common->write_log("BEGIN Identify");
+                $sso->identify_session();
+            }    
+        }
+    }
+
     public static function get_post_restrictions($post_id = null)
     {
         if( !$post_id )
@@ -103,12 +128,6 @@ class Tulo_Payway_Server_Public {
 
     public function has_access($post_id = null, $restrictions = null)
     {
-        // Early return if the user has no products
-        $tulo_payway = new Tulo_Payway_Server();
-
-        // no session id at the moment, lets identify
-        // $tulo_payway->request_identify_session();
-
         if($restrictions == null) {
             $restrictions = Tulo_Payway_Server_Public::get_post_restrictions($post_id);
         }
@@ -122,11 +141,14 @@ class Tulo_Payway_Server_Public {
             return true;
         }
 
-        if(!$tulo_payway->user_has_subscription()) {
+        $sso = new Tulo_Payway_API_SSO2();
+
+        // Early return if the user has no products
+        if(!$sso->user_has_subscription()) {
             return false;
         }
 
-        $user_products = $tulo_payway->get_user_active_products()['data']->item->active_products;
+        $user_products = $sso->get_user_active_products();
 
         foreach($restrictions as $restriction)
         {
