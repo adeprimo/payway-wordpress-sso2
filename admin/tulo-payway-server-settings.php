@@ -29,7 +29,8 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     foreach(Tulo_Payway_Server_Admin::get_post_types() as $posttype)
     {
         $key = 'tulo_'.$posttype['name'].'_default_restricted';
-        update_option($key, $_POST[$key]);
+        if (isset($_POST[$key]))
+            update_option($key, $_POST[$key]);
     }
     update_option("tulo_permission_required", stripslashes($_POST["tulo_permission_required"]));
     $products = json_decode(stripslashes($_POST["tulo_products_val"]));

@@ -172,6 +172,80 @@ class Tulo_Payway_API_SSO2 {
         }
     }
 
+    public function authenticate_user($email, $password) {
+        $this->common->write_log("!! Authenticating user: ".$email);
+        $url = $this->get_sso2_url("authenticate");
+        $client_id = get_option('tulo_server_client_id');
+        $client_secret = get_option('tulo_server_secret');
+        $organisation_id = get_option('tulo_organisation_id');
+        $ip_address = $_SERVER ['REMOTE_ADDR'];
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+        $time = time();
+        $payload = array(
+             "cid" => $client_id,
+             "sid" => $this->sso_session_id(),
+             "ipa" => $ip_address,
+             "uas" => $user_agent,
+             "usr" => $email,
+             "pwd" => $password,
+             "iss" => $organisation_id,
+             "aud" => "pw-sso",
+             "nbf" => $time,
+             "exp" => $time + 10,
+             "iat" => $time
+        );
+
+        $this->write_log("Authenticate payload:");
+        $this->write_log($payload);
+        $token = JWT::encode($payload, $client_secret);
+        $payload = json_encode(array("t" => $token));
+        
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_POST => 1,
+            CURLOPT_HTTPHEADER => array(
+                "Content-Type: application/json"
+            )
+        ));
+        $this->common->write_log("Authenticate url: ".$url);
+        $this->common->write_log("Payload: ".$payload);
+        $output = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $status = array();
+        if ($httpcode == 200) {
+            $data = json_decode($output);
+            $decoded = JWT::decode($data->t, $client_secret, array("HS256"));
+            $status["success"] = $decoded->sts=="loggedin" ? "true" : "false";
+            if ($decoded->sts == "loggedin") {
+                $this->common->write_log("User successfully authenticated!");
+                $this->register_basic_session($decoded);
+            } else {
+                $status["error_code"] = $decoded->err;
+                if ($decoded->err == "account_frozen") {
+                    $status["frozen_until"] = time() + $decoded->frf;
+                }
+                if ($decoded->err == "invalid_credentials") {
+                    $status["remaining_attempts"] = $decoded->raa;
+                }
+            }
+        }
+        else {
+            $error = curl_error($ch);
+            $this->common->write_log("!! Error authenticating: ".$httpcode." => ".$error);
+            $status["success"] = "false";
+            $status["error_code"] = "unknown_error";
+        }
+        $this->common->write_log("Response authentication:");
+        $this->common->write_log($status);
+        curl_close($ch);
+        return $status;
+
+    }
+
     private function logout_user() {
         
         $this->set_user_active_products(array());

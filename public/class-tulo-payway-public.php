@@ -78,6 +78,9 @@ class Tulo_Payway_Server_Public {
 
     public function check_session($wp) {
         global $post;
+        if (is_admin()) 
+            return;
+
         if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             $this->common->write_log("In check session");
             $sso = new Tulo_Payway_API_SSO2();
@@ -278,8 +281,8 @@ class Tulo_Payway_Server_Public {
         $persist = filter_input(INPUT_POST, 'persist', FILTER_VALIDATE_BOOLEAN);
 
         if (isset($username) && isset($password) && isset($persist)) {
-            $tulo_payway = new Tulo_Payway_Server();
-            $response = $tulo_payway->login($username, $password, $persist);
+            $sso = new Tulo_Payway_API_SSO2();
+            $response = $sso->authenticate_user($username, $password);
 
             echo json_encode($response);
         } else {
