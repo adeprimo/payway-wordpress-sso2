@@ -17,9 +17,6 @@
 if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
 
-    update_option("tulo_client_id", $_POST["tulo_client_id"]);
-    update_option("tulo_secret", $_POST["tulo_secret"]);
-    update_option("tulo_redirect_uri", $_POST["tulo_redirect_uri"]);
     update_option("tulo_server_client_id", $_POST["tulo_server_client_id"]);
     update_option("tulo_server_secret", $_POST["tulo_server_secret"]);
     update_option("tulo_organisation_id", $_POST["tulo_organisation_id"]);
@@ -32,11 +29,11 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
         if (isset($_POST[$key]))
             update_option($key, $_POST[$key]);
     }
-    update_option("tulo_permission_required", stripslashes($_POST["tulo_permission_required"]));
+    update_option("tulo_permission_required_loggedin", stripslashes($_POST["tulo_permission_required_loggedin"]));
+    update_option("tulo_permission_required_not_loggedin", stripslashes($_POST["tulo_permission_required_not_loggedin"]));
     $products = json_decode(stripslashes($_POST["tulo_products_val"]));
     update_option("tulo_products", $products);
 }
-
 
 function tulo_server_render_text_option_setting($label, $name, $helper = null)
 {
@@ -54,6 +51,25 @@ function tulo_server_render_text_option_setting($label, $name, $helper = null)
             <?php if($helper != null){
                       echo $helper;
                   } ?>
+        </td>
+    </tr>
+<?php }
+
+function tulo_server_render_text($label, $name)
+{
+    //$value = get_option($name);
+    ?>
+
+    <tr>
+	    <th scope="row">
+                <label for="<?php echo $name ?>">
+                    <?php echo esc_html( $label ); ?>
+                </label>
+        </th>
+        <td>
+            <p class="regular-text ">
+            <?php echo plugin_dir_url(__DIR__)."/landing.php (should be registered in Payway)"?>
+            </p>
         </td>
     </tr>
 <?php }
@@ -79,6 +95,7 @@ function tulo_server_render_bool_option_setting($label, $name, $helper = null)
     </tr>
 <?php
 }
+
 function tulo_server_render_env_setting()
 {
     $key = 'tulo_environment';
@@ -95,30 +112,46 @@ function tulo_server_render_env_setting()
         <select name="<?php echo $key ?>" id="<?php echo $key ?>" >
             <option value="prod" <?php echo $value == 'prod' ? 'selected="selected"':'' ?>>prod</option>
             <option value="stage" <?php echo $value == 'stage' ? 'selected="selected"':'' ?>>stage</option>
-            <option value="azure_stage" <?php echo $value == 'azure_stage' ? 'selected="selected"':'' ?>>azure_stage</option>
-            <option value="test" <?php echo $value == 'test' ? 'selected="selected"':'' ?>>test</option>
-            <option value="dev" <?php echo $value == 'dev' ? 'selected="selected"':'' ?>>dev</option>
-
         </select>
         </td>
     </tr>
 <?php }
 
 
-function tulo_server_render_required_setting()
+function tulo_server_render_required_setting_not_loggedin()
 {
-    $key = 'tulo_permission_required';
+    $key = 'tulo_permission_required_not_loggedin';
     $value = get_option($key);
     ?>
-        <tr>
+    <tr>
 	    <th scope="row">
             <label for="<?php echo $key ?>">
                 <?php _e('If permission required', 'tulo'); ?><br />
-                <i><?php _e('Code will be rendered if product is missing:', 'tulo'); ?></i>
+                <i><?php _e('Code will be rendered if product is missing and user is not logged in:', 'tulo'); ?></i>
             </label>
         </th>
         <td>
-            <textarea name="<?php echo $key ?>" class="permission_required"><?php echo $value ?></textarea>
+            <textarea name="<?php echo $key ?>" class="tulo_permission_required"><?php echo $value ?></textarea>
+        </td>
+    </tr>
+<?php
+
+}
+
+function tulo_server_render_required_setting_loggedin()
+{
+    $key = 'tulo_permission_required_loggedin';
+    $value = get_option($key);
+    ?>
+    <tr>
+	    <th scope="row">
+            <label for="<?php echo $key ?>">
+                <?php _e('If permission required', 'tulo'); ?><br />
+                <i><?php _e('Code will be rendered if product is missing and user already logged in:', 'tulo'); ?></i>
+            </label>
+        </th>
+        <td>
+            <textarea name="<?php echo $key ?>" class="tulo_permission_required"><?php echo $value ?></textarea>
         </td>
     </tr>
 <?php
@@ -194,6 +227,7 @@ function tulo_server_render_whitelist_ips() {
       <?php
       tulo_server_render_text_option_setting(__('API Client id', 'tulo'), 'tulo_server_client_id');
       tulo_server_render_text_option_setting(__('API Secret', 'tulo'), 'tulo_server_secret');
+      tulo_server_render_text(__('Redirect url', 'tulo'), 'tulo_redirect_uri');
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
       tulo_server_render_text_option_setting(__('Account origin', 'tulo'), 'tulo_account_origin');
       $posttypes = Tulo_Payway_Server_Admin::get_post_types();
@@ -210,20 +244,13 @@ function tulo_server_render_whitelist_ips() {
       }
 
       tulo_server_render_env_setting();
-      tulo_server_render_required_setting();
+      tulo_server_render_required_setting_not_loggedin();
+      tulo_server_render_required_setting_loggedin();
       tulo_server_render_whitelist_ips();
       ?>
 
   </table>
   <hr/>
-  <h2><?php echo __('Backwards compability settings', 'tulo'); ?></h2>
-  <table class="form-table">
-      <?php
-      tulo_server_render_text_option_setting(__('Client id', 'tulo'), 'tulo_client_id');
-      tulo_server_render_text_option_setting(__('Secret', 'tulo'), 'tulo_secret');
-      tulo_server_render_text_option_setting(__('Redirect url', 'tulo'), 'tulo_redirect_uri');
-      ?>
-    </table>
   <?php tulo_server_render_product_list(); ?>
 
   <?php submit_button( __( 'Save Changes' ), 'primary', 'Update' ); ?>

@@ -29,6 +29,7 @@ class Tulo_Payway_Server_Public {
     private $version;
 
     private $common;
+    private $sso;
     /**
      * Initialize the class and set its properties.
      * @param      string    $plugin_name       The name of the plugin.
@@ -38,6 +39,7 @@ class Tulo_Payway_Server_Public {
 
         $this->version = $version;
         $this->common = new Tulo_Payway_Server_Common();
+        $this->sso = new Tulo_Payway_API_SSO2();
     }
 
     public static function get_product_shop_url($product)
@@ -82,23 +84,23 @@ class Tulo_Payway_Server_Public {
             return;
 
         if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            $this->common->write_log("In check session");
-            $sso = new Tulo_Payway_API_SSO2();
-            if ($sso->session_established()) {
-                $this->common->write_log("Basic SSO2 session established: ".$sso->sso_session_id());
-                if ($sso->session_needs_refresh()) {
-                    $sso->refresh_session();
+            $this->common->write_log("In check session");            
+            if ($this->sso->session_established()) {
+                $this->common->write_log("Basic SSO2 session established: ".$this->sso->sso_session_id());
+                if ($this->sso->session_needs_refresh()) {
+                    $this->sso->refresh_session();
                 }
-                $status = $sso->get_session_status();
+                $status = $this->sso->get_session_status();
                 if ($status == "loggedin") {                    
-                    $this->common->write_log("Logged in as: ".$sso->get_user_name()." (".$sso->get_user_email().")");
+                    $this->common->write_log("Logged in as: ".$this->sso->get_user_name()." (".$this->sso->get_user_email().")");
+                    $this->common->write_log($this->sso->get_user_active_products());
                 } else if ($status == "anon") {
                     $this->common->write_log("Not logged in, user needs to login if accessing restricted content");                    
                 }
                 
             } else {
                 $this->common->write_log("BEGIN Identify");
-                $sso->identify_session();
+                $this->sso->identify_session();
             }    
         }
     }
@@ -144,14 +146,12 @@ class Tulo_Payway_Server_Public {
             return true;
         }
 
-        $sso = new Tulo_Payway_API_SSO2();
-
         // Early return if the user has no products
-        if(!$sso->user_has_subscription()) {
+        if(!$this->sso->user_has_subscription()) {
             return false;
         }
 
-        $user_products = $sso->get_user_active_products();
+        $user_products = $this->sso->get_user_active_products();
 
         foreach($restrictions as $restriction)
         {
@@ -207,7 +207,13 @@ class Tulo_Payway_Server_Public {
 
 
         $output .= '        <div class="info-box permission_required">';
-        $output .= do_shortcode('[tulo_permission_required]');
+        if ($this->sso->is_logged_in()) {
+            $output .= do_shortcode('[tulo_permission_required_loggedin]');
+        } else {
+            $output .= do_shortcode('[tulo_permission_required_not_loggedin]');
+        }
+        
+        
         $output .= '        </div>';
         $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
 
@@ -242,14 +248,28 @@ class Tulo_Payway_Server_Public {
         return null;
     }
 
-    public function debug_output()
+    public function shortcode_permission_required_loggedin()
     {
-        require_once('partials/debug-tools.php');
+        return get_option('tulo_permission_required_loggedin');
     }
-    public function shortcode_permission_required()
+
+    public function shortcode_permission_required_not_loggedin()
     {
-        return get_option('tulo_permission_required');
+        return get_option('tulo_permission_required_not_logged_in');
     }
+
+    public function shortcode_loggedin_user_name()
+    {
+        return $this->sso->get_user_name();
+    }
+
+    public function shortcode_loggedin_user_email()
+    {
+        return $this->sso->get_user_email();
+    }
+
+    
+
     public function shortcode_buy_button($atts)
     {
         $retval = '<button class="js-tuloBuy '.$atts['class'].'" data-product="'.$atts['product'].'">';
@@ -257,6 +277,7 @@ class Tulo_Payway_Server_Public {
         $retval .= '</button>';
         return $retval;
     }
+
     public function shortcode_product_link($atts, $content = null)
     {
         $output = '<a href="'.Tulo_Payway_Server_Public::get_product_shop_url($atts['product']).'" class="'.$atts['class'].'">';
@@ -280,9 +301,8 @@ class Tulo_Payway_Server_Public {
         $password = filter_input(INPUT_POST, 'password');
         $persist = filter_input(INPUT_POST, 'persist', FILTER_VALIDATE_BOOLEAN);
 
-        if (isset($username) && isset($password) && isset($persist)) {
-            $sso = new Tulo_Payway_API_SSO2();
-            $response = $sso->authenticate_user($username, $password);
+        if (isset($username) && isset($password) && isset($persist)) {            
+            $response = $this->sso->authenticate_user($username, $password);
 
             echo json_encode($response);
         } else {

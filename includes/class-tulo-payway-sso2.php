@@ -58,6 +58,15 @@ class Tulo_Payway_API_SSO2 {
         return false;
     }
 
+    public function is_logged_in() {
+        if ($this->session_established()) {
+            if ($this->get_user_name()!="" || $this->get_user_email() != "") {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function get_session_status() {
         return $_SESSION[$this->sso_session_status_key];
     }
@@ -75,7 +84,9 @@ class Tulo_Payway_API_SSO2 {
     }
 
     public function get_user_active_products() {
-        return $_SESSION[$this->sso_session_user_active_products_key]; 
+        if (isset($_SESSION[$this->sso_session_user_active_products_key]))
+            return $_SESSION[$this->sso_session_user_active_products_key]; 
+        return null;
     }
 
     public function session_established() {
