@@ -317,9 +317,7 @@ class Tulo_Payway_Server_Public {
 
     public function ajax_logout()
     {
-        $tulo_payway = new Tulo_Payway_Server();
-        $response = $tulo_payway->logout();
-
+        $response = $this->sso->logout_user();
         echo json_encode($response);
 
         wp_die();

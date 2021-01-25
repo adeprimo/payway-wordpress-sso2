@@ -237,14 +237,18 @@ class Tulo_Payway_API_SSO2 {
 
     }
     
-    private function logout_user() {
-        
+    public function logout_user() {
+
+        // Terminate session in Payway also.
         $this->set_user_active_products(array());
         $this->set_user_email(null);
         $this->set_user_name(null);
         $_SESSION[$this->sso_session_established_key] = null;
         $_SESSION[$this->sso_session_id_key] = null;
         $_SESSION[$this->sso_session_status_key] = null;
+        setcookie('tpw_id', null, -1, '/');
+        
+        return true;
     }
 
     private function set_user_name($name) {
@@ -261,6 +265,8 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_session_established() {
         $_SESSION[$this->sso_session_established_key] = time();
+        $unique_id = base64_encode($this->sso_session_id() . (string)microtime());
+        setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
     }
 
     private static function get_sso2_url($path) {       
