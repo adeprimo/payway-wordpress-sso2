@@ -39,24 +39,9 @@ class Tulo_Payway_API {
     public function get_user_details($token) {
 
         $url = $this->get_api_url("/external/api/v1/me");
-
-        $ch = curl_init();
-
-        curl_setopt_array($ch, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_HTTPHEADER => array(
-                'Accept: application/json',
-                'Authorization: Bearer ' . $token
-            )
-        ));
-
-        $response = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($httpcode == 200) {
-            $data = json_decode($response);
+        $response = $this->common->get_json_with_bearer($url, $token);
+        if ($response["status"] == 200) {
+            $data = json_decode($response["data"]);
             return $data->item;
         }        
         return null;
@@ -65,23 +50,10 @@ class Tulo_Payway_API {
     public function get_user_active_products($token) {
         $url = $this->get_api_url("/external/api/v1/me/active_products");
 
-        $ch = curl_init();
+        $response = $this->common->get_json_with_bearer($url, $token);
 
-        curl_setopt_array($ch, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_HTTPHEADER => array(
-                'Accept: application/json',
-                'Authorization: Bearer ' . $token
-            )
-        ));
-
-        $response = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($httpcode == 200) {
-            $data = json_decode($response);
+        if ($response["status"] == 200) {
+            $data = json_decode($response["data"]);
             return $data->item->active_products;
         }        
         return array();

@@ -17,7 +17,6 @@
                         var rememberCheckbox= loginForm.querySelector('input[type="checkbox"]');
                         var username        = loginForm.querySelector('input[type="text"]').value,
                             password        = loginForm.querySelector('input[type="password"]').value,
-                            rememberMe      = rememberCheckbox ? rememberCheckbox.value : true,
                             submitButton    = loginForm.querySelector('input[type=submit]');
 
                         if (!username.length || !password.length) {
@@ -33,17 +32,19 @@
                         xhr.onload = function() {
                             if (xhr.status === 200) {
                                 var parsedResponse = JSON.parse(xhr.response);
-                                if (parsedResponse.status == 200 && !parsedResponse.error) {
+                                if (parsedResponse.status == 200 && parsedResponse.success) {
                                     // If there are no errors, reload the window to fetch the latest information
                                     if (window.localStorage) {
-                                        localStorage.setItem('tulo_products', parsedResponse.data.products);
+                                        localStorage.setItem('tulo_products', parsedResponse.products);
                                     }
                                     window.location.reload();
 
                                 } else {
-                                    // Special case if account has been frozen
-                                    if (parsedResponse.data && parsedResponse.data.item && parsedResponse.data.item.account_frozen) {
-                                        var date = new Date(parsedResponse.data.item.frozen_until);
+                                    if (parsedResponse.error_code == "invalid_credentials") {
+                                        var message = parsedResponse.error.replace("$remaining_attempts", parsedResponse.remaining_attempts);
+                                        generateErrorMessage(loginForm, message);
+                                    } else if (parsedResponse.error_code == "account_frozen") {
+                                        var date = new Date(parsedResponse.frozen_until);
                                         generateErrorMessage(loginForm, parsedResponse.error + ' ' + date.toLocaleString('SV-se'));
                                     } else {
                                         generateErrorMessage(loginForm, parsedResponse.error);

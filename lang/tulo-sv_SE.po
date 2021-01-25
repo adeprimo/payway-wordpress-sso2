@@ -108,7 +108,7 @@ msgstr "Spara ändringar"
 
 #: includes/class-tulo-payway.php:687
 msgid "Wrong username or password"
-msgstr "Fel användarnamn eller lösenord"
+msgstr "Fel användarnamn eller lösenord. ($remaining_attempts försök kvar)"
 
 #: includes/class-tulo-payway.php:689
 msgid "Something went wrong"

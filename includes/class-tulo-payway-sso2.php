@@ -116,7 +116,7 @@ class Tulo_Payway_API_SSO2 {
         $url = sprintf("%s?t=%s&r=%s", $url, $token, $continueUrl);
         header("Location: ".$url);
         die();
-   }
+    }
 
     public function refresh_session() {
         $this->common->write_log("!! Refreshing session");
@@ -129,39 +129,24 @@ class Tulo_Payway_API_SSO2 {
 
         $time = time();
         $payload = array(
-             "cid" => $client_id,
-             "sid" => $this->sso_session_id(),
-             "ipa" => $ip_address,
-             "uas" => $user_agent,
-             "lks" => $this->get_session_status(),
-             "iss" => $organisation_id,
-             "aud" => "pw-sso",
-             "nbf" => $time,
-             "exp" => $time + 10,
-             "iat" => $time
+            "cid" => $client_id,
+            "iss" => $organisation_id,
+            "sid" => $this->sso_session_id(),
+            "ipa" => $ip_address,
+            "uas" => $user_agent,
+            "lks" => $this->get_session_status(),
+            "aud" => "pw-sso",
+            "nbf" => $time,
+            "exp" => $time + 10,
+            "iat" => $time
         );
-
-        $this->write_log("Session refresh payload:");
-        $this->write_log($payload);
+                
         $token = JWT::encode($payload, $client_secret);
         $payload = json_encode(array("t" => $token));
-        
-        $ch = curl_init();
-        curl_setopt_array($ch, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_POST => 1,
-            CURLOPT_HTTPHEADER => array(
-                "Content-Type: application/json"
-            )
-        ));
-        $this->common->write_log("Session status url: ".$url);
-        $this->common->write_log("Payload: ".$payload);
-        $output = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if ($httpcode == 200) {
-            $data = json_decode($output);
+
+        $response = $this->common->post_json_jwt($url, $payload);
+        if ($response["status"] == 200) {
+            $data = json_decode($response["data"]);
             $decoded = JWT::decode($data->t, $client_secret, array("HS256"));
             if ($decoded->sts == "terminated") {
                 $this->common->write_log("session terminated in other window, logging out user");
@@ -196,56 +181,51 @@ class Tulo_Payway_API_SSO2 {
              "iat" => $time
         );
 
-        $this->write_log("Authenticate payload:");
-        $this->write_log($payload);
         $token = JWT::encode($payload, $client_secret);
         $payload = json_encode(array("t" => $token));
-        
-        $ch = curl_init();
-        curl_setopt_array($ch, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_POST => 1,
-            CURLOPT_HTTPHEADER => array(
-                "Content-Type: application/json"
-            )
-        ));
-        $this->common->write_log("Authenticate url: ".$url);
-        $this->common->write_log("Payload: ".$payload);
-        $output = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        $response = $this->common->post_json_jwt($url, $payload);
         $status = array();
-        if ($httpcode == 200) {
-            $data = json_decode($output);
+        if ($response["status"] == 200) {
+            $data = json_decode($response["data"]);
             $decoded = JWT::decode($data->t, $client_secret, array("HS256"));
             $status["success"] = $decoded->sts=="loggedin" ? "true" : "false";
             if ($decoded->sts == "loggedin") {
                 $this->common->write_log("User successfully authenticated!");
                 $this->register_basic_session($decoded);
+                $status["name"] = $this->get_user_name();
+                $status["email"] = $this->get_user_email();
+                $status["products"] = $this->get_user_active_products();
             } else {
                 $status["error_code"] = $decoded->err;
                 if ($decoded->err == "account_frozen") {
-                    $status["frozen_until"] = time() + $decoded->frf;
+                    $status["error"] = __('Account locked until', 'tulo');
+                    $frozenTo = new DateTime();
+                    $this->common->write_log("Frozen for: ".$decoded->frf);
+                    $frozenTo->setTimestamp(time() + $decoded->frf);
+                    $status["frozen_until"] = $frozenTo->format('c');
                 }
                 if ($decoded->err == "invalid_credentials") {
+                    $status["error"] = __('Wrong username or password', 'tulo');
                     $status["remaining_attempts"] = $decoded->raa;
+                } 
+                if ($decoded->err == "account_not_active") {
+                    $status["error"] = __('Wrong username or password', 'tulo');
+                    $status["remaining_attempts"] = 5;
                 }
             }
         }
         else {
-            $error = curl_error($ch);
-            $this->common->write_log("!! Error authenticating: ".$httpcode." => ".$error);
+            $this->common->write_log("!! Error authenticating: ".$response["status"]." => ".$response["data"]);
             $status["success"] = "false";
             $status["error_code"] = "unknown_error";
         }
         $this->common->write_log("Response authentication:");
         $this->common->write_log($status);
-        curl_close($ch);
         return $status;
 
     }
-
+    
     private function logout_user() {
         
         $this->set_user_active_products(array());
