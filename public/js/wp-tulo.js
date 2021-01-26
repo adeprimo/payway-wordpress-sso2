@@ -42,8 +42,7 @@
 
                                 } else {
                                     if (parsedResponse.error_code == "invalid_credentials") {
-                                        var message = parsedResponse.error.replace("$remaining_attempts", parsedResponse.remaining_attempts);
-                                        generateErrorMessage(loginForm, message);
+                                        generateErrorMessage(loginForm, parsedResponse.error);
                                     } else if (parsedResponse.error_code == "account_frozen") {
                                         var date = new Date(parsedResponse.frozen_until);
                                         generateErrorMessage(loginForm, parsedResponse.error + ' ' + date.toLocaleString('SV-se'));
