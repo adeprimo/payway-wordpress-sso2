@@ -20,7 +20,6 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option("tulo_server_client_id", $_POST["tulo_server_client_id"]);
     update_option("tulo_server_secret", $_POST["tulo_server_secret"]);
     update_option("tulo_organisation_id", $_POST["tulo_organisation_id"]);
-    update_option("tulo_account_origin", $_POST["tulo_account_origin"]);
     update_option("tulo_environment", $_POST["tulo_environment"]);
     update_option('tulo_whitelist_ip', $_POST["tulo_whitelist_ip"]);
     foreach(Tulo_Payway_Server_Admin::get_post_types() as $posttype)
@@ -229,7 +228,6 @@ function tulo_server_render_whitelist_ips() {
       tulo_server_render_text_option_setting(__('API Secret', 'tulo'), 'tulo_server_secret');
       tulo_server_render_text(__('Redirect url', 'tulo'), 'tulo_redirect_uri');
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
-      tulo_server_render_text_option_setting(__('Account origin', 'tulo'), 'tulo_account_origin');
       $posttypes = Tulo_Payway_Server_Admin::get_post_types();
 
       foreach($posttypes as $post_type)

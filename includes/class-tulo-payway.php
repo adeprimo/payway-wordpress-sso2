@@ -26,7 +26,6 @@ use \Firebase\JWT\JWT;
  * @since      1.0.0
  * @package    Tulo_Payway_Server
  * @subpackage Tulo_Payway_Server/includes
- * @author     Your Name <email@example.com>
  */
 class Tulo_Payway_Server {
 

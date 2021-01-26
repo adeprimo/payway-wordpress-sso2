@@ -3,6 +3,7 @@
 class Tulo_Payway_API {
     
     private $common;
+    private $scopes;
     /**
      * Initialize the class and set its properties.
      * @param      string    $plugin_name       The name of the plugin.
@@ -10,6 +11,7 @@ class Tulo_Payway_API {
      */
     public function __construct( ) {
         $this->common = new Tulo_Payway_Server_Common();
+        $this->scopes = "/external/me/w";
     }  
 
 
@@ -63,10 +65,8 @@ class Tulo_Payway_API {
         $url = $this->get_api_url("/api/authorization/access_token");
         $client_id = get_option('tulo_server_client_id');
         $client_secret = get_option('tulo_server_secret');
-        $organisation_id = get_option('tulo_organisation_id');
-        $scopes = "/external/me/w /external/account/r /external/account/w";
-
-        $fields = "client_id=".$client_id."&client_secret=".$client_secret."&grant_type=ticket&scope=".$scopes."&ticket=".$ticket;
+        
+        $fields = "client_id=".$client_id."&client_secret=".$client_secret."&grant_type=ticket&scope=".$this->scopes."&ticket=".$ticket;
         $ch = curl_init();
         curl_setopt_array($ch, array(
             CURLOPT_URL => $url,
