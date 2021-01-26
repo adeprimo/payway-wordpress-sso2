@@ -136,9 +136,13 @@ class Tulo_Payway_Server {
            */
           require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tulo-payway-api.php';
           /**
-           * SSO2 library
+           * SSO2 API library
            */
-          require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tulo-payway-sso2.php';
+          require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tulo-payway-sso2-api.php';
+          /**
+           * SSO2 session public functions
+           */
+          require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tulo-payway-sso2-session.php';
 
           $this->loader = new Tulo_Payway_Server_Loader();
 
@@ -266,19 +270,6 @@ class Tulo_Payway_Server {
      public function get_version() {
           return $this->version;
      }
-/*
-     public function has_access($post_id = null)
-     {
-          $plugin_public = new Tulo_Payway_Server_Public( $this->get_version() );
-          return $plugin_public->has_access($post_id);
-     }
-
-     public function user_has_subscription() {
-          $user_active_products = $this->get_user_active_products();
-
-          return !empty($user_active_products['data']->item->active_products);
-     }
-*/
 }
 
 function Tulo_Server() {

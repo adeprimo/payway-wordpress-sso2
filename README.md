@@ -19,12 +19,17 @@ After activating the plugin you will find the plugin configuration under `Settin
 
 ### Create API user
 
-First of all you will need to create an API user in Tulo Payway. Go to Payway administration, security and API users.
+First of all you will need to create an API user in Tulo Payway. Go to Payway administration, security and API users. Press "New".
 
-* Add new API user
-* The user will need the following scopes: `/external/me/w`
-* The redirect URL needs to point at the `landing.php` page in the plugin, look at the configuration page to get the path to the landing page and enter it here.
-* Save
+* Name, enter name for API user, can be anything but should represent what kind of user this is.
+* Redirect URI, needs to point at the `landing.php` page in the plugin, look at the configuration page to get the link.
+* Offline access, not needed
+* SSO2 Client, **check this, important!!**
+* Scopes, the user will need the following scopes: `/external/me/w`
+* Origin urls, add urls that should be able to call use this API user, leave empty when developing.
+* Save user.
+
+When the API user has been created, you can see two new properties: `Client ID` and `Secret`. Copy these to the next step in configuration.
 
 ### Configuration details
 
@@ -45,7 +50,7 @@ To get started, enter the following piece of code to be shown when the user is n
 ```html
 <p>This content is restricted for subscribers only. You are not logged in. Please login.</p>
 
-<form class="js-tuloLogin is-hidden" action="/" method="POST"> <label for="email"> Email <input id="email" type="text"> </label> <label for="password"> Password <input id="password" type="password"> </label> <label for="remember"> Remember me: <input id="remember" type="checkbox"> </label> <input type="submit" value="Login"/> </form>
+<form class="js-tuloLogin is-hidden" action="/" method="POST"> <label for="email"> Email <input id="email" type="text"> </label> <label for="password"> Password <input id="password" type="password"> </label> <input type="submit" value="Login"/> </form>
 ```
 
 #### Logged in but do not have access
@@ -86,9 +91,32 @@ You will also need to add a logout button somewhere on the site, for example lik
 
 The javascript will find the logout button and manage it's visibility depending on whether the user is logged in or not. If the user clicks the logout button a logout-request will be sent to Tulo Payway SSO2 terminating the session. This will also terminate all other sessions the user may have in SSO2, effectively logging out the user on all sites.
 
-## User information
+## API
 
-If a user is authenticated with Tulo Payway SSO2 and logged into Wordpress session, you can access user information in a number of ways.
+### User information
+
+If a user is authenticated with Tulo Payway SSO2 and logged into Wordpress session, you can access user information in a number of ways. The publicly available PHP functions that might be useful are located in `Tulo_Payway_Session` and can be used like this:
+
+```php
+ $session = new Tulo_Payway_Session();
+ $session->is_logged_in();
+ $session->get_user_name();
+ $session->get_user_email();
+ $session->get_user_active_products();
+ $session->user_has_subscription();
+```
+If user is logged in, the list of active products is also available in `localStorage` with property name `tulo_products`.
+
+
+## FAQ
+
+### Where is "Remember me"?
+
+Functionality where the user can mark a checkbox upon login to "remember" the session upon closing the browser is not supported in Tulo Payway SSO2 and not implemented in this plugin. 
+
+* If a user logs in to Tulo Payway a session is established and the user is automatically logged in to any other websites (which supports SSO2) the user visits in the same browser.
+* If the user closes the browser and then re-open the browser again to go back to any of the sites connected to Tulo Payway SSO2 it gets automatically a session in SSO2 and user-data is fetched.
+* If the user in the same browser logs out on any of the websites connected to Tulo Payway SSO2 it will also be logged out from all websites.
 
 ## Troubleshooting
 

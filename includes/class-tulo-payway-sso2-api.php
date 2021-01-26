@@ -2,12 +2,19 @@
 
 use \Firebase\JWT\JWT;
 
+/**
+ * The Tulo Payway SSO2 API
+ * 
+ * TODO:
+ *  - Add production url
+ * 
+ */
 class Tulo_Payway_API_SSO2 {
 
     private $common;
     private $api;
 
-    private $sso_check_session_timeout = 30;
+    private $sso_check_session_timeout = 60*6;
     private $sso_session_id_key = "sso2_session_id";
     private $sso_session_status_key = "sso2_session_status";
     private $sso_session_established_key = "sso2_session_established";
@@ -23,34 +30,23 @@ class Tulo_Payway_API_SSO2 {
         $this->api = new Tulo_Payway_API();
     }  
 
-    public function write_log($msg) {
-        $this->common->write_log($msg);
-    }
-
     /**
      * Called from the landing page, checks session status and sets user in session if logged in
      */
-    public function register_basic_session($sso_payload) {
+    protected function register_basic_session($sso_payload) {
         $this->common->write_log("Registering SSO session");
         if (isset($sso_payload)) {
             $_SESSION[$this->sso_session_id_key] = $sso_payload->sid;
             $_SESSION[$this->sso_session_status_key] = $sso_payload->sts;
-
+            $_SESSION[$this->sso_session_established_key] = time();
+            
             if ($sso_payload->sts == "loggedin" && $sso_payload->at != "") {
-                $data = $this->api->get_user_and_products_by_ticket($sso_payload->at);
-                if ($data != null) {
-                    $this->set_user_name($data["user"]->first_name." ".$data["user"]->last_name);
-                    $this->set_user_email($data["user"]->email);
-                    $this->set_user_active_products($data["active_products"]);
-                    $this->set_session_loggedin();
-                } else {
-                    $this->common->write_log("!! Could not get user and product info from Payway!");
-                }
+                $this->fetch_user_and_login($sso_payload->at);
             }
         }
     }
-
-    public function session_needs_refresh() {
+    
+    protected function session_needs_refresh() {
         $established = $_SESSION[$this->sso_session_established_key];
         $diff = (time()-$established);
         if ($diff > $this->sso_check_session_timeout)
@@ -58,7 +54,7 @@ class Tulo_Payway_API_SSO2 {
         return false;
     }
 
-    public function is_logged_in() {
+    protected function is_session_logged_in() {
         if ($this->session_established()) {
             if ($this->get_user_name() !="" || $this->get_user_email() != "") {
                 return true;
@@ -67,40 +63,33 @@ class Tulo_Payway_API_SSO2 {
         return false;
     }
 
-    public function get_session_status() {
+    protected function get_session_status() {
         return $_SESSION[$this->sso_session_status_key];
     }
-    public function get_user_name() {
-        return $_SESSION[$this->sso_session_user_name_key];
+
+    protected function get_session_user_name() {
+        if (isset($_SESSION[$this->sso_session_user_name_key]))
+            return $_SESSION[$this->sso_session_user_name_key];
     }
 
-    public function get_user_email() {
-        return $_SESSION[$this->sso_session_user_email_key];
+    protected function get_session_user_email() {
+        if (isset($_SESSION[$this->sso_session_user_email_key]))
+            return $_SESSION[$this->sso_session_user_email_key];
     }
 
-    public function user_has_subscription() {
-        $products = $this->get_user_active_products();
-        return !empty($products);
-    }
-
-    public function get_user_active_products() {
+    protected function get_session_user_active_products() {
         if (isset($_SESSION[$this->sso_session_user_active_products_key]))
             return $_SESSION[$this->sso_session_user_active_products_key]; 
         return null;
     }
 
-    public function session_established() {
+    protected function session_established() {
         if (isset($_SESSION[$this->sso_session_id_key]) && $_SESSION[$this->sso_session_id_key] != "")
             return true;
         return false;
-    }
-    
-    public function sso_session_id() {
-        return $_SESSION[$this->sso_session_id_key];
-    }
-    
+    }        
 
-    public function identify_session() {
+    protected function identify_session() {
         $url = $this->get_sso2_url("identify");
         $client_id = get_option('tulo_server_client_id');
         $client_secret = get_option('tulo_server_secret');
@@ -116,20 +105,20 @@ class Tulo_Payway_API_SSO2 {
              "iat" => $time
         );
 
-        $this->write_log("Identify payload:");
-        $this->write_log($payload);
+        $this->common->write_log("Identify payload:");
+        $this->common->write_log($payload);
 
         $token = JWT::encode($payload, $client_secret);
         $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
         $continueUrl = sprintf("%s://%s%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
-        $this->write_log(("Redirect url: ".$continueUrl));
+        $this->common->write_log(("Redirect url: ".$continueUrl));
 
         $url = sprintf("%s?t=%s&r=%s", $url, $token, $continueUrl);
         header("Location: ".$url);
         die();
     }
 
-    public function refresh_session() {
+    protected function refresh_session() {
         $this->common->write_log("!! Refreshing session");
         $url = $this->get_sso2_url("sessionstatus");
         $client_id = get_option('tulo_server_client_id');
@@ -137,6 +126,7 @@ class Tulo_Payway_API_SSO2 {
         $organisation_id = get_option('tulo_organisation_id');
         $ip_address = $_SERVER ['REMOTE_ADDR'];
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        $lks = $this->get_session_status();
 
         $time = time();
         $payload = array(
@@ -145,13 +135,16 @@ class Tulo_Payway_API_SSO2 {
             "sid" => $this->sso_session_id(),
             "ipa" => $ip_address,
             "uas" => $user_agent,
-            "lks" => $this->get_session_status(),
+            "lks" => $lks,
             "aud" => "pw-sso",
             "nbf" => $time,
             "exp" => $time + 10,
             "iat" => $time
         );
                 
+        $this->common->write_log("Payload:");
+        $this->common->write_log($payload);
+
         $token = JWT::encode($payload, $client_secret);
         $payload = json_encode(array("t" => $token));
 
@@ -159,16 +152,28 @@ class Tulo_Payway_API_SSO2 {
         if ($response["status"] == 200) {
             $data = json_decode($response["data"]);
             $decoded = JWT::decode($data->t, $client_secret, array("HS256"));
+            $this->common->write_log("Session status: ".$decoded->sts. " at: ".$decoded->at);
+            $this->common->write_log($decoded);
+
             if ($decoded->sts == "terminated") {
                 $this->common->write_log("session terminated in other window, logging out user");
                 $this->logout_user(false);
             } else if ($decoded->sts == "loggedin") {
-                $this->set_session_loggedin();
+                if ($lks == "anon" || $lks == "terminated") {
+                    if ($decoded->at != "") {
+                        $this->fetch_user_and_login($decoded->at);
+                    } else {
+                        // No "at" available at this time, let's do another "identify" session call
+                        $this->identify_session();
+                    }                    
+                } else if ($lks == "loggedin" && !$this->is_logged_in()) {
+                    $this->identify_session();
+                }
             }
         }
     }
 
-    public function authenticate_user($email, $password) {
+    protected function authenticate_user($email, $password) {
         $this->common->write_log("!! Authenticating user: ".$email);
         $url = $this->get_sso2_url("authenticate");
         $client_id = get_option('tulo_server_client_id');
@@ -240,9 +245,8 @@ class Tulo_Payway_API_SSO2 {
         return $status;
 
     }
-
     
-    public function logout_user($locallyInitiated=true) {
+    protected function logout_user($locallyInitiated=true) {
 
         if ($locallyInitiated) {
             // Terminate session in Payway
@@ -257,6 +261,12 @@ class Tulo_Payway_API_SSO2 {
         $_SESSION[$this->sso_session_status_key] = null;
         setcookie('tpw_id', null, -1, '/');
         return true;
+    }
+
+    /** Private functions */
+
+    private function sso_session_id() {
+        return $_SESSION[$this->sso_session_id_key];
     }
 
     private function sso_logout() {
@@ -288,6 +298,18 @@ class Tulo_Payway_API_SSO2 {
             $this->common->write_log("Logout successful");
         } else {
             $this->common->write_log("Logout failed. (".$response["status"].") '".$response["error"]."'");
+        }
+    }
+
+    private function fetch_user_and_login($auth_ticket) {
+        $data = $this->api->get_user_and_products_by_ticket($auth_ticket);
+        if ($data != null) {
+            $this->set_user_name($data["user"]->first_name." ".$data["user"]->last_name);
+            $this->set_user_email($data["user"]->email);
+            $this->set_user_active_products($data["active_products"]);
+            $this->set_session_loggedin();
+        } else {
+            $this->common->write_log("!! Could not get user and product info from Payway!");
         }
     }
 

@@ -67,7 +67,7 @@ function tulo_server_render_text($label, $name)
         </th>
         <td>
             <p class="regular-text ">
-            <?php echo plugin_dir_url(__DIR__)."/landing.php (should be registered in Payway)"?>
+            <?php echo plugin_dir_url(__DIR__)."landing.php (shall be registered on API user in Payway)"?>
             </p>
         </td>
     </tr>

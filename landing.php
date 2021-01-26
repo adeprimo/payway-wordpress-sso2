@@ -5,7 +5,7 @@ function write_log($log) {
         if (is_array($log) || is_object($log)) {
             error_log(print_r($log, true));
         } else {
-            error_log($log);
+            error_log("[SSO2] ".$log);
         }
     }
 }
@@ -18,22 +18,22 @@ use \Firebase\JWT\JWT;
 $token = $_GET["t"];
 $redirectUrl = $_GET["r"];
 $clientSecret = get_option('tulo_server_secret');
-$pw = new Tulo_Payway_API_SSO2();
+$session = new Tulo_Payway_Session();
 
 try
 {
     $payload = JWT::decode($token, $clientSecret, array('HS256'));
-    $pw->write_log("Identify session payload response");
-    $pw->write_log($payload);
     if (isset($payload)) {        
-        $pw->register_basic_session($payload);
+        $session->register($payload);
     }
-    $pw->write_log("RedirectURL: ".$redirectUrl);    
     header("Location: ".$redirectUrl);    
 } catch(Firebase\JWT\ExpiredException $e) {
-    $pw->write_log("Got error!");
-    $pw->write_log($e);
-    echo "<h2>!! ERROR establishing session with Payway!</h2>";
+    // we land here if the JWT token can not be decoded properly, in this case some claims have expired.
+    write_log("Got error decoding JWT from Payway!");
+    write_log($e);
+
+    // restart the identification flow by going back to where we came from    
+    header("Location: ".$redirectUrl);    
 }
 
 die();

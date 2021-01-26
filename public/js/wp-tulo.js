@@ -17,7 +17,6 @@
                         var rememberCheckbox= loginForm.querySelector('input[type="checkbox"]');
                         var username        = loginForm.querySelector('input[type="text"]').value,
                             password        = loginForm.querySelector('input[type="password"]').value,
-                            rememberMe      = rememberCheckbox ? rememberCheckbox.value : true,
                             submitButton    = loginForm.querySelector('input[type=submit]');
 
                         if (!username.length || !password.length) {
@@ -58,7 +57,7 @@
                                 submitButton.disabled = false;
                             }
                         };
-                        xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&persist=' + rememberMe);
+                        xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password));
                     }
                 }
             });
