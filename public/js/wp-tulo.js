@@ -17,6 +17,7 @@
                         var rememberCheckbox= loginForm.querySelector('input[type="checkbox"]');
                         var username        = loginForm.querySelector('input[type="text"]').value,
                             password        = loginForm.querySelector('input[type="password"]').value,
+                            rememberMe      = rememberCheckbox ? rememberCheckbox.value : true,
                             submitButton    = loginForm.querySelector('input[type=submit]');
 
                         if (!username.length || !password.length) {
@@ -32,7 +33,7 @@
                         xhr.onload = function() {
                             if (xhr.status === 200) {
                                 var parsedResponse = JSON.parse(xhr.response);
-                                if (parsedResponse.status == 200 && parsedResponse.success) {
+                                if (parsedResponse.success) {
                                     // If there are no errors, reload the window to fetch the latest information
                                     if (window.localStorage) {
                                         localStorage.setItem('tulo_products', parsedResponse.products);

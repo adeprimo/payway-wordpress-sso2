@@ -255,7 +255,7 @@ class Tulo_Payway_Server_Public {
 
     public function shortcode_permission_required_not_loggedin()
     {
-        return get_option('tulo_permission_required_not_logged_in');
+        return get_option('tulo_permission_required_not_loggedin');
     }
 
     public function shortcode_loggedin_user_name()
