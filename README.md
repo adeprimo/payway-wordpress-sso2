@@ -15,11 +15,11 @@ This plugin integrates with the [SSO2 single sign on solution](https://docs.worl
 
 ## Configuration
 
-After activating the plugin you will find the plugin configuration under `Settings/Tulo Payway SSO2`.
+After activating the plugin you will find the plugin configuration in WP-admin under `Settings/Tulo Payway SSO2`.
 
 ### Create API user
 
-First of all you will need to create an API user in Tulo Payway. Go to Payway administration, security and API users. Press "New".
+First of all you will need to create an API user in [Tulo Payway Admin](https://docs.worldoftulo.com/payway/). Go to Payway administration, security and API users. Press "New".
 
 * Name, enter name for API user, can be anything but should represent what kind of user this is.
 * Redirect URI, needs to point at the `landing.php` page in the plugin, look at the configuration page to get the link.
