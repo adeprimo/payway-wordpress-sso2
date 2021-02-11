@@ -81,23 +81,30 @@ class Tulo_Payway_Server_Public {
             return;
 
         if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            $this->common->write_log("In check session");            
+            $this->common->write_log("[check_session]");            
             if ($this->session->established()) {
-                $this->common->write_log("Basic SSO2 session is established.");
-                $restrictions = Tulo_Payway_Server_Public::get_post_restrictions($post->ID);
-                if ( $this->session->needs_refresh() || (!empty($restrictions) && !$this->session->is_logged_in()) ) {
+                $this->common->write_log("basic SSO2 session is established.");                
+                if ($this->session->needs_refresh()) {
+                    $this->common->write_log("session expired, needs refresh");
                     $this->session->refresh();
+                } else { 
+                    $restrictions = Tulo_Payway_Server_Public::get_post_restrictions($post->ID);
+                    if (!empty($restrictions) && !$this->session->is_logged_in()) {
+                        $this->common->write_log("session not expired but page is restricted and user is not logged in, needs refresh");
+                        $this->common->write_log($restrictions);
+                        $this->session->refresh();
+                    }
                 }
+
                 $status = $this->session->get_status();
                 if ($status == "loggedin" && $this->session->is_logged_in()) {                    
-                    $this->common->write_log("Logged in as: ".$this->session->get_user_name()." (".$this->session->get_user_email().")");
+                    $this->common->write_log("logged in as: ".$this->session->get_user_name()." (".$this->session->get_user_email().")");
                     $this->common->write_log($this->session->get_user_active_products());
                 } else if ($status == "anon") {
-                    $this->common->write_log("Not logged in, user needs to login if accessing restricted content");                    
+                    $this->common->write_log("not logged in, user needs to login if accessing restricted content");                    
                 }
                 
             } else {
-                $this->common->write_log("BEGIN Identify");
                 $this->session->identify();
             }    
         }

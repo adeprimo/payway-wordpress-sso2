@@ -36,6 +36,8 @@
                                     // If there are no errors, reload the window to fetch the latest information
                                     if (window.localStorage) {
                                         localStorage.setItem('tulo_products', parsedResponse.products);
+                                        localStorage.setItem('tulo_account_name', parsedResponse.name);
+                                        localStorage.setItem('tulo_account_email', parsedResponse.email);
                                     }
                                     window.location.reload();
 
@@ -80,6 +82,9 @@
                             if (xhr.status === 200) {
                                 if (window.localStorage) {
                                     localStorage.removeItem('tulo_products');
+                                    localStorage.removeItem('tulo_account_name');
+                                    localStorage.removeItem('tulo_account_email');
+
                                 }
                                 window.location.reload();
                             } else {

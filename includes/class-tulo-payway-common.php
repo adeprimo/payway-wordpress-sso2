@@ -12,6 +12,7 @@ class Tulo_Payway_Server_Common {
     }
 
     public function get_json_with_bearer($url, $token) {
+        $this->write_log("[get_json_with_bearer]");
         $ch = curl_init();
 
         curl_setopt_array($ch, array(
@@ -41,7 +42,7 @@ class Tulo_Payway_Server_Common {
     }
 
     public function post_json_jwt($url, $payload) {
-
+        $this->write_log("[post_json_jwt]");
         $ch = curl_init();
         curl_setopt_array($ch, array(
             CURLOPT_URL => $url,
@@ -53,7 +54,7 @@ class Tulo_Payway_Server_Common {
             )
         ));
 
-        $this->write_log("Posting payload:");
+        $this->write_log("posting payload:");
         $this->write_log($payload);
         $output = curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

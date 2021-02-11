@@ -1,8 +1,17 @@
-# Tulo Payway SSO2 for Wordpress
+# Tulo Payway Connector for Wordpress 
+
+* Requires at least: 5.6
+* Tested up to: 5.6
+* Stable tag: trunk
+* Requires PHP: 7.4
+* License: GPLv2 or later
+* License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+## Tulo Payway Connector for Wordpress
 
 This plugin integrates with the [SSO2 single sign on solution](https://docs.worldoftulo.com/payway/integration/sso/sso2/sso2/) for Tulo Payway. It provides basic login/logout functionality as well as session identification.
 
-## Requirements
+## Changelog
 
 * Wordpress: Tested with 5.6
 * PHP: Tested with php 7.4
@@ -35,9 +44,10 @@ When the API user has been created, you can see two new properties: `Client ID` 
 
 Add `API Client id` and `API Secret` as specified for the API user created in the previous step.
 
+* Session refresh timeout - Enter the number of seconds that should pass before checking status for Tulo Payway session. Default is **360 seconds** and in production it should **not** be less than this, in development you can change it to a lower value which makes it easier for development.
 * Organisation id - Enter the Payway organisation id
 * Set restrictions for new pages/posts
-* Define towards which Payway environment the plugin should operate.
+* Define towards which Payway environment the plugin should operate. (stage or production)
 
 ### Configure restriction handling
 
@@ -105,7 +115,14 @@ If a user is authenticated with Tulo Payway SSO2 and logged into Wordpress sessi
  $session->get_user_active_products();
  $session->user_has_subscription();
 ```
-If user is logged in, the list of active products is also available in `localStorage` with property name `tulo_products`.
+If user is logged in, the following properties are also available in `localStorage`:
+
+```javascript
+localStorage.getItem('tulo_products');
+localStorage.getItem('tulo_account_name');
+localStorage.getItem('tulo_account_email');
+```
+ When user logout the items in `localStorage` are removed.
 
 
 ## FAQ
@@ -117,6 +134,11 @@ Functionality where the user can mark a checkbox upon login to "remember" the se
 * If a user logs in to Tulo Payway a session is established and the user is automatically logged in to any other websites (which supports SSO2) the user visits in the same browser.
 * If the user closes the browser and then re-open the browser again to go back to any of the sites connected to Tulo Payway SSO2 it gets automatically a session in SSO2 and user-data is fetched.
 * If the user in the same browser logs out on any of the websites connected to Tulo Payway SSO2 it will also be logged out from all websites.
+
+### Caching
+
+Any caching mechanism that is used with the site implementation, needs to consider if the user is logged in or not.
+The presence of the cookie `tpw_id` with a non-null value indicates that the user is logged in.
 
 ## Troubleshooting
 

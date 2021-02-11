@@ -14,7 +14,6 @@ class Tulo_Payway_API_SSO2 {
     private $common;
     private $api;
 
-    private $sso_check_session_timeout = 60*6;
     private $sso_session_id_key = "sso2_session_id";
     private $sso_session_status_key = "sso2_session_status";
     private $sso_session_established_key = "sso2_session_established";
@@ -34,7 +33,7 @@ class Tulo_Payway_API_SSO2 {
      * Called from the landing page, checks session status and sets user in session if logged in
      */
     protected function register_basic_session($sso_payload) {
-        $this->common->write_log("Registering SSO session");
+        $this->common->write_log("[register basic session]");            
         if (isset($sso_payload)) {
             $_SESSION[$this->sso_session_id_key] = $sso_payload->sid;
             $_SESSION[$this->sso_session_status_key] = $sso_payload->sts;
@@ -43,13 +42,17 @@ class Tulo_Payway_API_SSO2 {
             if ($sso_payload->sts == "loggedin" && $sso_payload->at != "") {
                 $this->fetch_user_and_login($sso_payload->at);
             }
+        } else {
+            $this->common->write_log("no sso payload to register");
         }
     }
     
     protected function session_needs_refresh() {
         $established = $_SESSION[$this->sso_session_established_key];
         $diff = (time()-$established);
-        if ($diff > $this->sso_check_session_timeout)
+        $session_timeout = get_option('tulo_session_refresh_timeout');
+        $this->common->write_log("established: ".$established." diff: ".$diff." timeout: ".$session_timeout);
+        if ($diff > $session_timeout)
             return true;
         return false;
     }
@@ -90,6 +93,8 @@ class Tulo_Payway_API_SSO2 {
     }        
 
     protected function identify_session() {
+        $this->common->write_log("[identify_session]");            
+
         $url = $this->get_sso2_url("identify");
         $client_id = get_option('tulo_server_client_id');
         $client_secret = get_option('tulo_server_secret');
@@ -105,7 +110,7 @@ class Tulo_Payway_API_SSO2 {
              "iat" => $time
         );
 
-        $this->common->write_log("Identify payload:");
+        $this->common->write_log("identify payload:");
         $this->common->write_log($payload);
 
         $token = JWT::encode($payload, $client_secret);
@@ -119,7 +124,8 @@ class Tulo_Payway_API_SSO2 {
     }
 
     protected function refresh_session() {
-        $this->common->write_log("!! Refreshing session");
+        $this->common->write_log("[refresh_session]");            
+
         $url = $this->get_sso2_url("sessionstatus");
         $client_id = get_option('tulo_server_client_id');
         $client_secret = get_option('tulo_server_secret');
@@ -142,7 +148,7 @@ class Tulo_Payway_API_SSO2 {
             "iat" => $time
         );
                 
-        $this->common->write_log("Payload:");
+        $this->common->write_log("sessionstatus payload:");
         $this->common->write_log($payload);
 
         $token = JWT::encode($payload, $client_secret);
@@ -150,15 +156,21 @@ class Tulo_Payway_API_SSO2 {
 
         $response = $this->common->post_json_jwt($url, $payload);
         if ($response["status"] == 200) {
+            $this->common->write_log("successful sessionstatus request, token:");
             $data = json_decode($response["data"]);
-            $decoded = JWT::decode($data->t, $client_secret, array("HS256"));
-            $this->common->write_log("Session status: ".$decoded->sts. " at: ".$decoded->at);
-            $this->common->write_log($decoded);
+            $this->common->write_log($data->t);
+            
+            $decoded = $this->decode_token($data->t, $client_secret);
+            if ($decoded == null) {
+                return;
+            }
 
+            $this->common->write_log("session status: <".$decoded->sts. "> at: ".$decoded->at);
             if ($decoded->sts == "terminated") {
                 $this->common->write_log("session terminated in other window, logging out user");
                 $this->logout_user(false);
             } else if ($decoded->sts == "loggedin") {
+                $this->register_basic_session($decoded);    
                 if ($lks == "anon" || $lks == "terminated") {
                     if ($decoded->at != "") {
                         $this->fetch_user_and_login($decoded->at);
@@ -170,11 +182,15 @@ class Tulo_Payway_API_SSO2 {
                     $this->identify_session();
                 }
             }
+        } else {
+            $this->common->write_log("[ERROR] error posting session status!");
+            $this->common->write_log($response);
         }
     }
 
     protected function authenticate_user($email, $password) {
-        $this->common->write_log("!! Authenticating user: ".$email);
+        $this->common->write_log("[authenticate_user]");
+        $this->common->write_log("email: ".$email);
         $url = $this->get_sso2_url("authenticate");
         $client_id = get_option('tulo_server_client_id');
         $client_secret = get_option('tulo_server_secret');
@@ -204,41 +220,54 @@ class Tulo_Payway_API_SSO2 {
         $status = array();
         if ($response["status"] == 200) {
             $data = json_decode($response["data"]);
-            $decoded = JWT::decode($data->t, $client_secret, array("HS256"));
-            $status["success"] = $decoded->sts=="loggedin";
-            if ($decoded->sts == "loggedin") {
-                $this->common->write_log("User successfully authenticated!");
-                $this->register_basic_session($decoded);
-                $status["name"] = $this->get_user_name();
-                $status["email"] = $this->get_user_email();
-                $status["products"] = $this->get_user_active_products();
+            $decoded = $this->decode_token($data->t, $client_secret);
+            if ($decoded == null) {
+                $status["success"] = false;
+                $status["error_code"] = "jwt_decode_failed";                
             } else {
-                $status["error_code"] = $decoded->err;
-                if ($decoded->err == "account_frozen") {
-                    $status["error"] = __('Account locked until', 'tulo');
-                    $frozenTo = new DateTime();
-                    $this->common->write_log("Frozen for: ".$decoded->frf);
-                    $frozenTo->setTimestamp(time() + $decoded->frf);
-                    $status["frozen_until"] = $frozenTo->format('c');
-                }
-                if ($decoded->err == "invalid_credentials") {
-                    $msg = __('Wrong username or password. (%s attempts left)', 'tulo');
-                    $msg = sprintf($msg, $decoded->raa);
-                    $status["error"] = $msg;
-                    $status["remaining_attempts"] = $decoded->raa;
-                } 
-                if ($decoded->err == "account_not_active") {
-                    $msg = __('Wrong username or password. (%s attempts left)', 'tulo');
-                    $msg = sprintf($msg, 5);
-                    $status["error"] = $msg;
-                    $status["remaining_attempts"] = 5;
-                }
+                $status["success"] = $decoded->sts=="loggedin";
+                if ($decoded->sts == "loggedin") {
+                    $this->common->write_log("User successfully authenticated!");
+                    $this->register_basic_session($decoded);
+                    $status["name"] = $this->get_user_name();
+                    $status["email"] = $this->get_user_email();
+                    $status["products"] = $this->get_user_active_products();
+                } else {
+                    $status["error_code"] = $decoded->err;
+                    if ($decoded->err == "account_frozen") {
+                        $status["error"] = __('Account locked until', 'tulo');
+                        $frozenTo = new DateTime();
+                        $this->common->write_log("Frozen for: ".$decoded->frf);
+                        $frozenTo->setTimestamp(time() + $decoded->frf);
+                        $status["frozen_until"] = $frozenTo->format('c');
+                    }
+                    if ($decoded->err == "invalid_credentials") {
+                        $msg = __('Wrong username or password. (%s attempts left)', 'tulo');
+                        $msg = sprintf($msg, $decoded->raa);
+                        $status["error"] = $msg;
+                        $status["remaining_attempts"] = $decoded->raa;
+                    } 
+                    if ($decoded->err == "account_not_active") {
+                        $msg = __('Wrong username or password. (%s attempts left)', 'tulo');
+                        $msg = sprintf($msg, 5);
+                        $status["error"] = $msg;
+                        $status["remaining_attempts"] = 5;
+                    }
+                }    
             }
         }
         else {
-            $this->common->write_log("!! Error authenticating: ".$response["status"]." => ".$response["data"]);
-            $status["success"] = false;
-            $status["error_code"] = "unknown_error";
+            $data = json_decode($response["data"]);
+            $decoded = $this->decode_token($data->t, $client_secret);
+            $this->common->write_log("!! Error authenticating: ".$response["status"]);
+            $this->common->write_log($decoded);
+            if ($decoded == null) {
+                $status["success"] = false;
+                $status["error_code"] = "jwt_decode_error";    
+            } else {
+                $status["success"] = false;
+                $status["error_code"] = "unknown_error";    
+            }
         }
         $this->common->write_log("Response authentication:");
         $this->common->write_log($status);
@@ -247,6 +276,8 @@ class Tulo_Payway_API_SSO2 {
     }
     
     protected function logout_user($locallyInitiated=true) {
+        $this->common->write_log("[logout_user]");
+        $this->common->write_log("locallyInitiated: ".$locallyInitiated);
 
         if ($locallyInitiated) {
             // Terminate session in Payway
@@ -263,14 +294,27 @@ class Tulo_Payway_API_SSO2 {
         return true;
     }
 
+    protected function decode_token($token, $client_secret) {
+        try {
+            JWT::$leeway = 60;
+            $decoded = JWT::decode($token, $client_secret, array("HS256"));
+            return $decoded;
+        } catch(Firebase\JWT\BeforeValidException $e) {
+            $this->common->write_log("[ERROR] could not decode JWT from Payway! Message: ".$e->getMessage());
+            return null;
+        }                
+    }
+
     /** Private functions */
+
 
     private function sso_session_id() {
         return $_SESSION[$this->sso_session_id_key];
     }
 
     private function sso_logout() {
-        $this->common->write_log("!! Logging out user");
+        $this->common->write_log("[sso_logout");
+
         $url = $this->get_sso2_url("logout");
         $client_id = get_option('tulo_server_client_id');
         $client_secret = get_option('tulo_server_secret');

@@ -47,7 +47,7 @@ class Tulo_Payway_Server_Admin {
 
     public function init_admin()
     {
-        add_options_page( 'Tulo settings', 'Tulo Payway SSO2', 'manage_options', 'wp-tulo-payway', array($this, 'tulo_render_settings'));
+        add_options_page( 'Tulo settings', 'Tulo Payway Connector', 'manage_options', 'wp-tulo-payway', array($this, 'tulo_render_settings'));
     }
     public function tulo_render_settings()
     {

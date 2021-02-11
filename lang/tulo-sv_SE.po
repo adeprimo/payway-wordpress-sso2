@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-26 09:43+0100\n"
-"PO-Revision-Date: 2021-01-26 09:44+0100\n"
+"POT-Creation-Date: 2021-02-11 16:32+0100\n"
+"PO-Revision-Date: 2021-02-11 16:32+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -25,127 +25,147 @@ msgstr ""
 msgid "Tulo Payway restrictions"
 msgstr "Tulo Payway begränsningar"
 
-#: admin/tulo-payway-server-settings.php:108
+#: admin/tulo-payway-server-settings.php:51
+msgid "At least 360 seconds in production"
+msgstr "Skall vara minst 360 sekunder i produktionsmiljö"
+
+#: admin/tulo-payway-server-settings.php:115
 msgid "Environment"
 msgstr "Miljö"
 
-#: admin/tulo-payway-server-settings.php:129
-#: admin/tulo-payway-server-settings.php:149
+#: admin/tulo-payway-server-settings.php:136
+#: admin/tulo-payway-server-settings.php:156
 msgid "If permission required"
 msgstr "Om behörighet saknas"
 
-#: admin/tulo-payway-server-settings.php:130
+#: admin/tulo-payway-server-settings.php:137
 msgid "Code will be rendered if product is missing and user is not logged in:"
 msgstr ""
 "Koden kommer att visas om produkten saknas och användaren inte är inloggad:"
 
-#: admin/tulo-payway-server-settings.php:150
+#: admin/tulo-payway-server-settings.php:157
 msgid "Code will be rendered if product is missing and user already logged in:"
 msgstr "Koden kommer att visas om produkten saknas och användaren är inloggad:"
 
-#: admin/tulo-payway-server-settings.php:164
+#: admin/tulo-payway-server-settings.php:171
 msgid "Available products"
 msgstr "Tillgängliga produkter"
 
-#: admin/tulo-payway-server-settings.php:169
+#: admin/tulo-payway-server-settings.php:176
 msgid "Productname"
 msgstr "Produktnamn"
 
-#: admin/tulo-payway-server-settings.php:173
+#: admin/tulo-payway-server-settings.php:180
 msgid "Productkey"
 msgstr "Produktnyckel"
 
-#: admin/tulo-payway-server-settings.php:175
+#: admin/tulo-payway-server-settings.php:182
 msgid "Delete"
 msgstr "Radera"
 
-#: admin/tulo-payway-server-settings.php:177
+#: admin/tulo-payway-server-settings.php:184
 msgid "Buy info"
 msgstr "Köpinformation"
 
-#: admin/tulo-payway-server-settings.php:178
+#: admin/tulo-payway-server-settings.php:185
 msgid "Code below will be rendered if this product is required"
 msgstr "Koden kommer att visas om produkten krävs"
 
-#: admin/tulo-payway-server-settings.php:181
+#: admin/tulo-payway-server-settings.php:188
 msgid "Useful shortodes"
 msgstr "Användbara shortodes"
 
-#: admin/tulo-payway-server-settings.php:190
+#: admin/tulo-payway-server-settings.php:197
 msgid "Add product"
 msgstr "Lägg till produkt"
 
-#: admin/tulo-payway-server-settings.php:208
+#: admin/tulo-payway-server-settings.php:215
 msgid "Whitelist IP Addresses"
 msgstr "Vitlista IP-adresser"
 
-#: admin/tulo-payway-server-settings.php:209
+#: admin/tulo-payway-server-settings.php:216
 msgid "Seperate the ip addresses with a new row"
 msgstr "Separera IP-adresser med en ny rad"
 
-#: admin/tulo-payway-server-settings.php:222
+#: admin/tulo-payway-server-settings.php:229
 msgid "Tulo settings"
 msgstr "Tulo inställningar"
 
-#: admin/tulo-payway-server-settings.php:228
+#: admin/tulo-payway-server-settings.php:235
 msgid "API Client id"
 msgstr "API Klient-ID"
 
-#: admin/tulo-payway-server-settings.php:229
+#: admin/tulo-payway-server-settings.php:236
 msgid "API Secret"
 msgstr "API Hemlig nyckel"
 
-#: admin/tulo-payway-server-settings.php:230
+#: admin/tulo-payway-server-settings.php:237
 msgid "Redirect url"
 msgstr "Omdirigera till URL"
 
-#: admin/tulo-payway-server-settings.php:231
+#: admin/tulo-payway-server-settings.php:238
+msgid "Session refresh timeout"
+msgstr "Session timeout, hur ofta skall sessionen kontrolleras"
+
+#: admin/tulo-payway-server-settings.php:238
+msgid "seconds"
+msgstr "sekunder"
+
+#: admin/tulo-payway-server-settings.php:239
 msgid "Organisation id"
 msgstr "Organisationens id"
 
-#: admin/tulo-payway-server-settings.php:232
-msgid "Account origin"
-msgstr "Konto ursprung"
-
-#: admin/tulo-payway-server-settings.php:241
+#: admin/tulo-payway-server-settings.php:248
 #, php-format
 msgid "New %s are restricted"
 msgstr "Nya %s är låsta"
 
-#: admin/tulo-payway-server-settings.php:256
+#: admin/tulo-payway-server-settings.php:263
 msgid "Save Changes"
 msgstr "Spara ändringar"
 
-#: includes/class-tulo-payway-sso2.php:213
+#: includes/class-tulo-payway-sso2-api.php:238
 msgid "Account locked until"
 msgstr "Kontot är låst till och med"
 
-#: includes/class-tulo-payway-sso2.php:220
-#: includes/class-tulo-payway-sso2.php:226
+#: includes/class-tulo-payway-sso2-api.php:245
+#: includes/class-tulo-payway-sso2-api.php:251
 #, php-format
 msgid "Wrong username or password. (%s attempts left)"
 msgstr "Fel användarnamn eller lösenord. (%s försök kvar)"
 
-#: public/class-tulo-payway-public.php:276
+#: public/class-tulo-payway-public.php:262
 msgid "Buy"
 msgstr "Köp"
 
 #. Plugin Name of the plugin/theme
-msgid "Tulo Payway Server to server"
-msgstr ""
+msgid "Tulo Payway Connector for Wordpress"
+msgstr "Tulo Payway Connector for Wordpress"
 
 #. Description of the plugin/theme
 msgid ""
-"This plugin integrates with Tulo Payway via server-to-server communication."
-msgstr "Denna plugin integrerar med Tulo Payway med Payway SSO2."
+"This plugin integrates with the SSO2 single sign on solution in Tulo Payway."
+msgstr "Denna plugin integrerar mot Tulo Payway Single Sign on v2 (SSO2)."
 
 #. Author of the plugin/theme
-msgid "Adeprimo"
+#, fuzzy
+#| msgid "Adeprimo"
+msgid "Adeprimo AB"
 msgstr "Adeprimo"
 
 #. Author URI of the plugin/theme
-msgid "http://adeprimo.se"
+#, fuzzy
+#| msgid "http://adeprimo.se"
+msgid "https://adeprimo.se"
 msgstr "https://adeprimo.se"
+
+#~ msgid "Account origin"
+#~ msgstr "Konto ursprung"
+
+#~ msgid ""
+#~ "This plugin integrates with Tulo Payway via server-to-server "
+#~ "communication."
+#~ msgstr "Denna plugin integrerar med Tulo Payway med Payway SSO2."
 
 #~ msgid "Something went wrong"
 #~ msgstr "Något gick snett"

@@ -55,6 +55,10 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         $this->identify_session();
     }
 
+    public function decode_jwt($token, $client_secret) {
+        return $this->decode_token($token, $client_secret);
+    }
+    
     public function authenticate($email, $password) {
         return $this->authenticate_user($email, $password);
     }

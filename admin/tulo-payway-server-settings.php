@@ -17,6 +17,7 @@
 if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
 
+    update_option("tulo_session_refresh_timeout", $_POST["tulo_session_refresh_timeout"]);
     update_option("tulo_server_client_id", $_POST["tulo_server_client_id"]);
     update_option("tulo_server_secret", $_POST["tulo_server_secret"]);
     update_option("tulo_organisation_id", $_POST["tulo_organisation_id"]);
@@ -37,12 +38,19 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
 function tulo_server_render_text_option_setting($label, $name, $helper = null)
 {
     $value = get_option($name);
+    if (empty($value) && $name == "tulo_session_refresh_timeout") 
+        $value = 360;
     ?>
 
     <tr>
 	    <th scope="row">
                 <label for="<?php echo $name ?>">
                     <?php echo esc_html( $label ); ?>
+                    <?php if ($name == "tulo_session_refresh_timeout") { ?>
+                        <br/><i>
+                            <?php _e('At least 360 seconds in production', 'tulo'); ?></i>                    
+                        </i>
+                    <?php } ?>
                 </label>
         </th>
         <td>
@@ -54,7 +62,7 @@ function tulo_server_render_text_option_setting($label, $name, $helper = null)
     </tr>
 <?php }
 
-function tulo_server_render_text($label, $name)
+function tulo_server_render_landing($label, $name)
 {
     //$value = get_option($name);
     ?>
@@ -226,7 +234,8 @@ function tulo_server_render_whitelist_ips() {
       <?php
       tulo_server_render_text_option_setting(__('API Client id', 'tulo'), 'tulo_server_client_id');
       tulo_server_render_text_option_setting(__('API Secret', 'tulo'), 'tulo_server_secret');
-      tulo_server_render_text(__('Redirect url', 'tulo'), 'tulo_redirect_uri');
+      tulo_server_render_landing(__('Redirect url', 'tulo'), 'tulo_redirect_uri');
+      tulo_server_render_text_option_setting(__('Session refresh timeout', 'tulo'), 'tulo_session_refresh_timeout', __('seconds', 'tulo'));
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
       $posttypes = Tulo_Payway_Server_Admin::get_post_types();
 
