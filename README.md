@@ -2,7 +2,6 @@
 
 * Requires at least: 5.6
 * Tested up to: 5.6
-* Stable tag: trunk
 * Requires PHP: 7.4
 * License: MIT
 * License URI: https://mit-license.org/
@@ -48,12 +47,24 @@ Add `API Client id` and `API Secret` as specified for the API user created in th
 * Organisation id - Enter the Payway organisation id
 * Set restrictions for new pages/posts
 * Define towards which Payway environment the plugin should operate. (stage or production)
+* Authentication URL, this can be used if the site won't implement their own login-form. See below for more details
+
+#### Authentication URL
+
+If the users should be authenticated on **another** SSO2 enabled website (such as the Payway portal), please enter the URL here. The URL should point to a page where the user can login, and after successful login be redirected back to this site.
+
+The authentication URL can include replacement variables `{currentOrganisation}` and `{currentUrl}` which can be applied to any part of the URL. 
+
+Example authentication URL when logging in using the Payway portal:
+```html
+https://{currentOrganisation}.payway-portal.stage.adeprimo.se/login/index?continue={currentUrl}
+```
 
 ### Configure restriction handling
 
 There are three different text-boxes available, one will contain code (html/css/js) that will be shown to the user if the user is trying to access restricted content and the user is **not** logged in. The other text-box will contain code that will be shown to the user if the user is logged but **do not** have access to the subscription that is required to view the content.
 
-#### Not logged in
+#### Not logged in - site supplies login-form
 
 To get started, enter the following piece of code to be shown when the user is not logged in:
 
@@ -61,6 +72,16 @@ To get started, enter the following piece of code to be shown when the user is n
 <p>This content is restricted for subscribers only. You are not logged in. Please login.</p>
 
 <form class="js-tuloLogin is-hidden" action="/" method="POST"> <label for="email"> Email <input id="email" type="text"> </label> <label for="password"> Password <input id="password" type="password"> </label> <input type="submit" value="Login"/> </form>
+```
+
+#### Not logged in - login-form supplied by other site
+
+To get started, enter the following piece of code to be shown when the user is not logged in:
+
+```html
+<p>This content is restricted for subscribers only. You are not logged in. Please login.</p>
+
+<a href="[tulo_authentication_url]">Login</a>
 ```
 
 #### Logged in but do not have access
@@ -139,6 +160,10 @@ Functionality where the user can mark a checkbox upon login to "remember" the se
 
 Any caching mechanism that is used with the site implementation, needs to consider if the user is logged in or not.
 The presence of the cookie `tpw_id` with a non-null value indicates that the user is logged in.
+
+### What about support?
+
+Please see our [terms](TERMS.md) for more information.
 
 ## Troubleshooting
 

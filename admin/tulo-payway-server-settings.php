@@ -18,6 +18,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
 
     update_option("tulo_session_refresh_timeout", $_POST["tulo_session_refresh_timeout"]);
+    update_option("tulo_authentication_url", $_POST["tulo_authentication_url"]);
     update_option("tulo_server_client_id", $_POST["tulo_server_client_id"]);
     update_option("tulo_server_secret", $_POST["tulo_server_secret"]);
     update_option("tulo_organisation_id", $_POST["tulo_organisation_id"]);
@@ -49,6 +50,11 @@ function tulo_server_render_text_option_setting($label, $name, $helper = null)
                     <?php if ($name == "tulo_session_refresh_timeout") { ?>
                         <br/><i>
                             <?php _e('At least 360 seconds in production', 'tulo'); ?></i>                    
+                        </i>
+                    <?php } ?>
+                    <?php if ($name == "tulo_authentication_url") { ?>
+                        <br/><i>
+                            <?php _e("Leave empty if this site is providing it's login-form", 'tulo'); ?></i>                    
                         </i>
                     <?php } ?>
                 </label>
@@ -235,6 +241,7 @@ function tulo_server_render_whitelist_ips() {
       tulo_server_render_text_option_setting(__('API Client id', 'tulo'), 'tulo_server_client_id');
       tulo_server_render_text_option_setting(__('API Secret', 'tulo'), 'tulo_server_secret');
       tulo_server_render_landing(__('Redirect url', 'tulo'), 'tulo_redirect_uri');
+      tulo_server_render_text_option_setting(__('Authentication URL', 'tulo'), 'tulo_authentication_url');
       tulo_server_render_text_option_setting(__('Session refresh timeout', 'tulo'), 'tulo_session_refresh_timeout', __('seconds', 'tulo'));
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
       $posttypes = Tulo_Payway_Server_Admin::get_post_types();

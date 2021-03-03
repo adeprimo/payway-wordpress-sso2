@@ -271,6 +271,14 @@ class Tulo_Payway_Server_Public {
         return $output;
     }
 
+    public function shortcode_authentication_url() {
+        global $wp;
+        $currentUrl = add_query_arg( $wp->query_vars, home_url( $wp->request ) );
+        $currentOrg = get_option('tulo_organisation_id');
+        $authUrl = get_option('tulo_authentication_url');
+        return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", $currentUrl, $authUrl));
+    }
+
     public function ajax_list_products() {
         header('Content-Type: application/json');
         echo json_encode(Tulo_Payway_Server::get_available_products());
