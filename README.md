@@ -3,8 +3,9 @@
 * Requires at least: 5.6
 * Tested up to: 5.6
 * Requires PHP: 7.4
-* License: MIT
+* License: [MIT](LICENSE)
 * License URI: https://mit-license.org/
+* [Terms of usage](TERMS.md)
 
 ## Tulo Payway Connector for Wordpress
 
@@ -108,9 +109,19 @@ Here you can add IP addresses that should have access to the content regardless 
 
 ### Login
 
+#### Site provides their own login-form
+
 The javascript provided with this plugin automatically detects any login-forms that you create on the site as long as they are decorated with the class `js-tuloLogin`. If the form also has a class `is-hidden` it will make sure to show the form only when the user is not logged in and the html is visible.
 
 If the form can be found and the user clicks the submit button, the javascript will post an authenticate call to the plugin which will authenticate the user with Tulo Payway SSO2.
+
+#### Users are authenticated by another SSO2 enabled website
+If the site will not have their own login-form, the users can login on another website defined by the configuration parameter `Authentication URL` (see above). This URL can be used in html as shortcode `[tulo_authentication_url]` like so:
+
+Sample login link:
+```html
+<a href="[tulo_authentication_url]">Please login</a>
+```
 
 ### Logout
 
