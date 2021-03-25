@@ -93,7 +93,10 @@ class Tulo_Payway_Server_Public {
                         $this->common->write_log("session not expired but page is restricted and user is not logged in, needs refresh");
                         $this->common->write_log($restrictions);
                         $this->session->refresh();
-                    }
+                    } else if (get_query_var("tpw_session_refresh") == "1") {
+                        $this->common->write_log("!! forced session session refresh using query param");
+                        $this->session->refresh();
+                    } 
                 }
 
                 $status = $this->session->get_status();
@@ -273,10 +276,12 @@ class Tulo_Payway_Server_Public {
 
     public function shortcode_authentication_url() {
         global $wp;
-        $currentUrl = add_query_arg( $wp->query_vars, home_url( $wp->request ) );
+        $queryVars = $wp->query_vars;
+        $queryVars['tpw_session_refresh'] = '1';
+        $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
         $currentOrg = get_option('tulo_organisation_id');
         $authUrl = get_option('tulo_authentication_url');
-        return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", $currentUrl, $authUrl));
+        return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", urlencode($currentUrl), $authUrl));
     }
 
     public function ajax_list_products() {
@@ -309,5 +314,10 @@ class Tulo_Payway_Server_Public {
         echo json_encode($response);
 
         wp_die();
+    }
+
+    public function tulo_query_vars($qvars) {
+        $qvars[] = "tpw_session_refresh";
+        return $qvars;
     }
 }

@@ -173,7 +173,7 @@ class Tulo_Payway_API_SSO2 {
                 $this->register_basic_session($decoded);    
                 if ($lks == "anon" || $lks == "terminated") {
                     if ($decoded->at != "") {
-                        $this->fetch_user_and_login($decoded->at);
+                        //$this->fetch_user_and_login($decoded->at);
                     } else {
                         // No "at" available at this time, let's do another "identify" session call
                         $this->identify_session();

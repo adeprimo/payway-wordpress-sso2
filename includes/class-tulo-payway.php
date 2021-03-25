@@ -215,6 +215,7 @@ class Tulo_Payway_Server {
           $this->loader->add_action( 'wp', $plugin_public, 'check_session');
           $this->loader->add_filter( 'the_content', $plugin_public, 'content_filter' );
           $this->loader->add_filter( 'post_class', $plugin_public, 'post_class_filter' );
+          $this->loader->add_filter( 'query_vars', $plugin_public, 'tulo_query_vars' );
 
           $this->loader->add_shortcode( 'tulo_permission_required_loggedin', $plugin_public, 'shortcode_permission_required_loggedin' );
           $this->loader->add_shortcode( 'tulo_permission_required_not_loggedin', $plugin_public, 'shortcode_permission_required_not_loggedin' );
