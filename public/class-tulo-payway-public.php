@@ -97,11 +97,14 @@ class Tulo_Payway_Server_Public {
                     } else if (get_query_var("tpw_session_refresh") == "1") {
                         $this->common->write_log("!! forced session session refresh using query param");
                         $this->session->refresh();
-                        $queryVars = $wp->query_vars;
-                        unset($queryVars['tpw_session_refresh']);
-                        $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
-                
-                        set_query_var("tpw_session_refresh", null);
+                        $currentUrl = home_url( $wp->request );
+                        $permalinkStructure = get_option( 'permalink_structure' );                        
+                        if ($permalinkStructure == "plain") {
+                            $queryVars = $wp->query_vars;
+                            unset($queryVars['tpw_session_refresh']);
+                            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+                        }                                
+                        $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);                        
                         header("Location: ".$currentUrl, true, 302);
                         die();
                     } 
@@ -284,9 +287,15 @@ class Tulo_Payway_Server_Public {
 
     public function shortcode_authentication_url() {
         global $wp;
-        $queryVars = $wp->query_vars;
-        $queryVars['tpw_session_refresh'] = '1';
-        $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+        $currentUrl = home_url( $wp->request );
+        $permalinkStructure = get_option( 'permalink_structure' );
+        if ($permalinkStructure == "plain") {
+            $queryVars = $wp->query_vars;
+            $queryVars['tpw_session_refresh'] = '1';
+            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );    
+        } else {
+            $currentUrl .= "?tpw_session_refresh=1";
+        } 
         $currentOrg = get_option('tulo_organisation_id');
         $authUrl = get_option('tulo_authentication_url');
         return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", urlencode($currentUrl), $authUrl));
