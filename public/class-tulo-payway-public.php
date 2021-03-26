@@ -76,6 +76,7 @@ class Tulo_Payway_Server_Public {
 
     public function check_session($wp) 
     {
+        global $wp;
         global $post;
         if (is_admin()) 
             return;
@@ -96,6 +97,13 @@ class Tulo_Payway_Server_Public {
                     } else if (get_query_var("tpw_session_refresh") == "1") {
                         $this->common->write_log("!! forced session session refresh using query param");
                         $this->session->refresh();
+                        $queryVars = $wp->query_vars;
+                        unset($queryVars['tpw_session_refresh']);
+                        $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+                
+                        set_query_var("tpw_session_refresh", null);
+                        header("Location: ".$currentUrl, true, 302);
+                        die();
                     } 
                 }
 
