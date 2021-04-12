@@ -17,7 +17,6 @@
                         var rememberCheckbox= loginForm.querySelector('input[type="checkbox"]');
                         var username        = loginForm.querySelector('input[type="text"]').value,
                             password        = loginForm.querySelector('input[type="password"]').value,
-                            rememberMe      = rememberCheckbox ? rememberCheckbox.value : true,
                             submitButton    = loginForm.querySelector('input[type=submit]');
 
                         if (!username.length || !password.length) {
@@ -33,17 +32,20 @@
                         xhr.onload = function() {
                             if (xhr.status === 200) {
                                 var parsedResponse = JSON.parse(xhr.response);
-                                if (parsedResponse.status == 200 && !parsedResponse.error) {
+                                if (parsedResponse.success) {
                                     // If there are no errors, reload the window to fetch the latest information
                                     if (window.localStorage) {
-                                        localStorage.setItem('tulo_products', parsedResponse.data.products);
+                                        localStorage.setItem('tulo_products', parsedResponse.products);
+                                        localStorage.setItem('tulo_account_name', parsedResponse.name);
+                                        localStorage.setItem('tulo_account_email', parsedResponse.email);
                                     }
                                     window.location.reload();
 
                                 } else {
-                                    // Special case if account has been frozen
-                                    if (parsedResponse.data && parsedResponse.data.item && parsedResponse.data.item.account_frozen) {
-                                        var date = new Date(parsedResponse.data.item.frozen_until);
+                                    if (parsedResponse.error_code == "invalid_credentials") {
+                                        generateErrorMessage(loginForm, parsedResponse.error);
+                                    } else if (parsedResponse.error_code == "account_frozen") {
+                                        var date = new Date(parsedResponse.frozen_until);
                                         generateErrorMessage(loginForm, parsedResponse.error + ' ' + date.toLocaleString('SV-se'));
                                     } else {
                                         generateErrorMessage(loginForm, parsedResponse.error);
@@ -57,7 +59,7 @@
                                 submitButton.disabled = false;
                             }
                         };
-                        xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&persist=' + rememberMe);
+                        xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password));
                     }
                 }
             });
@@ -80,6 +82,9 @@
                             if (xhr.status === 200) {
                                 if (window.localStorage) {
                                     localStorage.removeItem('tulo_products');
+                                    localStorage.removeItem('tulo_account_name');
+                                    localStorage.removeItem('tulo_account_email');
+
                                 }
                                 window.location.reload();
                             } else {

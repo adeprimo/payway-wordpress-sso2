@@ -8,16 +8,16 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://adeprimo.se
+ * @link              https://adeprimo.se
  * @since             1.0.0
  * @package           Tulo_Payway_Server
  *
  * @wordpress-plugin
- * Plugin Name:       Tulo Payway Server to server
- * Description:       This plugin integrates with Tulo Payway via server-to-server communication.
+ * Plugin Name:       Tulo Payway Connector for Wordpress
+ * Description:       This plugin integrates with the SSO2 single sign on solution in Tulo Payway.
  * Version:           1.0.0
- * Author:            Adeprimo
- * Author URI:        http://adeprimo.se
+ * Author:            Adeprimo AB
+ * Author URI:        https://adeprimo.se
  * Text Domain:       tulo
  * Domain Path: /lang
  */
