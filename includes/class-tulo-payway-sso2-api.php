@@ -378,7 +378,7 @@ class Tulo_Payway_API_SSO2 {
     private static function get_sso2_url($path) {       
         $url = "";
         if (get_option('tulo_environment') == 'prod') {
-            $url = "";
+            $url = "https://sso.worldoftulo.com";
         }
         else {
             $url = "https://payway-sso-stage.azurewebsites.net";
