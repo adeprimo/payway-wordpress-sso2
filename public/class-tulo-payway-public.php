@@ -80,6 +80,23 @@ class Tulo_Payway_Server_Public {
         global $post;
         if (is_admin()) 
             return;
+        
+        if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
+            if (get_query_var("tpw_session_refresh") == "1") {
+                $this->common->write_log("!! forced session session refresh using query param");
+                $this->session->refresh();
+                $currentUrl = home_url( $wp->request );
+                $permalinkStructure = get_option( 'permalink_structure' );
+                if ($permalinkStructure == "plain") {
+                    $queryVars = $wp->query_vars;
+                    unset($queryVars['tpw_session_refresh']);
+                    $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+                }
+                $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
+                header("Location: ".$currentUrl, true, 302);
+                die();
+            }
+        }
 
         if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             $this->common->write_log("[check_session]");            
@@ -94,19 +111,6 @@ class Tulo_Payway_Server_Public {
                         $this->common->write_log("session not expired but page is restricted and user is not logged in, needs refresh");
                         $this->common->write_log($restrictions);
                         $this->session->refresh();
-                    } else if (get_query_var("tpw_session_refresh") == "1") {
-                        $this->common->write_log("!! forced session session refresh using query param");
-                        $this->session->refresh();
-                        $currentUrl = home_url( $wp->request );
-                        $permalinkStructure = get_option( 'permalink_structure' );                        
-                        if ($permalinkStructure == "plain") {
-                            $queryVars = $wp->query_vars;
-                            unset($queryVars['tpw_session_refresh']);
-                            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
-                        }                                
-                        $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);                        
-                        header("Location: ".$currentUrl, true, 302);
-                        die();
                     } 
                 }
 
