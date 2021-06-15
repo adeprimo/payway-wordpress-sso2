@@ -9,14 +9,16 @@ function write_log($log) {
         }
     }
 }
+
+$token = $_GET["t"];
+$redirect_url = $_GET["r"];
+
 $baseurl = explode( "wp-content" , __FILE__ );
 $baseurl = $baseurl[0];
 require_once( $baseurl . "wp-load.php" );
 
 use \Firebase\JWT\JWT;
 
-$token = $_GET["t"];
-$redirect_url = $_GET["r"];
 $client_secret = get_option('tulo_server_secret');
 $session = new Tulo_Payway_Session();
 

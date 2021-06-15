@@ -106,7 +106,7 @@ class Tulo_Payway_API_SSO2 {
              "iss" => $organisation_id,
              "aud" => "pw-sso",
              "nbf" => $time,
-             "exp" => $time + 10,
+             "exp" => $time + 60,
              "iat" => $time
         );
 
@@ -296,7 +296,7 @@ class Tulo_Payway_API_SSO2 {
 
     protected function decode_token($token, $client_secret) {
         try {
-            JWT::$leeway = 60;
+            JWT::$leeway = 120;
             $decoded = JWT::decode($token, $client_secret, array("HS256"));
             return $decoded;
         } catch(Firebase\JWT\BeforeValidException $e) {
