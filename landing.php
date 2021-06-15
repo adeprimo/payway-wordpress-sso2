@@ -34,8 +34,6 @@ try
 } catch(Firebase\JWT\ExpiredException $e) {
     // we land here if the JWT token can not be decoded properly, in this case some claims have expired.
     write_log("Could not decode JWT from Payway! Message: ".$e->getMessage());
-    // restart the identification flow by going back to where we came from    
-    header("Location: ".$redirect_url);    
 }
 
 die();
