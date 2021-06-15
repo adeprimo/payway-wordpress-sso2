@@ -54,6 +54,8 @@ class Tulo_Payway_API_SSO2 {
         $this->common->write_log("established: ".$established." diff: ".$diff." timeout: ".$session_timeout);
         if ($diff > $session_timeout)
             return true;
+
+        $_SESSION[$this->sso_session_established_key] = time();            
         return false;
     }
 
@@ -93,7 +95,12 @@ class Tulo_Payway_API_SSO2 {
     }        
 
     protected function identify_session() {
-        $this->common->write_log("[identify_session]");            
+        $this->common->write_log("[identify_session]");
+
+        if ($this->isBot()) {
+            $this->common->write_log("bot detected, skipping identify!");
+            return;
+        }
 
         $url = $this->get_sso2_url("identify");
         $client_id = get_option('tulo_server_client_id');
@@ -121,6 +128,16 @@ class Tulo_Payway_API_SSO2 {
         $url = sprintf("%s?t=%s&r=%s", $url, $token, $continueUrl);
         header("Location: ".$url);
         die();
+    }
+
+    private function isBot() {
+        $crawlers = "alexa|bot|crawl(er|ing)|facebookexternalhit|feedburner|google web preview|nagios|postrank|pingdom|slurp|spider|yahoo!|yandex";
+        $pattern = "/".$crawlers."/i";
+        $agent = $_SERVER['HTTP_USER_AGENT'];
+        if ( preg_match($pattern, $agent) ) {
+            return true;
+        }    
+        return false;    
     }
 
     protected function refresh_session() {
