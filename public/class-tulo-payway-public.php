@@ -4,7 +4,7 @@
  * The public-facing functionality of the plugin.
  *
  * @link       http://example.com
- * @since      1.0.0
+ * @since      1.0.1
  *
  * @package    Tulo_Payway_Server
  * @subpackage Tulo_Payway_Server/public
@@ -273,6 +273,10 @@ class Tulo_Payway_Server_Public {
 
     public function shortcode_loggedin_user_email() {
         return $this->session->get_user_email();
+    }
+
+    public function shortcode_loggedin_user_customer_number() {
+        return $this->session->get_user_customer_number();
     }
 
     public function shortcode_buy_button($atts) {

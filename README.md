@@ -103,6 +103,7 @@ Here you can add IP addresses that should have access to the content regardless 
 
 * [tulo_user_name]
 * [tulo_user_email]
+* [tulo_user_customer_number]
 
 
 ## Login and logout management
@@ -144,6 +145,7 @@ If a user is authenticated with Tulo Payway SSO2 and logged into Wordpress sessi
  $session->is_logged_in();
  $session->get_user_name();
  $session->get_user_email();
+ $session->get_user_customer_number();
  $session->get_user_active_products();
  $session->user_has_subscription();
 ```
