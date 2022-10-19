@@ -19,6 +19,7 @@ class Tulo_Payway_API_SSO2 {
     private $sso_session_established_key = "sso2_session_established";
     private $sso_session_user_name_key = "sso2_session_user_name";
     private $sso_session_user_email_key = "sso2_session_user_email";
+    private $sso_session_user_custno_key = "sso2_session_user_customer_number";
     private $sso_session_user_active_products_key = "sso2_session_user_active_products";
 
     /**
@@ -80,6 +81,11 @@ class Tulo_Payway_API_SSO2 {
     protected function get_session_user_email() {
         if (isset($_SESSION[$this->sso_session_user_email_key]))
             return $_SESSION[$this->sso_session_user_email_key];
+    }
+
+    protected function get_session_user_customer_number() {
+        if (isset($_SESSION[$this->sso_session_user_custno_key]))
+            return $_SESSION[$this->sso_session_user_custno_key];
     }
 
     protected function get_session_user_active_products() {
@@ -367,6 +373,7 @@ class Tulo_Payway_API_SSO2 {
         if ($data != null) {
             $this->set_user_name($data["user"]->first_name." ".$data["user"]->last_name);
             $this->set_user_email($data["user"]->email);
+            $this->set_user_customer_number($data["user"]->customer_number);
             $this->set_user_active_products($data["active_products"]);
             $this->set_session_loggedin();
         } else {
@@ -380,6 +387,10 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_user_email($email) {
         $_SESSION[$this->sso_session_user_email_key] = $email;
+    }
+    
+    private function set_user_customer_number($customer_number) {
+        $_SESSION[$this->sso_session_user_custno_key] = $customer_number;
     }
 
     private function set_user_active_products($products) {

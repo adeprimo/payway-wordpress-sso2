@@ -275,6 +275,10 @@ class Tulo_Payway_Server_Public {
         return $this->session->get_user_email();
     }
 
+    public function shortcode_loggedin_user_customer_number() {
+        return $this->session->get_user_customer_number();
+    }
+
     public function shortcode_buy_button($atts) {
         $retval = '<button class="js-tuloBuy '.$atts['class'].'" data-product="'.$atts['product'].'">';
         $retval .= __('Buy', 'tulo');

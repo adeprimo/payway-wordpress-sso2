@@ -222,7 +222,8 @@ class Tulo_Payway_Server {
           $this->loader->add_shortcode( 'tulo_buy_button', $plugin_public, 'shortcode_buy_button' );
           $this->loader->add_shortcode( 'tulo_product_link', $plugin_public, 'shortcode_product_link' );
           $this->loader->add_shortcode( 'tulo_user_name', $plugin_public, 'shortcode_loggedin_user_name' );
-          $this->loader->add_shortcode( 'tulo_user_email', $plugin_public, 'shortcode_loggedin_email' );
+          $this->loader->add_shortcode( 'tulo_user_email', $plugin_public, 'shortcode_loggedin_user_email' );
+          $this->loader->add_shortcode( 'tulo_user_customer_number', $plugin_public, 'shortcode_loggedin_user_customer_number' );
           $this->loader->add_shortcode( 'tulo_authentication_url', $plugin_public, 'shortcode_authentication_url' );
 
           $this->loader->add_action( 'wp_ajax_tulo_getproducts', $plugin_public, 'ajax_list_products', 1 );
