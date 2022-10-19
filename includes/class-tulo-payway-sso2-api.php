@@ -254,6 +254,7 @@ class Tulo_Payway_API_SSO2 {
                     $this->register_basic_session($decoded);
                     $status["name"] = $this->get_user_name();
                     $status["email"] = $this->get_user_email();
+                    $status["customer_number"] = $this->get_user_customer_number();
                     $status["products"] = $this->get_user_active_products();
                 } else {
                     $status["error_code"] = $decoded->err;

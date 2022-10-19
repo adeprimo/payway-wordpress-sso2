@@ -38,6 +38,7 @@
                                         localStorage.setItem('tulo_products', parsedResponse.products);
                                         localStorage.setItem('tulo_account_name', parsedResponse.name);
                                         localStorage.setItem('tulo_account_email', parsedResponse.email);
+                                        localStorage.setItem('tulo_account_customer_number', parsedResponse.customer_number);
                                     }
                                     window.location.reload();
 
