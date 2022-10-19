@@ -4,7 +4,7 @@
  * The public-facing functionality of the plugin.
  *
  * @link       http://example.com
- * @since      1.0.0
+ * @since      1.0.1
  *
  * @package    Tulo_Payway_Server
  * @subpackage Tulo_Payway_Server/public

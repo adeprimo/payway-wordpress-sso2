@@ -8,7 +8,7 @@ use \Firebase\JWT\JWT;
  * public-facing side of the site and the admin area.
  *
  * @link       http://example.com
- * @since      1.0.0
+ * @since      1.0.1
  *
  * @package    Tulo_Payway_Server
  * @subpackage Tulo_Payway_Server/includes
