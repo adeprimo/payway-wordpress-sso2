@@ -22,6 +22,10 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         return $this->get_session_user_email();
     }
 
+    public function get_user_customer_number() {
+       return $this->get_session_user_customer_number();
+    }
+
     public function get_user_active_products() {
         return $this->get_session_user_active_products();
     }
