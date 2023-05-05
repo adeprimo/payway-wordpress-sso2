@@ -1,6 +1,7 @@
 <?php
 
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 
 /**
  * The Tulo Payway SSO2 API
@@ -17,6 +18,7 @@ class Tulo_Payway_API_SSO2 {
     private $sso_session_id_key = "sso2_session_id";
     private $sso_session_status_key = "sso2_session_status";
     private $sso_session_established_key = "sso2_session_established";
+    private $sso_session_user_id_key = "sso2_session_user_id";
     private $sso_session_user_name_key = "sso2_session_user_name";
     private $sso_session_user_email_key = "sso2_session_user_email";
     private $sso_session_user_custno_key = "sso2_session_user_customer_number";
@@ -73,6 +75,11 @@ class Tulo_Payway_API_SSO2 {
         return $_SESSION[$this->sso_session_status_key];
     }
 
+    protected function get_session_user_id() {
+        if (isset($_SESSION[$this->sso_session_user_id_key]))
+            return $_SESSION[$this->sso_session_user_id_key];
+    }
+
     protected function get_session_user_name() {
         if (isset($_SESSION[$this->sso_session_user_name_key]))
             return $_SESSION[$this->sso_session_user_name_key];
@@ -126,7 +133,7 @@ class Tulo_Payway_API_SSO2 {
         $this->common->write_log("identify payload:");
         $this->common->write_log($payload);
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
         $continueUrl = sprintf("%s://%s%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
         $this->common->write_log(("Redirect url: ".$continueUrl));
@@ -174,7 +181,7 @@ class Tulo_Payway_API_SSO2 {
         $this->common->write_log("sessionstatus payload:");
         $this->common->write_log($payload);
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $payload = json_encode(array("t" => $token));
 
         $response = $this->common->post_json_jwt($url, $payload);
@@ -236,7 +243,7 @@ class Tulo_Payway_API_SSO2 {
              "iat" => $time
         );
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $payload = json_encode(array("t" => $token));
 
         $response = $this->common->post_json_jwt($url, $payload);
@@ -311,6 +318,8 @@ class Tulo_Payway_API_SSO2 {
         $this->set_user_active_products(array());
         $this->set_user_email(null);
         $this->set_user_name(null);
+        $this->set_user_customer_number(null);
+        $this->set_user_id(null);
         $_SESSION[$this->sso_session_established_key] = null;
         $_SESSION[$this->sso_session_id_key] = null;
         $_SESSION[$this->sso_session_status_key] = null;
@@ -321,7 +330,7 @@ class Tulo_Payway_API_SSO2 {
     protected function decode_token($token, $client_secret) {
         try {
             JWT::$leeway = 120;
-            $decoded = JWT::decode($token, $client_secret, array("HS256"));
+            $decoded = JWT::decode($token, new Key($client_secret, "HS256"));
             return $decoded;
         } catch(Firebase\JWT\BeforeValidException $e) {
             $this->common->write_log("[ERROR] could not decode JWT from Payway! Message: ".$e->getMessage());
@@ -359,7 +368,7 @@ class Tulo_Payway_API_SSO2 {
              "iat" => $time
         );
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $payload = json_encode(array("t" => $token));
         $response = $this->common->post_json_jwt($url, $payload);
         if ($response["status"] == 200) {
@@ -372,6 +381,7 @@ class Tulo_Payway_API_SSO2 {
     private function fetch_user_and_login($auth_ticket) {
         $data = $this->api->get_user_and_products_by_ticket($auth_ticket);
         if ($data != null) {
+            $this->set_user_id($data["user"]->id);
             $this->set_user_name($data["user"]->first_name." ".$data["user"]->last_name);
             $this->set_user_email($data["user"]->email);
             $this->set_user_customer_number($data["user"]->customer_number);
@@ -380,6 +390,10 @@ class Tulo_Payway_API_SSO2 {
         } else {
             $this->common->write_log("!! Could not get user and product info from Payway!");
         }
+    }
+
+    private function set_user_id($accountId) {
+        $_SESSION[$this->sso_session_user_id_key] = $accountId;
     }
 
     private function set_user_name($name) {

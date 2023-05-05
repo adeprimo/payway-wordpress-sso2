@@ -14,6 +14,10 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         return $this->is_session_logged_in();
     }
 
+    public function get_user_id() {
+        return $this->get_session_user_id();
+    }
+
     public function get_user_name() {
         return $this->get_session_user_name();
     }

@@ -1,7 +1,7 @@
 {
     "name": "adeprimo/payway-wordpress-sso2",
     "require": {
-        "firebase/php-jwt": "^5.2.0"
+        "firebase/php-jwt": "^6.4"
     },
     "authors": [
         {
