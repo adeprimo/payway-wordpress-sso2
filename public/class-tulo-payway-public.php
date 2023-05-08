@@ -229,7 +229,7 @@ class Tulo_Payway_Server_Public {
             }                    
             $userProducts = json_encode($this->session->get_user_active_products());
         }
-        return '  if (dataLayer!==undefined) { dataLayer.push({"tulo": {"user" : { "id": "'.$userId.'", "email": "'.$userEmail.'", "customer_number": "'.$userCustomerNumber.'", "products":'.$userProducts.'}}}); }';
+        return '  if (window.dataLayer!==undefined) { dataLayer.push({"tulo": {"user" : { "id": "'.$userId.'", "email": "'.$userEmail.'", "customer_number": "'.$userCustomerNumber.'", "products":'.$userProducts.'}}}); }';
     }
 
     private function get_local_storage() {
