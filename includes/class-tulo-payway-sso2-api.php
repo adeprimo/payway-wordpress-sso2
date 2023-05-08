@@ -24,6 +24,10 @@ class Tulo_Payway_API_SSO2 {
     private $sso_session_user_custno_key = "sso2_session_user_customer_number";
     private $sso_session_user_active_products_key = "sso2_session_user_active_products";
 
+    const SESSION_ESTABLISHED_STATUS_COLD = "cold";
+    const SESSION_ESTABLISHED_STATUS_WARM = "warm";
+    const SESSION_ESTABLISHED_STATUS_NOEXIST = "nosession";
+
     /**
      * Initialize the class and set its properties.
      */
@@ -51,6 +55,10 @@ class Tulo_Payway_API_SSO2 {
     }
     
     protected function session_needs_refresh() {
+        if (!isset($_SESSION[$this->sso_session_established_key])) {
+            return true;
+        }
+
         $established = $_SESSION[$this->sso_session_established_key];
         $diff = (time()-$established);
         $session_timeout = get_option('tulo_session_refresh_timeout');
@@ -72,7 +80,9 @@ class Tulo_Payway_API_SSO2 {
     }
 
     protected function get_session_status() {
-        return $_SESSION[$this->sso_session_status_key];
+        if (isset($_SESSION[$this->sso_session_status_key]))
+            return $_SESSION[$this->sso_session_status_key];
+        return "anon";            
     }
 
     protected function get_session_user_id() {
@@ -102,9 +112,14 @@ class Tulo_Payway_API_SSO2 {
     }
 
     protected function session_established() {
+
+        $cookieSessionId = $this->get_session_id_from_cookie();        
         if (isset($_SESSION[$this->sso_session_id_key]) && $_SESSION[$this->sso_session_id_key] != "")
-            return true;
-        return false;
+            return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_WARM;
+        if ($cookieSessionId != "") {
+            return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_COLD;
+        }
+        return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_NOEXIST;
     }        
 
     protected function identify_session() {
@@ -342,7 +357,15 @@ class Tulo_Payway_API_SSO2 {
 
 
     private function sso_session_id() {
-        return $_SESSION[$this->sso_session_id_key];
+        if (isset($_SESSION[$this->sso_session_id_key])) {
+            return $_SESSION[$this->sso_session_id_key];
+        }
+        
+        $sessionId = $this->get_session_id_from_cookie();         
+        if ($sessionId != "") {
+            $this->common->write_log("sso session id not found in session but found in cookie");
+        }
+        return $sessionId;
     }
 
     private function sso_logout() {
@@ -414,8 +437,31 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_session_loggedin() {
         $_SESSION[$this->sso_session_established_key] = time();
-        $unique_id = base64_encode($this->sso_session_id() . (string)microtime());
+        $unique_id = base64_encode($this->sso_session_id() .'^'. (string)microtime());
         setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
+    }
+
+    private function get_session_id_from_cookie() {
+        if (isset($_COOKIE["tpw_id"]) && $_COOKIE["tpw_id"] != "")  {
+            $data = base64_decode($_COOKIE["tpw_id"]);
+            if (str_contains($data, "^")) {
+                $vals = explode("^", $data);
+                if (count($vals) == 2) {
+                    return $vals[0];
+                }    
+            }
+            else {
+                if (isset($_SESSION[$this->sso_session_id_key])) {
+                    $sessionId = $_SESSION[$this->sso_session_id_key];
+                    if ($sessionId != "") {
+                        $unique_id = base64_encode($sessionId .'^'. (string)microtime());
+                        setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');            
+                        return $sessionId;
+                    }
+                }                
+            }
+        }
+        return "";
     }
 
     private static function get_sso2_url($path) {       

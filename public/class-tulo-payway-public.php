@@ -102,7 +102,9 @@ class Tulo_Payway_Server_Public {
 
         if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             $this->common->write_log("[check_session]");            
-            if ($this->session->established()) {
+            $established = $this->session->established();
+            $this->common->write_log("established status: ".$established);            
+            if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_WARM) {
                 $this->common->write_log("basic SSO2 session is established.");                
                 if ($this->session->needs_refresh()) {
                     $this->common->write_log("session expired, needs refresh");
@@ -124,7 +126,12 @@ class Tulo_Payway_Server_Public {
                     $this->common->write_log("not logged in, user needs to login if accessing restricted content");                    
                 }
                 
-            } else {
+            }
+            else if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_COLD) {
+                $this->common->write_log("session is cold but exist in cookie, refresh session data");
+                $this->session->refresh();
+            }
+            else {
                 $this->session->identify();
             }    
         }
@@ -207,6 +214,8 @@ class Tulo_Payway_Server_Public {
     
     private function get_data_layer() {
         $userId = "";
+        $userEmail = "";
+        $userCustomerNumber = "";
         $userProducts = '[]';
         if ($this->session->is_logged_in()) {
             if (get_option('tulo_expose_account_id', false)) {
