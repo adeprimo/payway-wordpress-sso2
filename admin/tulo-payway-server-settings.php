@@ -24,6 +24,9 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option("tulo_organisation_id", $_POST["tulo_organisation_id"]);
     update_option("tulo_environment", $_POST["tulo_environment"]);
     update_option('tulo_whitelist_ip', $_POST["tulo_whitelist_ip"]);
+    update_option('tulo_expose_account_id', $_POST["tulo_expose_account_id"]);
+    update_option('tulo_expose_email', $_POST["tulo_expose_email"]);
+    update_option('tulo_expose_customer_number', $_POST["tulo_expose_customer_number"]);
     foreach(Tulo_Payway_Server_Admin::get_post_types() as $posttype)
     {
         $key = 'tulo_'.$posttype['name'].'_default_restricted';
@@ -219,7 +222,7 @@ function tulo_server_render_whitelist_ips() {
     <th scope="row">
       <label for="<?php echo $key; ?>">
         <?php _e('Whitelist IP Addresses', 'tulo'); ?>
-        <i><?php _e('Seperate the ip addresses with a new row', 'tulo'); ?></i>
+        <i><?php _e('Separate the ip addresses with a new row', 'tulo'); ?></i>
       </label>
     </th>
     <td>
@@ -244,6 +247,10 @@ function tulo_server_render_whitelist_ips() {
       tulo_server_render_text_option_setting(__('Authentication URL', 'tulo'), 'tulo_authentication_url');
       tulo_server_render_text_option_setting(__('Session refresh timeout', 'tulo'), 'tulo_session_refresh_timeout', __('seconds', 'tulo'));
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
+      tulo_server_render_bool_option_setting(__('Expose account id', 'tulo'), 'tulo_expose_account_id', __('Help expose account id', 'tulo'));
+      tulo_server_render_bool_option_setting(__('Expose email', 'tulo'), 'tulo_expose_email', __('Help expose email', 'tulo'));
+      tulo_server_render_bool_option_setting(__('Expose customer number', 'tulo'), 'tulo_expose_customer_number', __('Help expose customer number', 'tulo'));
+
       $posttypes = Tulo_Payway_Server_Admin::get_post_types();
 
       foreach($posttypes as $post_type)

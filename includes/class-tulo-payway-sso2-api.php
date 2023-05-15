@@ -1,6 +1,7 @@
 <?php
 
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 
 /**
  * The Tulo Payway SSO2 API
@@ -17,10 +18,15 @@ class Tulo_Payway_API_SSO2 {
     private $sso_session_id_key = "sso2_session_id";
     private $sso_session_status_key = "sso2_session_status";
     private $sso_session_established_key = "sso2_session_established";
+    private $sso_session_user_id_key = "sso2_session_user_id";
     private $sso_session_user_name_key = "sso2_session_user_name";
     private $sso_session_user_email_key = "sso2_session_user_email";
     private $sso_session_user_custno_key = "sso2_session_user_customer_number";
     private $sso_session_user_active_products_key = "sso2_session_user_active_products";
+
+    const SESSION_ESTABLISHED_STATUS_COLD = "cold";
+    const SESSION_ESTABLISHED_STATUS_WARM = "warm";
+    const SESSION_ESTABLISHED_STATUS_NOEXIST = "nosession";
 
     /**
      * Initialize the class and set its properties.
@@ -49,6 +55,10 @@ class Tulo_Payway_API_SSO2 {
     }
     
     protected function session_needs_refresh() {
+        if (!isset($_SESSION[$this->sso_session_established_key])) {
+            return true;
+        }
+
         $established = $_SESSION[$this->sso_session_established_key];
         $diff = (time()-$established);
         $session_timeout = get_option('tulo_session_refresh_timeout');
@@ -70,7 +80,14 @@ class Tulo_Payway_API_SSO2 {
     }
 
     protected function get_session_status() {
-        return $_SESSION[$this->sso_session_status_key];
+        if (isset($_SESSION[$this->sso_session_status_key]))
+            return $_SESSION[$this->sso_session_status_key];
+        return "anon";            
+    }
+
+    protected function get_session_user_id() {
+        if (isset($_SESSION[$this->sso_session_user_id_key]))
+            return $_SESSION[$this->sso_session_user_id_key];
     }
 
     protected function get_session_user_name() {
@@ -95,9 +112,14 @@ class Tulo_Payway_API_SSO2 {
     }
 
     protected function session_established() {
+
+        $cookieSessionId = $this->get_session_id_from_cookie();        
         if (isset($_SESSION[$this->sso_session_id_key]) && $_SESSION[$this->sso_session_id_key] != "")
-            return true;
-        return false;
+            return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_WARM;
+        if ($cookieSessionId != "") {
+            return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_COLD;
+        }
+        return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_NOEXIST;
     }        
 
     protected function identify_session() {
@@ -126,7 +148,7 @@ class Tulo_Payway_API_SSO2 {
         $this->common->write_log("identify payload:");
         $this->common->write_log($payload);
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
         $continueUrl = sprintf("%s://%s%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
         $this->common->write_log(("Redirect url: ".$continueUrl));
@@ -174,7 +196,7 @@ class Tulo_Payway_API_SSO2 {
         $this->common->write_log("sessionstatus payload:");
         $this->common->write_log($payload);
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $payload = json_encode(array("t" => $token));
 
         $response = $this->common->post_json_jwt($url, $payload);
@@ -236,7 +258,7 @@ class Tulo_Payway_API_SSO2 {
              "iat" => $time
         );
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $payload = json_encode(array("t" => $token));
 
         $response = $this->common->post_json_jwt($url, $payload);
@@ -311,6 +333,8 @@ class Tulo_Payway_API_SSO2 {
         $this->set_user_active_products(array());
         $this->set_user_email(null);
         $this->set_user_name(null);
+        $this->set_user_customer_number(null);
+        $this->set_user_id(null);
         $_SESSION[$this->sso_session_established_key] = null;
         $_SESSION[$this->sso_session_id_key] = null;
         $_SESSION[$this->sso_session_status_key] = null;
@@ -321,7 +345,7 @@ class Tulo_Payway_API_SSO2 {
     protected function decode_token($token, $client_secret) {
         try {
             JWT::$leeway = 120;
-            $decoded = JWT::decode($token, $client_secret, array("HS256"));
+            $decoded = JWT::decode($token, new Key($client_secret, "HS256"));
             return $decoded;
         } catch(Firebase\JWT\BeforeValidException $e) {
             $this->common->write_log("[ERROR] could not decode JWT from Payway! Message: ".$e->getMessage());
@@ -333,7 +357,15 @@ class Tulo_Payway_API_SSO2 {
 
 
     private function sso_session_id() {
-        return $_SESSION[$this->sso_session_id_key];
+        if (isset($_SESSION[$this->sso_session_id_key])) {
+            return $_SESSION[$this->sso_session_id_key];
+        }
+        
+        $sessionId = $this->get_session_id_from_cookie();         
+        if ($sessionId != "") {
+            $this->common->write_log("sso session id not found in session but found in cookie");
+        }
+        return $sessionId;
     }
 
     private function sso_logout() {
@@ -359,7 +391,7 @@ class Tulo_Payway_API_SSO2 {
              "iat" => $time
         );
 
-        $token = JWT::encode($payload, $client_secret);
+        $token = JWT::encode($payload, $client_secret, 'HS256');
         $payload = json_encode(array("t" => $token));
         $response = $this->common->post_json_jwt($url, $payload);
         if ($response["status"] == 200) {
@@ -372,6 +404,7 @@ class Tulo_Payway_API_SSO2 {
     private function fetch_user_and_login($auth_ticket) {
         $data = $this->api->get_user_and_products_by_ticket($auth_ticket);
         if ($data != null) {
+            $this->set_user_id($data["user"]->id);
             $this->set_user_name($data["user"]->first_name." ".$data["user"]->last_name);
             $this->set_user_email($data["user"]->email);
             $this->set_user_customer_number($data["user"]->customer_number);
@@ -380,6 +413,10 @@ class Tulo_Payway_API_SSO2 {
         } else {
             $this->common->write_log("!! Could not get user and product info from Payway!");
         }
+    }
+
+    private function set_user_id($accountId) {
+        $_SESSION[$this->sso_session_user_id_key] = $accountId;
     }
 
     private function set_user_name($name) {
@@ -400,8 +437,31 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_session_loggedin() {
         $_SESSION[$this->sso_session_established_key] = time();
-        $unique_id = base64_encode($this->sso_session_id() . (string)microtime());
+        $unique_id = base64_encode($this->sso_session_id() .'^'. (string)microtime());
         setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
+    }
+
+    private function get_session_id_from_cookie() {
+        if (isset($_COOKIE["tpw_id"]) && $_COOKIE["tpw_id"] != "")  {
+            $data = base64_decode($_COOKIE["tpw_id"]);
+            if (str_contains($data, "^")) {
+                $vals = explode("^", $data);
+                if (count($vals) == 2) {
+                    return $vals[0];
+                }    
+            }
+            else {
+                if (isset($_SESSION[$this->sso_session_id_key])) {
+                    $sessionId = $_SESSION[$this->sso_session_id_key];
+                    if ($sessionId != "") {
+                        $unique_id = base64_encode($sessionId .'^'. (string)microtime());
+                        setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');            
+                        return $sessionId;
+                    }
+                }                
+            }
+        }
+        return "";
     }
 
     private static function get_sso2_url($path) {       

@@ -1,33 +1,32 @@
-<?php return array (
-  'root' => 
-  array (
-    'pretty_version' => 'dev-main',
-    'version' => 'dev-main',
-    'aliases' => 
-    array (
+<?php return array(
+    'root' => array(
+        'name' => 'adeprimo/payway-wordpress-sso2',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '22f6ba6a301892b67fb944381f9e9f7bf3c6b4d2',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
     ),
-    'reference' => '0340418042685aee578dbd592c03ed80ba2ec9dc',
-    'name' => 'adeprimo/payway-wordpress-sso2',
-  ),
-  'versions' => 
-  array (
-    'adeprimo/payway-wordpress-sso2' => 
-    array (
-      'pretty_version' => 'dev-main',
-      'version' => 'dev-main',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '0340418042685aee578dbd592c03ed80ba2ec9dc',
+    'versions' => array(
+        'adeprimo/payway-wordpress-sso2' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '22f6ba6a301892b67fb944381f9e9f7bf3c6b4d2',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'firebase/php-jwt' => array(
+            'pretty_version' => 'v6.4.0',
+            'version' => '6.4.0.0',
+            'reference' => '4dd1e007f22a927ac77da5a3fbb067b42d3bc224',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../firebase/php-jwt',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
     ),
-    'firebase/php-jwt' => 
-    array (
-      'pretty_version' => 'v5.2.0',
-      'version' => '5.2.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'feb0e820b8436873675fd3aca04f3728eb2185cb',
-    ),
-  ),
 );

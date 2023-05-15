@@ -65,7 +65,9 @@ class Tulo_Payway_Server_Public {
             'redirecturi' => get_option('tulo_redirect_uri'),
             'env' => get_option('tulo_environment'),
             'oid' => get_option('tulo_organisation_id')
-        ));
+        ));        
+        wp_add_inline_script( Tulo_Payway_Server::instance()->plugin_name, $this->get_data_layer());
+        wp_add_inline_script( Tulo_Payway_Server::instance()->plugin_name, $this->get_local_storage());
     }
 
     public function register_session() {
@@ -100,7 +102,9 @@ class Tulo_Payway_Server_Public {
 
         if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             $this->common->write_log("[check_session]");            
-            if ($this->session->established()) {
+            $established = $this->session->established();
+            $this->common->write_log("established status: ".$established);            
+            if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_WARM) {
                 $this->common->write_log("basic SSO2 session is established.");                
                 if ($this->session->needs_refresh()) {
                     $this->common->write_log("session expired, needs refresh");
@@ -122,7 +126,12 @@ class Tulo_Payway_Server_Public {
                     $this->common->write_log("not logged in, user needs to login if accessing restricted content");                    
                 }
                 
-            } else {
+            }
+            else if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_COLD) {
+                $this->common->write_log("session is cold but exist in cookie, refresh session data");
+                $this->session->refresh();
+            }
+            else {
                 $this->session->identify();
             }    
         }
@@ -203,14 +212,59 @@ class Tulo_Payway_Server_Public {
         return $classes;
     }
     
-    public function content_filter($content) {
-        if($this->has_access())
-            return $content;
+    private function get_data_layer() {
+        $userId = "";
+        $userEmail = "";
+        $userCustomerNumber = "";
+        $userProducts = '[]';
+        if ($this->session->is_logged_in()) {
+            if (get_option('tulo_expose_account_id', false)) {
+                $userId = $this->session->get_user_id();
+            }            
+            if (get_option('tulo_expose_email', false)) {
+                $userEmail = $this->session->get_user_email();
+            }
+            if (get_option('tulo_expose_customer_number', false)) {
+                $userCustomerNumber = $this->session->get_user_customer_number();
+            }                    
+            $userProducts = json_encode($this->session->get_user_active_products());
+        }
+        return '  if (window.dataLayer!==undefined) { dataLayer.push({"tulo": {"user" : { "id": "'.$userId.'", "email": "'.$userEmail.'", "customer_number": "'.$userCustomerNumber.'", "products":'.$userProducts.'}}}); }';
+    }
 
+    private function get_local_storage() {
+        $userId = "";
+        $userName = "";
+        $userEmail = "";
+        $userCustomerNumber = "";
+        $userProducts = '[]';
+        if ($this->session->is_logged_in()) {
+            if (get_option('tulo_expose_account_id', false)) {
+                $userId = $this->session->get_user_id();
+            }            
+            if (get_option('tulo_expose_email', false)) {
+                $userEmail = $this->session->get_user_email();
+            }
+            if (get_option('tulo_expose_customer_number', false)) {
+                $userCustomerNumber = $this->session->get_user_customer_number();
+            }                    
+            $userName = $this->session->get_user_name();
+            $userProducts = json_encode($this->session->get_user_active_products());
+        }
+        return ' if (window.localStorage) { localStorage.setItem("tulo.account_name", "'.$userName.'"); localStorage.setItem("tulo.account_email", "'.$userEmail.'"); localStorage.setItem("tulo.account_customer_number", "'.$userCustomerNumber.'"); localStorage.setItem("tulo.account_id", "'.$userId.'"); localStorage.setItem("tulo.account_user_products", '.$userProducts.'); }';  
+    }
+
+    public function content_filter($content) {
+
+        if($this->has_access()) {                        
+            return $content;
+        }
+        
         do_action('tulo_before_permission_required');
 
         global $post;
-        $output  = '<div class="paygate">';
+        //$output  = $this->get_script_content();
+        $output = '<div class="paygate">';
         $output .= '    <div class="info-box-wrapper">';
         if(!empty($post->post_excerpt))
         {
@@ -265,6 +319,10 @@ class Tulo_Payway_Server_Public {
 
     public function shortcode_permission_required_not_loggedin() {
         return get_option('tulo_permission_required_not_loggedin');
+    }
+
+    public function shortcode_loggedin_user_id() {
+        return $this->session->get_user_id();
     }
 
     public function shortcode_loggedin_user_name() {
