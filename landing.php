@@ -13,7 +13,7 @@ function write_log($log) {
 $token = $_GET["t"];
 $redirect_url = $_GET["r"];
 
-$baseurl = explode( "wp-content" , __FILE__ );
+$baseurl = explode( "wp-content" , $_SERVER['SCRIPT_FILENAME'] );
 $baseurl = $baseurl[0];
 require_once( $baseurl . "wp-load.php" );
 
