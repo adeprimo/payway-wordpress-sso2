@@ -42,13 +42,24 @@ class Tulo_Payway_Server_Admin {
     public function __construct( $version ) {
 
         $this->version = $version;
-
     }
 
     public function init_admin()
     {
-        add_options_page( 'Tulo settings', 'Tulo Payway Connector', 'manage_options', 'wp-tulo-payway', array($this, 'tulo_render_settings'));
+        add_options_page( 'Tulo settings', 'Tulo Payway Settings', 'manage_options', 'wp-tulo-payway', array($this, 'tulo_render_settings'));
+        add_options_page( 'Tulo Paywall settings', 'Tulo Paywall Settings', 'manage_options', 'wp-tulo-paywall', array($this, 'tulo_paywall_settings'));
     }
+
+    public function tulo_paywall_settings()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('You do not have sufficient permissions to access this page.');
+        }
+        $this->enqueue_scripts();
+        wp_enqueue_style('tulo-admin', plugin_dir_url( __FILE__ ) . 'css/tulo-admin.css', array(),  $this->version);
+        require_once('tulo-payway-paywall-settings.php');
+    }
+
     public function tulo_render_settings()
     {
         if (!current_user_can('manage_options')) {
