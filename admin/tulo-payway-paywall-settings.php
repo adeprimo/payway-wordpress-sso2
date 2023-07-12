@@ -21,7 +21,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option('tulo_paywall_css_url', $_POST["tulo_paywall_css_url"]);
     update_option('tulo_paywall_traffic_source', $_POST["tulo_paywall_traffic_source"]);
     update_option('tulo_paywall_merchant_reference_static', $_POST["tulo_paywall_merchant_reference_static"]);
-    update_option('tulo_paywall_merchant_reference_slug', isset($_POST["tulo_paywall_merchant_reference_slug"]) ? "on" : "");
+    update_option('tulo_paywall_merchant_reference_link', isset($_POST["tulo_paywall_merchant_reference_link"]) ? "on" : "");
     update_option('tulo_paywall_article_id_slug', isset($_POST["tulo_paywall_article_id_slug"]) ? "on" : "");
 
 }
@@ -108,10 +108,8 @@ function tulo_server_render_option_titles($label)
         tulo_server_render_text_option_setting(__("Tulo Paywall Account Origin", "tulo"), "tulo_paywall_account_origin", __("New accounts will be created with this account origin", "tulo"));
         tulo_server_render_text_option_setting(__("Tulo Paywall CSS URL", "tulo"), "tulo_paywall_css_url", __("Leave empty if this site will use Tulo standard CSS", "tulo"));
         tulo_server_render_text_option_setting(__("Tulo Paywall Traffic Source", "tulo"), "tulo_paywall_traffic_source", __("Leave empty if no traffic source should be used (not recommended).", "tulo"));
-        tulo_server_render_text_option_setting(__("Tulo Paywall Merchant Reference (static)", "tulo"), "tulo_paywall_merchant_reference_static", __("Leave empty if no merchant reference should be used or if inferred from slug.", "tulo"));
-        tulo_server_render_bool_option_setting(__("Tulo Paywall Merchant Reference from slug", "tulo"), "tulo_paywall_merchant_reference_slug", __("Get merchant reference from slug", "tulo"));
-        tulo_server_render_bool_option_setting(__("Tulo Paywall Article ID from slug", "tulo"), "tulo_paywall_article_id_slug", __("Get article ID from slug", "tulo"));
-
+        tulo_server_render_text_option_setting(__("Tulo Paywall Merchant Reference (static)", "tulo"), "tulo_paywall_merchant_reference_static", __("Leave empty if no merchant reference should be used or if inferred from article link.", "tulo"));
+        tulo_server_render_bool_option_setting(__("Tulo Paywall Merchant Reference from link", "tulo"), "tulo_paywall_merchant_reference_link", __("Get merchant reference from current article link", "tulo"));
     ?>
 
   </table>
