@@ -211,6 +211,8 @@ The Tulo Paywall product requires that you create a **new** API user in Payway (
 
 When the API user has been created, reach out to [Payway support](https://docs.worldoftulo.com/payway/support/) to have the new API user activated for Tulo Paywall.
 
+**HEADSUP! An API user already exists for your organisation in your staging environment, look for an API user with the name "Tulo Paywall" in Payway admin and use that for the Paywall settings below in your staging environment.**
+
 #### Update settings
 
 * Enable Tulo Paywall
