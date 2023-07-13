@@ -39,6 +39,7 @@ function tulo_server_render_text_option_setting($label, $name, $helper = null, $
                 </label>
         </th>
         <td>
+            <input <?php echo $ph?> class="regular-text " type="text" name="<?php echo $name ?>" id="<?php echo $name ?>" value="<?php echo esc_attr( $value ) ?>" />
             <?php if($helper != null){
                       echo $helper;
                   } ?>
