@@ -317,7 +317,9 @@ class Tulo_Payway_Server_Public {
         $paywall = new Tulo_Paywall_Common();
 
         $output = '<div id="paywall-container"></div>';
-        $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
+        if (get_option("tulo_paywall_css_enabled") == "on") {
+            $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
+        }
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
         $output .= '<script type="text/javascript">
                      new Paywall().Init({

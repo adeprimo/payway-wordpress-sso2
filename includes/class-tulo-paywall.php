@@ -76,10 +76,6 @@ class Tulo_Paywall_Common {
     }
 
     public function get_paywall_css() {
-        $url = get_option("tulo_paywall_css_url");
-        if ( $url != "") {
-            return $url;
-        }
         return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/paywall.css";
     }
     public function get_paywall_js() {
