@@ -11,6 +11,8 @@
 
 This plugin integrates with the [SSO2 single sign on solution](https://docs.worldoftulo.com/payway/integration/sso/sso2/sso2/) for Tulo Payway. It provides basic login/logout functionality as well as session identification.
 
+From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worldoftulo.com/paywall/core_concept/overview/).
+
 ## Changelog
 
 * Wordpress: Tested with 6.1.1
