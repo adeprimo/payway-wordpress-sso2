@@ -14,7 +14,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Tulo Payway Connector for Wordpress
- * Description:       This plugin integrates with the SSO2 single sign on solution in Tulo Payway.
+ * Description:       This plugin integrates with the SSO2 single sign on solution in Tulo Payway. Now with support for Tulo Paywall.
  * Version:           1.2.0
  * Author:            Adeprimo AB
  * Author URI:        https://adeprimo.se

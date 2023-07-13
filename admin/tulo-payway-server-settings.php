@@ -253,7 +253,14 @@ function tulo_server_render_whitelist_ips() {
 
     <?php if (get_option("tulo_paywall_enabled") == "on"): ?>
         <div class="notice notice-warning">
-            <p>Tulo Paywall is enabled on this website! See <a href="<?php echo get_admin_page_url("wp-tulo-paywall")?>">Tulo Paywall Settings</a> for additional settings.</p>
+            <p>
+                <?php 
+                    $url = get_admin_page_url("wp-tulo-paywall");
+                    $warning = __('Tulo Paywall is enabled on this website! See <a href=%s>Tulo Paywall Settings</a> for additional settings.', 'tulo');
+                    $warning = sprintf($warning, $url);
+                    echo $warning;
+                ?>
+            </p>
         </div>
     <?php endif ?>
 

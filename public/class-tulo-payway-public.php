@@ -284,11 +284,7 @@ class Tulo_Payway_Server_Public {
         
         $output .= '        </div>';
 
-        if (get_option("tulo_paywall_enabled") == "on") 
-        {
-            $output .= $this->initialize_paywall();
-        }
-        else 
+        if (get_option("tulo_paywall_enabled") != "on") 
         {
             $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
             foreach($restrictions as $restriction) {
@@ -308,6 +304,12 @@ class Tulo_Payway_Server_Public {
 
         $output .= '</div>';
         $output .= '</div>';
+
+        if (get_option("tulo_paywall_enabled") == "on") 
+        {
+            $output .= $this->initialize_paywall();
+        }
+
         do_action('tulo_after_permission_required');
         return $output;
     }
@@ -315,6 +317,7 @@ class Tulo_Payway_Server_Public {
     private function initialize_paywall()
     {
         $paywall = new Tulo_Paywall_Common();
+        $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
 
         $output = '<div id="paywall-container"></div>';
         if (get_option("tulo_paywall_css_enabled") == "on") {
@@ -323,7 +326,7 @@ class Tulo_Payway_Server_Public {
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
         $output .= '<script type="text/javascript">
                      new Paywall().Init({
-                        debug: true,
+                        debug: '.$debug.',
                         url: "'.$paywall->get_paywall_url().'",
                         jwtToken: "'.$paywall->get_signature().'",
                         accountOrigin: "'.$paywall->get_account_origin().'",

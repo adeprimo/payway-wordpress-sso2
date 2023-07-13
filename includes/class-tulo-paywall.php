@@ -18,8 +18,8 @@ class Tulo_Paywall_Common {
     public function get_signature() {
 
         $title = get_option("tulo_paywall_title");
-        $client_id = get_option('tulo_server_client_id');
-        $client_secret = get_option('tulo_server_secret');
+        $client_id = get_option('tulo_paywall_client_id');
+        $client_secret = get_option('tulo_paywall_secret');
         $aid = $this->session->get_user_id();
 
         $time = time();
