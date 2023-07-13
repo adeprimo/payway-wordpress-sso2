@@ -12,6 +12,10 @@
  * @subpackage Tulo_Payway_Server/admin/partials
  */
 
+//Get the active tab from the $_GET param
+$default_tab = null;
+$tab = isset($_GET['tab']) ? $_GET['tab'] : $default_tab;
+
 
 
 if(isset($_POST['action']) && $_POST['action'] == 'update')
@@ -24,9 +28,9 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option("tulo_organisation_id", $_POST["tulo_organisation_id"]);
     update_option("tulo_environment", $_POST["tulo_environment"]);
     update_option('tulo_whitelist_ip', $_POST["tulo_whitelist_ip"]);
-    update_option('tulo_expose_account_id', $_POST["tulo_expose_account_id"]);
-    update_option('tulo_expose_email', $_POST["tulo_expose_email"]);
-    update_option('tulo_expose_customer_number', $_POST["tulo_expose_customer_number"]);
+    update_option('tulo_expose_account_id', isset($_POST["tulo_expose_account_id"]) ? "on" : "");
+    update_option('tulo_expose_email', isset($_POST["tulo_expose_email"]) ? "on" : "");
+    update_option('tulo_expose_customer_number', isset($_POST["tulo_expose_customer_number"]) ? "on" : "");
     foreach(Tulo_Payway_Server_Admin::get_post_types() as $posttype)
     {
         $key = 'tulo_'.$posttype['name'].'_default_restricted';
@@ -213,6 +217,16 @@ function tulo_server_render_product_list()
 
     <?php
 }
+function get_admin_page_url(string $menu_slug, $query = null, array $esc_options = []) : string
+{
+    $url = menu_page_url($menu_slug, false);
+
+    if($query) {
+        $url .= '&' . (is_array($query) ? http_build_query($query) : (string) $query);
+    }
+
+    return esc_url($url, ...$esc_options);
+}
 
 function tulo_server_render_whitelist_ips() {
   $key = 'tulo_whitelist_ip';
@@ -234,8 +248,25 @@ function tulo_server_render_whitelist_ips() {
 }
 ?>
 
+
 <div class="wrap" ng-app="tulo.admin">
-  <h1><?php esc_html_e( 'Tulo settings', 'tulo'); ?></h1>
+
+    <?php if (get_option("tulo_paywall_enabled") == "on"): ?>
+        <div class="notice notice-warning">
+            <p>
+                <?php 
+                    $url = get_admin_page_url("wp-tulo-paywall");
+                    $warning = __('Tulo Paywall is enabled on this website! See <a href=%s>Tulo Paywall Settings</a> for additional settings.', 'tulo');
+                    $warning = sprintf($warning, $url);
+                    echo $warning;
+                ?>
+            </p>
+        </div>
+    <?php endif ?>
+
+    <h1><?php esc_html_e( 'Tulo settings', 'tulo'); ?></h1>
+
+
   <form name="form" action="" method="post" id="tulo-server-options">
   <?php wp_nonce_field('options-options') ?>
   <input type="hidden" name="action" value="update" />
@@ -271,6 +302,7 @@ function tulo_server_render_whitelist_ips() {
       ?>
 
   </table>
+  <hr/>
   <hr/>
   <?php tulo_server_render_product_list(); ?>
 

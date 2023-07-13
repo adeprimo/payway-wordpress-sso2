@@ -14,6 +14,19 @@ class Tulo_Payway_API {
         $this->scopes = "/external/me/w";
     }  
 
+    public function get_titles() {
+        $this->common->write_log("Fetching titles from Payway");
+        $token = $this->get_access_token_s2s("/external/title/r");
+        if (isset($token) && $token != "" ) {
+            $url = $this->get_api_url("/external/api/v1/titles");
+            $response = $this->common->get_json_with_bearer($url, $token);
+            if ($response["status"] == 200) {
+                $data = json_decode($response["data"]);
+                return $data->items;
+            }        
+            return null;
+        }
+    }
 
     public function get_user_and_products_by_ticket($ticket) {
         $this->common->write_log("Fetching user from ticket: ".$ticket);
@@ -95,6 +108,43 @@ class Tulo_Payway_API {
         }
         curl_close($ch);
         return $token;
+    }
+
+    public function get_access_token_s2s($scopes) {
+        $url = $this->get_api_url("/api/authorization/access_token");
+        $client_id = get_option('tulo_server_client_id');
+        $client_secret = get_option('tulo_server_secret');
+        
+        $fields = "client_id=".$client_id."&client_secret=".$client_secret."&grant_type=none&scope=".$scopes;
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_POSTFIELDS => $fields,
+            CURLOPT_POST => 1,
+            CURLOPT_HTTPHEADER => array(
+                "Accept: application/json",
+                "Content-Type: application/x-www-form-urlencoded"
+            )
+        ));
+
+        $this->common->write_log("Access token url: ".$url);
+        $this->common->write_log("Fields: ".$fields);
+        $output = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $data = json_decode($output);
+
+        $token = null;
+        if ($httpcode == 200) {
+            $this->common->write_log("Got access token: ".$data->access_token);
+            $token = $data->access_token;
+        } else {
+            $error = curl_error($ch);
+            $this->common->write_log("!! Error fetching access token: ".$httpcode." => ".$error);
+        }
+        curl_close($ch);
+        return $token;
+
     }
 
     private function get_api_url($path) {

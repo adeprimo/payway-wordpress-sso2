@@ -1,5 +1,6 @@
 <?php
 
+require plugin_dir_path( __FILE__ ) . '../includes/class-tulo-paywall.php';
 /**
  * The public-facing functionality of the plugin.
  *
@@ -256,7 +257,8 @@ class Tulo_Payway_Server_Public {
 
     public function content_filter($content) {
 
-        if($this->has_access()) {                        
+        if($this->has_access()) {  
+
             return $content;
         }
         
@@ -281,23 +283,72 @@ class Tulo_Payway_Server_Public {
         }
         
         $output .= '        </div>';
-        $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
 
-        foreach($restrictions as $restriction) {
-            $product = $this->find_product($restriction->productid);
-            if($product == null)
-                continue;
-
-            if(empty($product->buyinfo))
-                continue;
-            $output .= '<div class="tulo-product-wrapper info-box">';
-            $output .= $product->buyinfo;
-            $output .= '</div>';
-
+        if (get_option("tulo_paywall_enabled") != "on") 
+        {
+            $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
+            foreach($restrictions as $restriction) {
+                $product = $this->find_product($restriction->productid);
+                if($product == null)
+                    continue;
+    
+                if(empty($product->buyinfo))
+                    continue;
+                $output .= '<div class="tulo-product-wrapper info-box">';
+                $output .= $product->buyinfo;
+                $output .= '</div>';
+    
+            }    
         }
+
+
         $output .= '</div>';
         $output .= '</div>';
+
+        if (get_option("tulo_paywall_enabled") == "on") 
+        {
+            $output .= $this->initialize_paywall();
+        }
+
         do_action('tulo_after_permission_required');
+        return $output;
+    }
+
+    private function initialize_paywall()
+    {
+        $paywall = new Tulo_Paywall_Common();
+        $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
+
+        $output = '<div id="paywall-container"></div>';
+        if (get_option("tulo_paywall_css_enabled") == "on") {
+            $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
+        }
+        $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
+        $output .= '<script type="text/javascript">
+                     new Paywall().Init({
+                        debug: '.$debug.',
+                        url: "'.$paywall->get_paywall_url().'",
+                        jwtToken: "'.$paywall->get_signature().'",
+                        accountOrigin: "'.$paywall->get_account_origin().'",
+                        trafficSource: "'.$paywall->get_traffic_source().'",
+                        merchantReference: "'.$paywall->get_merchant_reference().'",
+                        returnUrl: "'.$paywall->get_return_url().'",
+                        backUrl: "'.$paywall->get_back_url().'",
+                        utmSource: "",
+                        utmMedium: "",
+                        utmCampaign: "",
+                        utmContent: "",
+                        resources: {
+                            errorHeader: "An error occurred",
+                            errorDescription: "Please contact support if problem persists."
+                        },
+                        engageTracking: {
+                            articleId: "'.$paywall->get_article_id().'",
+                            sections: [],
+                            categories: []
+                        }
+                    })
+                    </script>';
         return $output;
     }
 
@@ -338,6 +389,9 @@ class Tulo_Payway_Server_Public {
     }
 
     public function shortcode_buy_button($atts) {
+        if(!isset($atts['class'])) {
+            $atts['class'] = '';
+        }
         $retval = '<button class="js-tuloBuy '.$atts['class'].'" data-product="'.$atts['product'].'">';
         $retval .= __('Buy', 'tulo');
         $retval .= '</button>';
