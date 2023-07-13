@@ -209,7 +209,7 @@ A new admin-panel is now visible in WP called "Tulo Paywall Settings" where you 
 
 The Tulo Paywall product requires that you create a **new** API user in Payway (see [Plug & Play integration](https://docs.worldoftulo.com/paywall/integration/plug-and-play/overview/) for more information), you only need **1** API user for Tulo Paywall in your organisation, and assign correct "Origin-urls" depending on which sites the paywall should be rendered on. 
 
-When the API user has been created reach out to [Payway support](https://docs.worldoftulo.com/payway/support/), to have the new API user activated for Tulo Paywall.
+When the API user has been created, reach out to [Payway support](https://docs.worldoftulo.com/payway/support/) to have the new API user activated for Tulo Paywall.
 
 #### Update settings
 
