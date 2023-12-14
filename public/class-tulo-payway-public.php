@@ -84,6 +84,10 @@ class Tulo_Payway_Server_Public {
         if (is_admin()) 
             return;
         
+        if (get_option("tulo_plugin_active") != "on") 
+            return;
+
+
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             if (get_query_var("tpw_session_refresh") == "1") {
                 $this->common->write_log("!! forced session session refresh using query param");
@@ -257,6 +261,9 @@ class Tulo_Payway_Server_Public {
 
     public function content_filter($content) {
 
+        if (get_option("tulo_plugin_active") != "on") 
+            return $content;
+
         if($this->has_access()) {  
 
             return $content;
@@ -314,8 +321,16 @@ class Tulo_Payway_Server_Public {
         return $output;
     }
 
-    private function initialize_paywall()
+    private function initialize_paywall()    
     {
+        if (get_option("tulo_plugin_active") != "on") 
+            return $content;
+
+        $version = get_option('tulo_paywall_version');
+        if ($version == "1.2") {
+            return $this->initialize_paywall_v1_2();
+        }
+
         $paywall = new Tulo_Paywall_Common();
         $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
 
@@ -326,6 +341,48 @@ class Tulo_Payway_Server_Public {
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
         $output .= '<script type="text/javascript">
                      new Paywall().Init({
+                        debug: '.$debug.',
+                        url: "'.$paywall->get_paywall_url().'",
+                        jwtToken: "'.$paywall->get_signature().'",
+                        accountOrigin: "'.$paywall->get_account_origin().'",
+                        trafficSource: "'.$paywall->get_traffic_source().'",
+                        merchantReference: "'.$paywall->get_merchant_reference().'",
+                        returnUrl: "'.$paywall->get_return_url().'",
+                        backUrl: "'.$paywall->get_back_url().'",
+                        utmSource: "",
+                        utmMedium: "",
+                        utmCampaign: "",
+                        utmContent: "",
+                        resources: {
+                            errorHeader: "An error occurred",
+                            errorDescription: "Please contact support if problem persists."
+                        },
+                        engageTracking: {
+                            articleId: "'.$paywall->get_article_id().'",
+                            sections: [],
+                            categories: []
+                        }
+                    })
+                    </script>';
+        return $output;
+    }
+
+    private function initialize_paywall_v1_2()    
+    {
+        if (get_option("tulo_plugin_active") != "on") 
+            return $content;
+
+        $paywall = new Tulo_Paywall_Common();
+        $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
+
+        $spinner_text = get_option("tulo_paywall_spinner_text");
+        $output = '<div id="tulo-paywall"><template id="paywall-loader-template"><div class="lds-dual-ring"></div><p><i>'.$spinner_text.'</i></p></template><div id="paywall-container"></div></div>';
+        if (get_option("tulo_paywall_css_enabled") == "on") {
+            $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
+        }
+        $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
+        $output .= '<script type="text/javascript">
+                     new TuloPaywall().Init({
                         debug: '.$debug.',
                         url: "'.$paywall->get_paywall_url().'",
                         jwtToken: "'.$paywall->get_signature().'",

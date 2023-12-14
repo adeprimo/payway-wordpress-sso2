@@ -22,6 +22,13 @@ class Tulo_Paywall_Common {
         $client_secret = get_option('tulo_paywall_secret');
         $aid = $this->session->get_user_id();
 
+        $key = get_option('tulo_paywall_static_selector_key');
+        $dynamic_key = get_option('tulo_paywall_dynamic_selector_key');
+        
+        if ($dynamic_key != "" && isset($_SESSION[$dynamic_key])) {
+            $key = $_SESSION[$dynamic_key];
+        }
+
         $time = time();
         $payload = array(
              "t"   => $title,
@@ -30,7 +37,8 @@ class Tulo_Paywall_Common {
              "aud" => "pw-paywall",
              "nbf" => $time,
              "exp" => $time + 60,
-             "iat" => $time
+             "iat" => $time,
+             "pc" => $key
         );
 
         $token = JWT::encode($payload, $client_secret, 'HS256');
@@ -76,10 +84,18 @@ class Tulo_Paywall_Common {
     }
 
     public function get_paywall_css() {
-        return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/paywall.css";
+        $version = get_option('tulo_paywall_version');
+        if ($version == '1.0') {
+            return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/paywall.css";
+        }
+        return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/".$version."/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/".$version."/paywall.css";
     }
     public function get_paywall_js() {
-        return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/paywall.js";
+        $version = get_option('tulo_paywall_version');
+        if ($version == '1.0') {
+            return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/paywall.js";
+        }
+        return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/".$version."/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/".$version."/paywall.js";
     }
     public function get_paywall_url() {
         //return "https://localhost:7172/api/paywall";

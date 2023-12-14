@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-13 14:41+0200\n"
-"PO-Revision-Date: 2023-07-13 14:41+0200\n"
+"POT-Creation-Date: 2023-12-14 15:31+0100\n"
+"PO-Revision-Date: 2023-12-14 15:32+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4.1\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: wp-tulo-payway.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -34,7 +34,7 @@ msgid "Tulo Paywall enabled"
 msgstr "Tulo Paywall enabled"
 
 #: admin/tulo-payway-paywall-settings.php:108
-#: admin/tulo-payway-server-settings.php:275
+#: admin/tulo-payway-server-settings.php:277
 msgid "API Client id"
 msgstr "API Client-ID"
 
@@ -43,7 +43,7 @@ msgid "Paywall API user client id"
 msgstr "Paywall API user client id"
 
 #: admin/tulo-payway-paywall-settings.php:109
-#: admin/tulo-payway-server-settings.php:276
+#: admin/tulo-payway-server-settings.php:278
 msgid "API Secret"
 msgstr "API Secret"
 
@@ -112,77 +112,77 @@ msgid "Check to see extra debug statements in the Javascript console"
 msgstr "Check to see extra debug statements in the Javascript console"
 
 #: admin/tulo-payway-paywall-settings.php:123
-#: admin/tulo-payway-server-settings.php:309
+#: admin/tulo-payway-server-settings.php:311
 msgid "Save Changes"
 msgstr "Save Changes"
 
-#: admin/tulo-payway-server-settings.php:59
+#: admin/tulo-payway-server-settings.php:60
 msgid "At least 360 seconds in production"
 msgstr "At least 360 seconds in production"
 
-#: admin/tulo-payway-server-settings.php:64
+#: admin/tulo-payway-server-settings.php:65
 msgid "Leave empty if this site is providing it's login-form"
 msgstr "Leave empty if this site is providing it’s login-form"
 
-#: admin/tulo-payway-server-settings.php:128
+#: admin/tulo-payway-server-settings.php:129
 msgid "Environment"
 msgstr "Environment"
 
-#: admin/tulo-payway-server-settings.php:149
-#: admin/tulo-payway-server-settings.php:169
+#: admin/tulo-payway-server-settings.php:150
+#: admin/tulo-payway-server-settings.php:170
 msgid "If permission required"
 msgstr "If permission required"
 
-#: admin/tulo-payway-server-settings.php:150
+#: admin/tulo-payway-server-settings.php:151
 msgid "Code will be rendered if product is missing and user is not logged in:"
 msgstr "Code will be rendered if product is missing and user is not logged in:"
 
-#: admin/tulo-payway-server-settings.php:170
+#: admin/tulo-payway-server-settings.php:171
 msgid "Code will be rendered if product is missing and user already logged in:"
 msgstr ""
 "Code will be rendered if product is missing and user already logged in:"
 
-#: admin/tulo-payway-server-settings.php:184
+#: admin/tulo-payway-server-settings.php:185
 msgid "Available products"
 msgstr "Available products"
 
-#: admin/tulo-payway-server-settings.php:189
+#: admin/tulo-payway-server-settings.php:190
 msgid "Productname"
 msgstr "Productname"
 
-#: admin/tulo-payway-server-settings.php:193
+#: admin/tulo-payway-server-settings.php:194
 msgid "Productkey"
 msgstr "Productkey"
 
-#: admin/tulo-payway-server-settings.php:195
+#: admin/tulo-payway-server-settings.php:196
 msgid "Delete"
 msgstr "Delete"
 
-#: admin/tulo-payway-server-settings.php:197
+#: admin/tulo-payway-server-settings.php:198
 msgid "Buy info"
 msgstr "Buy info"
 
-#: admin/tulo-payway-server-settings.php:198
+#: admin/tulo-payway-server-settings.php:199
 msgid "Code below will be rendered if this product is required"
 msgstr "Code below will be rendered if this product is required"
 
-#: admin/tulo-payway-server-settings.php:201
+#: admin/tulo-payway-server-settings.php:202
 msgid "Useful shortodes"
 msgstr "Useful shortcodes"
 
-#: admin/tulo-payway-server-settings.php:210
+#: admin/tulo-payway-server-settings.php:211
 msgid "Add product"
 msgstr "Add product"
 
-#: admin/tulo-payway-server-settings.php:238
+#: admin/tulo-payway-server-settings.php:239
 msgid "Whitelist IP Addresses"
 msgstr "Whitelist IP Addresses"
 
-#: admin/tulo-payway-server-settings.php:239
+#: admin/tulo-payway-server-settings.php:240
 msgid "Separate the ip addresses with a new row"
 msgstr "Separate the ip addresses with a new row"
 
-#: admin/tulo-payway-server-settings.php:259
+#: admin/tulo-payway-server-settings.php:260
 #, php-format
 msgid ""
 "Tulo Paywall is enabled on this website! See <a href=%s>Tulo Paywall "
@@ -191,61 +191,69 @@ msgstr ""
 "Tulo Paywall is enabled on this website! See <a href=%s>Tulo Paywall "
 "Settings</a> for additional settings."
 
-#: admin/tulo-payway-server-settings.php:267
+#: admin/tulo-payway-server-settings.php:268
 msgid "Tulo settings"
 msgstr "Tulo settings"
 
-#: admin/tulo-payway-server-settings.php:277
+#: admin/tulo-payway-server-settings.php:276
+msgid "Tulo active?"
+msgstr "Tulo Active?"
+
+#: admin/tulo-payway-server-settings.php:276
+msgid "Help plugin active"
+msgstr "Is the Tulo plugin activated"
+
+#: admin/tulo-payway-server-settings.php:279
 msgid "Redirect url"
 msgstr "Redirect url"
 
-#: admin/tulo-payway-server-settings.php:278
+#: admin/tulo-payway-server-settings.php:280
 msgid "Authentication URL"
 msgstr "Authentication URL"
 
-#: admin/tulo-payway-server-settings.php:279
+#: admin/tulo-payway-server-settings.php:281
 msgid "Session refresh timeout"
 msgstr "Session refresh timeout"
 
-#: admin/tulo-payway-server-settings.php:279
+#: admin/tulo-payway-server-settings.php:281
 msgid "seconds"
 msgstr "seconds"
 
-#: admin/tulo-payway-server-settings.php:280
+#: admin/tulo-payway-server-settings.php:282
 msgid "Organisation id"
 msgstr "Organisation id"
 
-#: admin/tulo-payway-server-settings.php:281
+#: admin/tulo-payway-server-settings.php:283
 msgid "Expose account id"
 msgstr "Expose account id"
 
-#: admin/tulo-payway-server-settings.php:281
+#: admin/tulo-payway-server-settings.php:283
 msgid "Help expose account id"
 msgstr ""
 "If checked, the account ID for logged in user will be exposed in ‘dataLayer’ "
 "and ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:282
+#: admin/tulo-payway-server-settings.php:284
 msgid "Expose email"
 msgstr "Expose email"
 
-#: admin/tulo-payway-server-settings.php:282
+#: admin/tulo-payway-server-settings.php:284
 msgid "Help expose email"
 msgstr ""
 "If checked, the email-address for logged in user will be exposed in "
 "‘dataLayer’ and ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:283
+#: admin/tulo-payway-server-settings.php:285
 msgid "Expose customer number"
 msgstr "Expose customer number"
 
-#: admin/tulo-payway-server-settings.php:283
+#: admin/tulo-payway-server-settings.php:285
 msgid "Help expose customer number"
 msgstr ""
 "If checked, the customer number for logged in user will be exposed in "
 "‘dataLayer’ and ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:293
+#: admin/tulo-payway-server-settings.php:295
 #, php-format
 msgid "New %s are restricted"
 msgstr "New %s are restricted"
@@ -260,7 +268,7 @@ msgstr "Account locked until"
 msgid "Wrong username or password. (%s attempts left)"
 msgstr "Wrong username or password. (%s attempts left)"
 
-#: public/class-tulo-payway-public.php:396
+#: public/class-tulo-payway-public.php:406
 msgid "Buy"
 msgstr "Buy"
 
@@ -269,8 +277,13 @@ msgid "Tulo Payway Connector for Wordpress"
 msgstr "Tulo Payway Connector for Wordpress"
 
 #. Description of the plugin/theme
+#, fuzzy
+#| msgid ""
+#| "This plugin integrates with the SSO2 single sign on solution in Tulo "
+#| "Payway."
 msgid ""
-"This plugin integrates with the SSO2 single sign on solution in Tulo Payway."
+"This plugin integrates with the SSO2 single sign on solution in Tulo Payway. "
+"Now with support for Tulo Paywall."
 msgstr ""
 "This plugin integrates with the SSO2 single sign on solution in Tulo Payway."
 
