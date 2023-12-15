@@ -110,10 +110,10 @@ class Tulo_Paywall_Common {
     }
 
     private function get_product_code($post_restrictions) {
-        $restrictions = [];
+        $restrictions = array();
+        $this->common->write_log("Getting product code for restrictions: ".print_r($post_restrictions, true));
         if (isset($post_restrictions) && is_array($post_restrictions)) {
-            return $post_restrictions[0]->productid;
-            foreach($restrictions as $restriction) {
+            foreach($post_restrictions as $restriction) {
                 array_push($restrictions, $restriction->productid);
             }
             return join(".", $restrictions);
