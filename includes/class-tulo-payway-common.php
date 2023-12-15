@@ -2,13 +2,23 @@
 
 use \Firebase\JWT\JWT;
 
+class Tulo_Paywall_Server_Common extends Tulo_Payway_Server_Common {
+
+    const LOG_PREFIX = "PAYWALL";
+
+    public function __construct() {
+    }
+
+}
+
 /**
  * Plugin common methods
  */
 class Tulo_Payway_Server_Common {
 
-    public function __construct() {
+    const LOG_PREFIX = "SSO";
 
+    public function __construct() {
     }
 
     public function get_json_with_bearer($url, $token) {
@@ -77,7 +87,7 @@ class Tulo_Payway_Server_Common {
             if (is_array($log) || is_object($log)) {
                 error_log(print_r($log, true));
             } else {
-                error_log("[SSO2] ".$log);
+                error_log("[".static::LOG_PREFIX."] ".$log);
             }
         }
     }

@@ -291,9 +291,9 @@ class Tulo_Payway_Server_Public {
         
         $output .= '        </div>';
 
+        $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
         if (get_option("tulo_paywall_enabled") != "on") 
         {
-            $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
             foreach($restrictions as $restriction) {
                 $product = $this->find_product($restriction->productid);
                 if($product == null)
@@ -314,60 +314,15 @@ class Tulo_Payway_Server_Public {
 
         if (get_option("tulo_paywall_enabled") == "on") 
         {
-            $output .= $this->initialize_paywall();
+            $output .= $this->initialize_paywall($restrictions);
         }
 
         do_action('tulo_after_permission_required');
         return $output;
     }
 
-    private function initialize_paywall()    
-    {
-        if (get_option("tulo_plugin_active") != "on") 
-            return $content;
 
-        $version = get_option('tulo_paywall_version');
-        if ($version == "1.2") {
-            return $this->initialize_paywall_v1_2();
-        }
-
-        $paywall = new Tulo_Paywall_Common();
-        $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
-
-        $output = '<div id="paywall-container"></div>';
-        if (get_option("tulo_paywall_css_enabled") == "on") {
-            $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
-        }
-        $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
-        $output .= '<script type="text/javascript">
-                     new Paywall().Init({
-                        debug: '.$debug.',
-                        url: "'.$paywall->get_paywall_url().'",
-                        jwtToken: "'.$paywall->get_signature().'",
-                        accountOrigin: "'.$paywall->get_account_origin().'",
-                        trafficSource: "'.$paywall->get_traffic_source().'",
-                        merchantReference: "'.$paywall->get_merchant_reference().'",
-                        returnUrl: "'.$paywall->get_return_url().'",
-                        backUrl: "'.$paywall->get_back_url().'",
-                        utmSource: "",
-                        utmMedium: "",
-                        utmCampaign: "",
-                        utmContent: "",
-                        resources: {
-                            errorHeader: "An error occurred",
-                            errorDescription: "Please contact support if problem persists."
-                        },
-                        engageTracking: {
-                            articleId: "'.$paywall->get_article_id().'",
-                            sections: [],
-                            categories: []
-                        }
-                    })
-                    </script>';
-        return $output;
-    }
-
-    private function initialize_paywall_v1_2()    
+    private function initialize_paywall($post_restrictions)    
     {
         if (get_option("tulo_plugin_active") != "on") 
             return $content;
@@ -375,8 +330,12 @@ class Tulo_Payway_Server_Public {
         $paywall = new Tulo_Paywall_Common();
         $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
 
-        $spinner_text = get_option("tulo_paywall_spinner_text");
-        $output = '<div id="tulo-paywall"><template id="paywall-loader-template"><div class="lds-dual-ring"></div><p><i>'.$spinner_text.'</i></p></template><div id="paywall-container"></div></div>';
+        $spinner_html = get_option("tulo_paywall_spinner_html");
+        if ($spinner_html == "") {
+            $loading = __('Loading paywall...', 'tulo');
+            $spinner_html = '<div class="lds-dual-ring"></div><p><i>'.$loading.'</i></p>';
+        }
+        $output = '<div id="tulo-paywall"><template id="paywall-loader-template">'.$spinner_html.'</template><div id="paywall-container"></div></div>';
         if (get_option("tulo_paywall_css_enabled") == "on") {
             $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
         }
@@ -385,7 +344,7 @@ class Tulo_Payway_Server_Public {
                      new TuloPaywall().Init({
                         debug: '.$debug.',
                         url: "'.$paywall->get_paywall_url().'",
-                        jwtToken: "'.$paywall->get_signature().'",
+                        jwtToken: "'.$paywall->get_signature($post_restrictions).'",
                         accountOrigin: "'.$paywall->get_account_origin().'",
                         trafficSource: "'.$paywall->get_traffic_source().'",
                         merchantReference: "'.$paywall->get_merchant_reference().'",

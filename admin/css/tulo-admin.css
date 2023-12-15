@@ -5,17 +5,21 @@
 
 textarea[name="tulo_whitelist_ip"]
 {
-    width:100%;
+    width:80%;
     height:300px;
 }
 textarea.tulo_permission_required {
-    width:100%;
+    width:80%;
+    height:300px;
+}
+textarea.tulo_paywall_spinner_html {
+    width:80%;
     height:300px;
 }
 
 .tulo_product_row textarea.buy-info{
 
-    width:100%;
+    width:80%;
     height:300px;
 }
 .tulo_product_row td{
