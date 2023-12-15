@@ -31,6 +31,9 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option('tulo_paywall_merchant_reference_static', $_POST["tulo_paywall_merchant_reference_static"]);
     update_option('tulo_paywall_merchant_reference_link', isset($_POST["tulo_paywall_merchant_reference_link"]) ? "on" : "");
     update_option('tulo_paywall_js_debug_enabled', isset($_POST["tulo_paywall_js_debug_enabled"]) ? "on" :"");
+
+    $variables = json_decode(stripslashes($_POST["tulo_variables_val"]));
+    update_option("tulo_paywall_variables", $variables);
 }
 
 function tulo_server_render_spinner_html()
@@ -121,6 +124,35 @@ function tulo_server_render_option_titles($label)
  
 <?php }
 
+function tulo_server_render_custom_variables()
+{
+?>
+<table class="form-table tulo-variables"  ng-controller="VariableListController">
+    <tr class="tulo_variable_row {{variable.key}}" ng-repeat="variable in model.Variables">
+        <th scope="row">
+            <?php _e('Variable key', 'tulo'); ?>
+            <input type="text" class="label" ng-model="variable.key">
+
+        </th>
+        <td>
+            <?php _e('Variable value', 'tulo') ?>
+            <input type="text" class="value" ng-model="variable.value">
+            <a class="delete" ng-click="deleteVariable(variable)"><?php _e('Variable delete', 'tulo') ?></a>            
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <textarea name="tulo_variables_val">{{model.Variables}}</textarea>
+            <a class="tulo_add_variable" ng-click="addVariable()"><?php _e('Add variable', 'tulo'); ?></a>
+
+        </td>
+    </tr>
+
+</table>
+
+    <?php
+}
+
 ?>
 
 <div class="wrap" ng-app="tulo.admin">
@@ -184,6 +216,15 @@ function tulo_server_render_option_titles($label)
             tulo_server_render_bool_option_setting(__("Javascript debug enabled", "tulo"), "tulo_paywall_js_debug_enabled", __("Check to see extra debug statements in the Javascript console", "tulo"));
         ?>
     </table>
+    <hr/>
+    <h2><?php _e('Paywall custom variables', 'tulo') ?></h2>
+    <table class="form-table">
+
+        <?php
+            tulo_server_render_custom_variables();
+        ?>
+    </table>
+    
 
   <hr/>
 

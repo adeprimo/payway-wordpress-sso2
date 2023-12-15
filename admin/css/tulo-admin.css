@@ -34,3 +34,27 @@ textarea.tulo_paywall_spinner_html {
 .tulo-products a{
     cursor:pointer;
 }
+
+.tulo_variable_row td{
+    padding-top:35px;
+
+}
+.tulo_variable_row input.productid
+{
+    margin:0 30px;
+
+}
+.tulo_variables a{
+    cursor:pointer;
+}
+
+a.tulo_add_variable {
+    cursor:pointer;
+}
+textarea[name="tulo_variables_val"]
+{
+    display:none;
+}
+table.tulo-variables {
+    width:100px;
+}

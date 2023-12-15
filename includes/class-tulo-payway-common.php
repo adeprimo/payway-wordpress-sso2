@@ -21,6 +21,22 @@ class Tulo_Payway_Server_Common {
     public function __construct() {
     }
 
+    public function get_authentication_url() {
+        global $wp;
+        $currentUrl = home_url( $wp->request );
+        $permalinkStructure = get_option( 'permalink_structure' );
+        if ($permalinkStructure == "plain") {
+            $queryVars = $wp->query_vars;
+            $queryVars['tpw_session_refresh'] = '1';
+            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );    
+        } else {
+            $currentUrl .= "?tpw_session_refresh=1";
+        } 
+        $currentOrg = get_option('tulo_organisation_id');
+        $authUrl = get_option('tulo_authentication_url');
+        return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", urlencode($currentUrl), $authUrl));
+    }
+
     public function get_json_with_bearer($url, $token) {
         $this->write_log("[get_json_with_bearer]");
         $ch = curl_init();

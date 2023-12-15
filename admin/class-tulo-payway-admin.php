@@ -87,6 +87,7 @@ class Tulo_Payway_Server_Admin {
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'angular.js', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js', array( 'jquery' ), $this->version, false );
         wp_enqueue_script( Tulo_Payway_Server::instance()->plugin_name.'productlist.controller', plugin_dir_url( __FILE__ ) . 'js/productlist.controller.js', null, $this->version, false );
+        wp_enqueue_script( Tulo_Payway_Server::instance()->plugin_name.'variablelist.controller', plugin_dir_url( __FILE__ ) . 'js/variablelist.controller.js', null, $this->version, false );
         wp_enqueue_script( Tulo_Payway_Server::instance()->plugin_name.'_app', plugin_dir_url( __FILE__ ) . 'js/tulo-admin.js', array( 'jquery', 'angular.js' ), $this->version, false );
     }
 

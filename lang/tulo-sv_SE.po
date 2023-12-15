@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 11:42+0100\n"
-"PO-Revision-Date: 2023-12-15 11:42+0100\n"
+"POT-Creation-Date: 2023-12-15 13:44+0100\n"
+"PO-Revision-Date: 2023-12-15 15:24+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -25,63 +25,79 @@ msgstr ""
 msgid "Tulo Payway restrictions"
 msgstr "Tulo Payway begränsningar"
 
-#: admin/tulo-payway-paywall-settings.php:42
+#: admin/tulo-payway-paywall-settings.php:47
 msgid "Spinner html"
 msgstr "Spinner html"
 
-#: admin/tulo-payway-paywall-settings.php:43
+#: admin/tulo-payway-paywall-settings.php:48
 msgid "HTML shown when paywall is loading."
 msgstr ""
 "HTML som visas när Paywall laddas, om fältet lämnas tomt används standard "
 "Tulo Paywall “spinner”."
 
-#: admin/tulo-payway-paywall-settings.php:125
+#: admin/tulo-payway-paywall-settings.php:133
+msgid "Variable key"
+msgstr "Nyckel"
+
+#: admin/tulo-payway-paywall-settings.php:138
+msgid "Variable value"
+msgstr "Värde"
+
+#: admin/tulo-payway-paywall-settings.php:140
+msgid "Variable delete"
+msgstr "Ta bort"
+
+#: admin/tulo-payway-paywall-settings.php:146
+msgid "Add variable"
+msgstr "Lägg till ny variabel"
+
+#: admin/tulo-payway-paywall-settings.php:159
 msgid "Tulo Paywall settings"
 msgstr "Tulo Paywall inställningar"
 
-#: admin/tulo-payway-paywall-settings.php:130
+#: admin/tulo-payway-paywall-settings.php:164
 msgid "Paywall basic settings"
 msgstr "Grundinställningar"
 
-#: admin/tulo-payway-paywall-settings.php:134
+#: admin/tulo-payway-paywall-settings.php:168
 msgid "Tulo Paywall enabled"
 msgstr "Tulo Paywall aktiverad"
 
-#: admin/tulo-payway-paywall-settings.php:135
+#: admin/tulo-payway-paywall-settings.php:169
 #: admin/tulo-payway-server-settings.php:277
 msgid "API Client id"
 msgstr "API Klient-ID"
 
-#: admin/tulo-payway-paywall-settings.php:135
+#: admin/tulo-payway-paywall-settings.php:169
 msgid "Paywall API user client id"
 msgstr "Paywall API Klient-ID"
 
-#: admin/tulo-payway-paywall-settings.php:136
+#: admin/tulo-payway-paywall-settings.php:170
 #: admin/tulo-payway-server-settings.php:278
 msgid "API Secret"
 msgstr "API Hemlig nyckel"
 
-#: admin/tulo-payway-paywall-settings.php:136
+#: admin/tulo-payway-paywall-settings.php:170
 msgid "Paywall API user secret"
 msgstr "Paywall API hemlig nyckel"
 
-#: admin/tulo-payway-paywall-settings.php:140
+#: admin/tulo-payway-paywall-settings.php:174
 msgid "Paywall selection settings"
 msgstr "Inställningar för urval av Paywall"
 
-#: admin/tulo-payway-paywall-settings.php:144
+#: admin/tulo-payway-paywall-settings.php:178
 msgid "Tulo Paywall title"
 msgstr "Tulo Paywall Titel"
 
-#: admin/tulo-payway-paywall-settings.php:144
+#: admin/tulo-payway-paywall-settings.php:178
 msgid "Tulo Payway title code where Paywall is configured"
 msgstr "Payway titel-kod där Paywall finns konfigurerad"
 
-#: admin/tulo-payway-paywall-settings.php:145
+#: admin/tulo-payway-paywall-settings.php:179
 msgid "Tulo Paywall Static Selector Key"
 msgstr "Statisk nyckel för hämtning av Paywall"
 
-#: admin/tulo-payway-paywall-settings.php:145
+#: admin/tulo-payway-paywall-settings.php:179
 msgid ""
 "If there are more than one Paywall active in Tulo, this static key will "
 "select which Paywall to select for presentation. If static and dynamic keys "
@@ -91,11 +107,11 @@ msgstr ""
 "för att välja vilken Paywall som skall hämtas. Om både statisk och dynamisk "
 "nyckel är odefinierade, levererar Tulo den 1:a Paywall som skapades."
 
-#: admin/tulo-payway-paywall-settings.php:146
+#: admin/tulo-payway-paywall-settings.php:180
 msgid "Tulo Paywall Dynamic Selector Key"
 msgstr "Dynamisk nyckel för hämtning av Paywall"
 
-#: admin/tulo-payway-paywall-settings.php:146
+#: admin/tulo-payway-paywall-settings.php:180
 msgid ""
 "Enter the name of a session variable that holds the Paywall selection key, "
 "if no value is defined on the session variable, the static key will be used."
@@ -104,11 +120,11 @@ msgstr ""
 "Paywall som skall hämtas, om inget värde är definierat på sessions-variabeln "
 "används den statiska nyckeln istället."
 
-#: admin/tulo-payway-paywall-settings.php:147
+#: admin/tulo-payway-paywall-settings.php:181
 msgid "Tulo Paywall Product Selector Key"
 msgstr "Produkt på artikel"
 
-#: admin/tulo-payway-paywall-settings.php:147
+#: admin/tulo-payway-paywall-settings.php:181
 msgid ""
 "Use the locked article's required product code as selector, must map to a "
 "Paywall with matching key."
@@ -117,23 +133,23 @@ msgstr ""
 "Om flera produkter används slås dessa ihop till en nyckel separerade med "
 "punkt. Ex: “productA.productB”."
 
-#: admin/tulo-payway-paywall-settings.php:153
+#: admin/tulo-payway-paywall-settings.php:187
 msgid "Paywall analytics settings"
 msgstr "Inställningar för spårbarhet"
 
-#: admin/tulo-payway-paywall-settings.php:157
+#: admin/tulo-payway-paywall-settings.php:191
 msgid "Tulo Paywall Traffic Source"
 msgstr "Tulo Paywall trafik källa"
 
-#: admin/tulo-payway-paywall-settings.php:157
+#: admin/tulo-payway-paywall-settings.php:191
 msgid "Leave empty if no traffic source should be used (not recommended)."
 msgstr "Lämna tomt om ingen trafik källa skall användas (ej rekommenderat)"
 
-#: admin/tulo-payway-paywall-settings.php:158
+#: admin/tulo-payway-paywall-settings.php:192
 msgid "Tulo Paywall Merchant Reference (static)"
 msgstr "Tulo Paywall Merchant Reference"
 
-#: admin/tulo-payway-paywall-settings.php:158
+#: admin/tulo-payway-paywall-settings.php:192
 msgid ""
 "Leave empty if no merchant reference should be used or if inferred from "
 "article link."
@@ -141,47 +157,69 @@ msgstr ""
 "Lämna tomt om ingen merchant reference skall användas eller om det skall "
 "härledas från artikelns länk."
 
-#: admin/tulo-payway-paywall-settings.php:159
+#: admin/tulo-payway-paywall-settings.php:193
 msgid "Tulo Paywall Merchant Reference from link"
 msgstr "Tulo Paywall Merchant reference från länk"
 
-#: admin/tulo-payway-paywall-settings.php:159
+#: admin/tulo-payway-paywall-settings.php:193
 msgid "Get merchant reference from current article link"
 msgstr "Använd artikelns länk som merchant reference"
 
-#: admin/tulo-payway-paywall-settings.php:160
+#: admin/tulo-payway-paywall-settings.php:194
 msgid "Tulo Paywall Account Origin"
 msgstr "Tulo Paywall Konto ursprung"
 
-#: admin/tulo-payway-paywall-settings.php:160
+#: admin/tulo-payway-paywall-settings.php:194
 msgid "New accounts will be created with this account origin"
 msgstr "Nya konton kommer bli skapade med detta värde som “Account Origin”"
 
-#: admin/tulo-payway-paywall-settings.php:165
+#: admin/tulo-payway-paywall-settings.php:199
 msgid "Paywall look and feel settings"
 msgstr "Inställningar för utseende"
 
-#: admin/tulo-payway-paywall-settings.php:170
+#: admin/tulo-payway-paywall-settings.php:204
 msgid "Tulo Paywall CSS enabled"
 msgstr "Tulo Paywall CSS aktiverad"
 
-#: admin/tulo-payway-paywall-settings.php:170
+#: admin/tulo-payway-paywall-settings.php:204
 msgid "Check to include Tulo CSS for the paywall"
 msgstr "Kryssa om Tulo CSS skall inkluderas vid rendering"
 
-#: admin/tulo-payway-paywall-settings.php:176
+#: admin/tulo-payway-paywall-settings.php:210
 msgid "Paywall other settings"
 msgstr "Övriga inställningar"
 
-#: admin/tulo-payway-paywall-settings.php:180
+#: admin/tulo-payway-paywall-settings.php:214
+msgid "Tulo Paywall Login Url"
+msgstr "Login Url"
+
+#: admin/tulo-payway-paywall-settings.php:214
+msgid "Login URL that can be used in the Paywall template"
+msgstr ""
+"Ange URL för login om du vill använda den i Paywall mallen, lämna tomt om "
+"standard inloggnings URL skall användas"
+
+#: admin/tulo-payway-paywall-settings.php:215
+msgid "Tulo Paywall Shop Url"
+msgstr "Shop Url"
+
+#: admin/tulo-payway-paywall-settings.php:215
+msgid "Shop URL that can be used in the Paywall template"
+msgstr "Ange Url till den Tulo Shop du vill länka till i Paywall mallen"
+
+#: admin/tulo-payway-paywall-settings.php:216
 msgid "Javascript debug enabled"
 msgstr "Javascript debug aktiverat"
 
-#: admin/tulo-payway-paywall-settings.php:180
+#: admin/tulo-payway-paywall-settings.php:216
 msgid "Check to see extra debug statements in the Javascript console"
 msgstr "Kryssa för att se debug information i Javascript konsol"
 
-#: admin/tulo-payway-paywall-settings.php:186
+#: admin/tulo-payway-paywall-settings.php:220
+msgid "Paywall custom variables"
+msgstr "Utökade variabler"
+
+#: admin/tulo-payway-paywall-settings.php:231
 #: admin/tulo-payway-server-settings.php:311
 msgid "Save Changes"
 msgstr "Spara ändringar"
@@ -192,7 +230,7 @@ msgstr "Skall vara minst 360 sekunder i produktionsmiljö"
 
 #: admin/tulo-payway-server-settings.php:65
 msgid "Leave empty if this site is providing it's login-form"
-msgstr "Lämna tomt om sajten har sitt eget inloggniwngsformulär"
+msgstr "Lämna tomt om sajten har sitt eget inloggningsformulär"
 
 #: admin/tulo-payway-server-settings.php:129
 msgid "Environment"
@@ -344,7 +382,7 @@ msgstr "Fel användarnamn eller lösenord. (%s försök kvar)"
 msgid "Loading paywall..."
 msgstr "Laddar..."
 
-#: public/class-tulo-payway-public.php:412
+#: public/class-tulo-payway-public.php:414
 msgid "Buy"
 msgstr "Köp"
 
