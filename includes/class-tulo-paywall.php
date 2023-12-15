@@ -90,6 +90,14 @@ class Tulo_Paywall_Common {
         return $wp_query->post->ID;
     }
 
+    public function get_login_url() {
+        return get_option("tulo_paywall_template_login_url");
+    }
+
+    public function get_shop_url() {
+        return get_option("tulo_paywall_template_shop_url");
+    }
+
     public function get_paywall_css() {
         $version = Tulo_Paywall_Common::PAYWALL_VERSION;
         if ($version == '1.0') {

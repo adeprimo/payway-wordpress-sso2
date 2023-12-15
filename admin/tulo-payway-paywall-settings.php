@@ -16,6 +16,8 @@
 if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
     update_option('tulo_paywall_enabled', isset($_POST["tulo_paywall_enabled"]) ? "on" : "" );
+    update_option('tulo_paywall_template_login_url', $_POST["tulo_paywall_template_login_url"]);
+    update_option('tulo_paywall_template_shop_url', $_POST["tulo_paywall_template_shop_url"]);
     update_option('tulo_paywall_client_id', $_POST["tulo_paywall_client_id"]);
     update_option('tulo_paywall_secret', $_POST["tulo_paywall_secret"]);
     update_option('tulo_paywall_spinner_html', $_POST["tulo_paywall_spinner_html"]);
@@ -177,6 +179,8 @@ function tulo_server_render_option_titles($label)
     <table class="form-table">
 
         <?php
+            tulo_server_render_text_option_setting(__("Tulo Paywall Login Url", "tulo"), "tulo_paywall_template_login_url", __("Login URL that can be used in the Paywall template", "tulo"));
+            tulo_server_render_text_option_setting(__("Tulo Paywall Shop Url", "tulo"), "tulo_paywall_template_shop_url", __("Shop URL that can be used in the Paywall template", "tulo"));
             tulo_server_render_bool_option_setting(__("Javascript debug enabled", "tulo"), "tulo_paywall_js_debug_enabled", __("Check to see extra debug statements in the Javascript console", "tulo"));
         ?>
     </table>

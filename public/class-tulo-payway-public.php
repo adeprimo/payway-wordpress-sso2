@@ -351,6 +351,8 @@ class Tulo_Payway_Server_Public {
                         returnUrl: "'.$paywall->get_return_url().'",
                         backUrl: "'.$paywall->get_back_url().'",
                         utmSource: "",
+                        loginUrl: "'.$paywall->get_login_url().'",
+                        shopUrl: "'.$paywall->get_shop_url().'",
                         utmMedium: "",
                         utmCampaign: "",
                         utmContent: "",
