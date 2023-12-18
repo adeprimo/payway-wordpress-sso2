@@ -213,11 +213,44 @@ When the API user has been created, reach out to [Payway support](https://docs.w
 
 **HEADSUP! An API user already exists for your organisation in your staging environment, look for an API user with the name "Tulo Paywall" in Payway admin and use that for the Paywall settings below in your staging environment.**
 
-#### Update settings
+#### Basic settings
 
 * Enable Tulo Paywall
 * Add API clientId and secret
-* Define the Payway title code where the Paywall has been configured. [Read more ...](https://docs.worldoftulo.com/paywall/core_concept/overview/)
+
+#### Paywall selection settings
+
+These settings determine which Paywall configured in Tulo Payway is going to be displayed when it is fetched on the website.
+
+* Tulo Paywall title - Define the Payway title code where the Paywall has been configured. [Read more ...](https://docs.worldoftulo.com/paywall/core_concept/overview/).
+* Static Paywall key - If you have multiple active Paywalls you can set a static key selecting the Paywall you want to display on the website.
+* Dynamic Paywall key - Enter a name of a session variable that should be used for Paywall selection, if left empty, the static key is used.
+* Product Paywall key - If checked, Paywall is selected based on the products required to read the article where the Paywall is displayed. 
+
+!!! note "General"
+
+    If all of the above settings are left empty/unchecked, the first active Paywall created will be selected and displayed.
+    
+!!! note "Product key"
+
+    It is the "product code" that will be used when selecting a Paywall, if an article/page requires multiple products, the product codes will be joined in a string separated with ".". For example: `productA.productB`.
+    
+
+
+#### Analytics settings
+
+
+#### Look and feel
+
+
+#### Other settings
+
+
+#### Custom variables
+
+
+
+
 * Define an [Account Origin](https://docs.worldoftulo.com/payway/portal/account_origin/overview/) that should be used for new accounts created from the paywall.
 * Define a [Traffic Source](https://docs.worldoftulo.com/payway/portal/traffic_source/overview/) for new purchases through the paywall.
 * Decide if you want to use a static [Merchant Reference](https://docs.worldoftulo.com/payway/portal/merchant_reference/overview/) or use the article-link as the reference, or leave empty if you don't want to use it.
