@@ -230,8 +230,9 @@ These settings determine which Paywall configured in Tulo Payway is going to be 
 > [!NOTE]
 > If all of the above settings are left empty/unchecked, the first active Paywall created will be selected and displayed.
     
-> [!NOTE "Product key"]
-> It is the "product code" that will be used when selecting a Paywall, if an article/page requires multiple products, the product codes will be joined in a string separated with ".". For example: `productA.productB`.
+> [!NOTE]
+> About the "Product Paywall key" - From this version of the plugin it is now possible to define a `paywall key` for the tulo product that can be created as a part of the setup of the plugin. This means that multiple tulo products can reference the same Paywall if needed. However, if no `paywall key` has been defined on the tulo product, the `product key` will be used when selecting the Paywall. If an article/page requires multiple products, the product codes/paywall keys will be joined in a string separated with ".". For example: `productA.productB`.
+> Please note that if you already have assigned "tulo restrictions" for articles based on previous versions of the plugin, the "tulo restrictions" needs to be updated if you wish to use `paywall keys` as a selector for the Paywall.
     
 
 
@@ -267,6 +268,4 @@ These settings determine which Paywall configured in Tulo Payway is going to be 
 * Define a key for the variable and a value
 
 > [!TIP]
-> Add a variable with the value `$user.name` to add the logged in user's name as a custom variable, which could be used in a greeting for example.
-
-All defined variables can then be used in the Paywall template.
+> If a user is logged in but hasn't the needed subscription, a custom variable named `USER_NAME` is automatically added to the list of variables. Which could be useful as a greeting in a Paywall displaying a new or higher ranking offer than what the user already have access to.

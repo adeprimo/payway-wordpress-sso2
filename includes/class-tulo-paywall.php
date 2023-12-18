@@ -124,25 +124,34 @@ class Tulo_Paywall_Common {
     }
 
     public function get_custom_variables() {
+        $custom_variables = $this->get_user_custom_variables();
+
         $variables = get_option("tulo_paywall_variables");
-        $custom_variables = array();
         foreach($variables as $variable) {
             $value = $variable->value;
-            if ($value == "\$user.name") {
-                $user_name = $this->session->get_user_name();
-                $value = $user_name != null ? $user_name : "";
-            }
             $custom_variables[$variable->key] = $value;
         }   
         return json_encode($custom_variables);
     }
 
+    private function get_user_custom_variables() {
+        $custom_variables = array();
+        $user_name = $this->session->get_user_name();
+        $value = $user_name != null ? $user_name : "";
+
+        $custom_variables["USER_NAME"] = $value;
+        return $custom_variables;
+    }
+
     private function get_product_codes($post_restrictions) {
         $restrictions = array();
-        //$this->common->write_log("Getting product code for restrictions: ".print_r($post_restrictions, true));
+        $this->common->write_log("Getting product code for restrictions: ".print_r($post_restrictions, true));
         if (isset($post_restrictions) && is_array($post_restrictions)) {
             foreach($post_restrictions as $restriction) {                
-                array_push($restrictions, $restriction->productid);
+                if (isset($restriction->paywallkey))
+                    array_push($restrictions, $restriction->paywallkey);
+                else
+                    array_push($restrictions, $restriction->productid);
             }
             return join(".", $restrictions);
         }

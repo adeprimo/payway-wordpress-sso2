@@ -191,8 +191,11 @@ function tulo_server_render_product_list()
             <input type="text" class="label" ng-model="product.label">
 
         </th>
-        <td><?php _e('Productkey', 'tulo') ?>:
+        <td>
+            <?php _e('Productkey', 'tulo') ?>:
             <input type="text" class="productid" ng-model="product.productid">
+            <?php _e('Paywallkey', 'tulo') ?>:
+            <input type="text" class="productid" ng-model="product.paywallkey">
             <a class="delete" ng-click="delete(product)"><?php _e('Delete', 'tulo') ?></a>
             <p>
             <?php _e('Buy info', 'tulo') ?>:<br>

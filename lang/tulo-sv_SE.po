@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 13:44+0100\n"
-"PO-Revision-Date: 2023-12-15 15:24+0100\n"
+"POT-Creation-Date: 2023-12-18 16:58+0100\n"
+"PO-Revision-Date: 2023-12-18 16:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -64,7 +64,7 @@ msgid "Tulo Paywall enabled"
 msgstr "Tulo Paywall aktiverad"
 
 #: admin/tulo-payway-paywall-settings.php:169
-#: admin/tulo-payway-server-settings.php:277
+#: admin/tulo-payway-server-settings.php:280
 msgid "API Client id"
 msgstr "API Klient-ID"
 
@@ -73,7 +73,7 @@ msgid "Paywall API user client id"
 msgstr "Paywall API Klient-ID"
 
 #: admin/tulo-payway-paywall-settings.php:170
-#: admin/tulo-payway-server-settings.php:278
+#: admin/tulo-payway-server-settings.php:281
 msgid "API Secret"
 msgstr "API Hemlig nyckel"
 
@@ -220,7 +220,7 @@ msgid "Paywall custom variables"
 msgstr "Utökade variabler"
 
 #: admin/tulo-payway-paywall-settings.php:231
-#: admin/tulo-payway-server-settings.php:311
+#: admin/tulo-payway-server-settings.php:314
 msgid "Save Changes"
 msgstr "Spara ändringar"
 
@@ -258,39 +258,43 @@ msgstr "Tillgängliga produkter"
 msgid "Productname"
 msgstr "Produktnamn"
 
-#: admin/tulo-payway-server-settings.php:194
+#: admin/tulo-payway-server-settings.php:195
 msgid "Productkey"
 msgstr "Produktnyckel"
 
-#: admin/tulo-payway-server-settings.php:196
+#: admin/tulo-payway-server-settings.php:197
+msgid "Paywallkey"
+msgstr "Paywall nyckel"
+
+#: admin/tulo-payway-server-settings.php:199
 msgid "Delete"
 msgstr "Radera"
 
-#: admin/tulo-payway-server-settings.php:198
+#: admin/tulo-payway-server-settings.php:201
 msgid "Buy info"
 msgstr "Köpinformation"
 
-#: admin/tulo-payway-server-settings.php:199
+#: admin/tulo-payway-server-settings.php:202
 msgid "Code below will be rendered if this product is required"
 msgstr "Koden kommer att visas om produkten krävs"
 
-#: admin/tulo-payway-server-settings.php:202
+#: admin/tulo-payway-server-settings.php:205
 msgid "Useful shortodes"
 msgstr "Användbara shortodes"
 
-#: admin/tulo-payway-server-settings.php:211
+#: admin/tulo-payway-server-settings.php:214
 msgid "Add product"
 msgstr "Lägg till produkt"
 
-#: admin/tulo-payway-server-settings.php:239
+#: admin/tulo-payway-server-settings.php:242
 msgid "Whitelist IP Addresses"
 msgstr "Vitlista IP-adresser"
 
-#: admin/tulo-payway-server-settings.php:240
+#: admin/tulo-payway-server-settings.php:243
 msgid "Separate the ip addresses with a new row"
 msgstr "Separera IP-adresser med en ny rad"
 
-#: admin/tulo-payway-server-settings.php:260
+#: admin/tulo-payway-server-settings.php:263
 #, php-format
 msgid ""
 "Tulo Paywall is enabled on this website! See <a href=%s>Tulo Paywall "
@@ -299,71 +303,71 @@ msgstr ""
 "Tulo Paywall är aktiverad på den här sajten! Se <a href=%s>Tulo Paywall "
 "Inställningar</a> för mer inställningsmöjligheter."
 
-#: admin/tulo-payway-server-settings.php:268
+#: admin/tulo-payway-server-settings.php:271
 msgid "Tulo settings"
 msgstr "Tulo inställningar"
 
-#: admin/tulo-payway-server-settings.php:276
+#: admin/tulo-payway-server-settings.php:279
 msgid "Tulo active?"
 msgstr "Tulo aktiverat?"
 
-#: admin/tulo-payway-server-settings.php:276
+#: admin/tulo-payway-server-settings.php:279
 msgid "Help plugin active"
 msgstr ""
 "Indikerar om Tulo funktionalitet är aktiverad på sajten, inga kontroller mot "
 "SSO eller behörighetskontroller på artiklar görs om Tulo inte är aktiverat"
 
-#: admin/tulo-payway-server-settings.php:279
+#: admin/tulo-payway-server-settings.php:282
 msgid "Redirect url"
 msgstr "Omdirigera till URL"
 
-#: admin/tulo-payway-server-settings.php:280
+#: admin/tulo-payway-server-settings.php:283
 msgid "Authentication URL"
 msgstr "Autentiserings URL"
 
-#: admin/tulo-payway-server-settings.php:281
+#: admin/tulo-payway-server-settings.php:284
 msgid "Session refresh timeout"
 msgstr "Session timeout, hur ofta skall sessionen kontrolleras"
 
-#: admin/tulo-payway-server-settings.php:281
+#: admin/tulo-payway-server-settings.php:284
 msgid "seconds"
 msgstr "sekunder"
 
-#: admin/tulo-payway-server-settings.php:282
+#: admin/tulo-payway-server-settings.php:285
 msgid "Organisation id"
 msgstr "Organisationens id"
 
-#: admin/tulo-payway-server-settings.php:283
+#: admin/tulo-payway-server-settings.php:286
 msgid "Expose account id"
 msgstr "Exponera account ID"
 
-#: admin/tulo-payway-server-settings.php:283
+#: admin/tulo-payway-server-settings.php:286
 msgid "Help expose account id"
 msgstr ""
 "Om markerad, så kommer konto ID för inloggad användare exponeras i "
 "‘dataLayer’ och i ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:284
+#: admin/tulo-payway-server-settings.php:287
 msgid "Expose email"
 msgstr "Exponera e-postadress"
 
-#: admin/tulo-payway-server-settings.php:284
+#: admin/tulo-payway-server-settings.php:287
 msgid "Help expose email"
 msgstr ""
 "Om markerad, så kommer e-postadressen för inloggad användare exponeras i "
 "‘dataLayer’ och i ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:285
+#: admin/tulo-payway-server-settings.php:288
 msgid "Expose customer number"
 msgstr "Exponera kundnummer"
 
-#: admin/tulo-payway-server-settings.php:285
+#: admin/tulo-payway-server-settings.php:288
 msgid "Help expose customer number"
 msgstr ""
 "Om markerad, så kommer kundnummer för inloggad användare exponeras i "
 "‘dataLayer’ och i ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:295
+#: admin/tulo-payway-server-settings.php:298
 #, php-format
 msgid "New %s are restricted"
 msgstr "Nya %s är låsta"
@@ -378,11 +382,11 @@ msgstr "Kontot är låst till och med"
 msgid "Wrong username or password. (%s attempts left)"
 msgstr "Fel användarnamn eller lösenord. (%s försök kvar)"
 
-#: public/class-tulo-payway-public.php:335
+#: public/class-tulo-payway-public.php:341
 msgid "Loading paywall..."
 msgstr "Laddar..."
 
-#: public/class-tulo-payway-public.php:414
+#: public/class-tulo-payway-public.php:422
 msgid "Buy"
 msgstr "Köp"
 
