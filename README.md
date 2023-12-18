@@ -233,7 +233,7 @@ These settings determine which Paywall configured in Tulo Payway is going to be 
 > [!NOTE]
 > If "Product Paywall key" is checked - From this version of the plugin it is now possible to define a `paywall key` for the tulo product that can be created as a part of the setup of the plugin. This means that multiple tulo products can reference the same Paywall if needed. However, if no `paywall key` has been defined on the tulo product, the `product key` will be used when selecting the Paywall. If an article/page requires multiple products, the product codes/paywall keys will be joined in a string separated with ".". For example: `productA.productB`.
 
-> [!WARN]
+> [!WARNING]
 > Please note that if you already have assigned "tulo restrictions" for articles based on previous versions of the plugin, the "tulo restrictions" needs to be updated if you wish to use `paywall keys` as a selector for the Paywall.
     
 
