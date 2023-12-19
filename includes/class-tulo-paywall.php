@@ -104,6 +104,25 @@ class Tulo_Paywall_Common {
         return get_option("tulo_paywall_template_shop_url");
     }
 
+    public function get_error_header() {
+        $header = __('Error loading paywall', 'tulo');
+        $custom_header = get_option("tulo_paywall_error_header");
+        if ($custom_header != "") {
+            $header = $custom_header;
+        }
+        return $header;
+    }
+
+    public function get_error_message() {
+        $message = __('The paywall could not be loaded due to an unexpected error. Please try again later.', 'tulo');
+        $custom_message = get_option("tulo_paywall_error_message");
+        if ($custom_message != "") {
+            $message = $custom_message;
+        }
+        return $message;
+    }
+
+
     public function get_paywall_css() {
         $version = Tulo_Paywall_Common::PAYWALL_VERSION;
         if ($version == '1.0') {

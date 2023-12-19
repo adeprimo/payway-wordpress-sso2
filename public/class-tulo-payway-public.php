@@ -345,6 +345,10 @@ class Tulo_Payway_Server_Public {
         if (get_option("tulo_paywall_css_enabled") == "on") {
             $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
         }
+
+        
+
+
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
         $output .= '<script type="text/javascript">
                      new TuloPaywall().Init({
@@ -364,8 +368,8 @@ class Tulo_Payway_Server_Public {
                         utmContent: "",
                         customVariables: '.$custom_variables.',
                         resources: {
-                            errorHeader: "An error occurred",
-                            errorDescription: "Please contact support if problem persists."
+                            errorHeader: "'.$paywall->get_error_header().'",
+                            errorDescription: "'.$paywall->get_error_message().'"
                         },
                         engageTracking: {
                             articleId: "'.$paywall->get_article_id().'",

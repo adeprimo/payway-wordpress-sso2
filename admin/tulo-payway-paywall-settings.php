@@ -16,6 +16,9 @@
 if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
     update_option('tulo_paywall_enabled', isset($_POST["tulo_paywall_enabled"]) ? "on" : "" );
+    update_option('tulo_paywall_error_header', $_POST["tulo_paywall_error_header"]);
+    update_option('tulo_paywall_error_message', $_POST["tulo_paywall_error_message"]);
+    //update_option('tulo_paywall_error_function', $_POST["tulo_paywall_error_function"]);
     update_option('tulo_paywall_template_login_url', $_POST["tulo_paywall_template_login_url"]);
     update_option('tulo_paywall_template_shop_url', $_POST["tulo_paywall_template_shop_url"]);
     update_option('tulo_paywall_client_id', $_POST["tulo_paywall_client_id"]);
@@ -141,12 +144,18 @@ function tulo_server_render_custom_variables()
         </td>
     </tr>
     <tr>
-        <td>
+        <td colspan="2">
             <textarea name="tulo_variables_val">{{model.Variables}}</textarea>
             <a class="tulo_add_variable" ng-click="addVariable()"><?php _e('Add variable', 'tulo'); ?></a>
 
         </td>
     </tr>
+    <tr>
+            <td colspan="2">
+                <p><?php echo __('Tulo Paywall custom variable.', 'tulo');?></p>
+            </td>
+    </tr>
+
 
 </table>
 
@@ -207,6 +216,21 @@ function tulo_server_render_custom_variables()
     </table>
 
     <hr/>
+    <h2><?php esc_html_e( 'Paywall error handling settings', 'tulo'); ?></h1>
+    <table class="form-table">
+
+        <?php
+            tulo_server_render_text_option_setting(__("Tulo Paywall Error header", "tulo"), "tulo_paywall_error_header", __("Error header text shown when the paywall cannot be loaded", "tulo"));
+            tulo_server_render_text_option_setting(__("Tulo Paywall Error description", "tulo"), "tulo_paywall_error_message", __("Error description text shown when the paywall cannot be loaded", "tulo"));
+            //tulo_server_render_text_option_setting(__("Tulo Paywall Error function", "tulo"), "tulo_paywall_error_function", __("External function called when the paywall cannot be loaded", "tulo"));
+        ?>
+        <tr>
+            <td colspan="2">
+                <p><?php echo __('Tulo Paywall error handling.', 'tulo');?></p>
+            </td>
+        </tr>
+    </table>
+    <hr/>
     <h2><?php esc_html_e( 'Paywall other settings', 'tulo'); ?></h1>
     <table class="form-table">
 
@@ -223,6 +247,7 @@ function tulo_server_render_custom_variables()
         <?php
             tulo_server_render_custom_variables();
         ?>
+
     </table>
     
 

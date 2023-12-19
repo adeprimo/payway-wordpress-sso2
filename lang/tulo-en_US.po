@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-18 16:58+0100\n"
-"PO-Revision-Date: 2023-12-18 16:59+0100\n"
+"POT-Creation-Date: 2023-12-19 14:56+0100\n"
+"PO-Revision-Date: 2023-12-19 14:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -25,79 +25,88 @@ msgstr ""
 msgid "Tulo Payway restrictions"
 msgstr "Tulo Payway restrictions"
 
-#: admin/tulo-payway-paywall-settings.php:47
+#: admin/tulo-payway-paywall-settings.php:50
 msgid "Spinner html"
 msgstr "Spinner html"
 
-#: admin/tulo-payway-paywall-settings.php:48
+#: admin/tulo-payway-paywall-settings.php:51
 msgid "HTML shown when paywall is loading."
 msgstr ""
 "HTML shown when the paywall is loading, if left empty standard Tulo Paywall "
 "spinner will be shown."
 
-#: admin/tulo-payway-paywall-settings.php:133
+#: admin/tulo-payway-paywall-settings.php:136
 msgid "Variable key"
 msgstr "Key"
 
-#: admin/tulo-payway-paywall-settings.php:138
+#: admin/tulo-payway-paywall-settings.php:141
 msgid "Variable value"
 msgstr "Value"
 
-#: admin/tulo-payway-paywall-settings.php:140
+#: admin/tulo-payway-paywall-settings.php:143
 msgid "Variable delete"
 msgstr "Delete"
 
-#: admin/tulo-payway-paywall-settings.php:146
+#: admin/tulo-payway-paywall-settings.php:149
 msgid "Add variable"
 msgstr "Add variable"
 
-#: admin/tulo-payway-paywall-settings.php:159
+#: admin/tulo-payway-paywall-settings.php:155
+#, fuzzy
+#| msgid "Tulo Paywall custom variables."
+msgid "Tulo Paywall custom variable."
+msgstr ""
+"<a href=“https://docs.worldoftulo.com/paywall/integration/plug-and-play/"
+"paywall-js/1-1/#support-for-custom-variables”>Read more about custom "
+"variables</a>."
+
+#: admin/tulo-payway-paywall-settings.php:168
 msgid "Tulo Paywall settings"
 msgstr "Tulo Paywall settings"
 
-#: admin/tulo-payway-paywall-settings.php:164
+#: admin/tulo-payway-paywall-settings.php:173
 msgid "Paywall basic settings"
 msgstr "Basic settings"
 
-#: admin/tulo-payway-paywall-settings.php:168
+#: admin/tulo-payway-paywall-settings.php:177
 msgid "Tulo Paywall enabled"
 msgstr "Tulo Paywall enabled"
 
-#: admin/tulo-payway-paywall-settings.php:169
+#: admin/tulo-payway-paywall-settings.php:178
 #: admin/tulo-payway-server-settings.php:280
 msgid "API Client id"
 msgstr "API Client-ID"
 
-#: admin/tulo-payway-paywall-settings.php:169
+#: admin/tulo-payway-paywall-settings.php:178
 msgid "Paywall API user client id"
 msgstr "Paywall API user client id"
 
-#: admin/tulo-payway-paywall-settings.php:170
+#: admin/tulo-payway-paywall-settings.php:179
 #: admin/tulo-payway-server-settings.php:281
 msgid "API Secret"
 msgstr "API Secret"
 
-#: admin/tulo-payway-paywall-settings.php:170
+#: admin/tulo-payway-paywall-settings.php:179
 msgid "Paywall API user secret"
 msgstr "Paywall API user secret"
 
-#: admin/tulo-payway-paywall-settings.php:174
+#: admin/tulo-payway-paywall-settings.php:183
 msgid "Paywall selection settings"
 msgstr "Paywall selection settings"
 
-#: admin/tulo-payway-paywall-settings.php:178
+#: admin/tulo-payway-paywall-settings.php:187
 msgid "Tulo Paywall title"
 msgstr "Tulo Paywall title"
 
-#: admin/tulo-payway-paywall-settings.php:178
+#: admin/tulo-payway-paywall-settings.php:187
 msgid "Tulo Payway title code where Paywall is configured"
 msgstr "Tulo Payway title code where Paywall is configured"
 
-#: admin/tulo-payway-paywall-settings.php:179
+#: admin/tulo-payway-paywall-settings.php:188
 msgid "Tulo Paywall Static Selector Key"
 msgstr "Static Paywall key"
 
-#: admin/tulo-payway-paywall-settings.php:179
+#: admin/tulo-payway-paywall-settings.php:188
 msgid ""
 "If there are more than one Paywall active in Tulo, this static key will "
 "select which Paywall to select for presentation. If static and dynamic keys "
@@ -107,11 +116,11 @@ msgstr ""
 "select which Paywall to select for presentation. If static and dynamic keys "
 "are left blank, Tulo will display the first Paywall created."
 
-#: admin/tulo-payway-paywall-settings.php:180
+#: admin/tulo-payway-paywall-settings.php:189
 msgid "Tulo Paywall Dynamic Selector Key"
 msgstr "Dynamic Paywall key"
 
-#: admin/tulo-payway-paywall-settings.php:180
+#: admin/tulo-payway-paywall-settings.php:189
 msgid ""
 "Enter the name of a session variable that holds the Paywall selection key, "
 "if no value is defined on the session variable, the static key will be used."
@@ -119,11 +128,11 @@ msgstr ""
 "Enter the name of a session variable that holds the Paywall selection key, "
 "if no value is defined on the session variable, the static key will be used."
 
-#: admin/tulo-payway-paywall-settings.php:181
+#: admin/tulo-payway-paywall-settings.php:190
 msgid "Tulo Paywall Product Selector Key"
 msgstr "Product Paywall key"
 
-#: admin/tulo-payway-paywall-settings.php:181
+#: admin/tulo-payway-paywall-settings.php:190
 msgid ""
 "Use the locked article's required product code as selector, must map to a "
 "Paywall with matching key."
@@ -131,23 +140,23 @@ msgstr ""
 "Use the locked article’s required product code as selector, must map to a "
 "Paywall with matching key."
 
-#: admin/tulo-payway-paywall-settings.php:187
+#: admin/tulo-payway-paywall-settings.php:196
 msgid "Paywall analytics settings"
 msgstr "Analytics settings"
 
-#: admin/tulo-payway-paywall-settings.php:191
+#: admin/tulo-payway-paywall-settings.php:200
 msgid "Tulo Paywall Traffic Source"
 msgstr "Tulo Paywall Traffic Source"
 
-#: admin/tulo-payway-paywall-settings.php:191
+#: admin/tulo-payway-paywall-settings.php:200
 msgid "Leave empty if no traffic source should be used (not recommended)."
 msgstr "Leave empty if no traffic source should be used (not recommended)."
 
-#: admin/tulo-payway-paywall-settings.php:192
+#: admin/tulo-payway-paywall-settings.php:201
 msgid "Tulo Paywall Merchant Reference (static)"
 msgstr "Tulo Paywall Merchant Reference (static)"
 
-#: admin/tulo-payway-paywall-settings.php:192
+#: admin/tulo-payway-paywall-settings.php:201
 msgid ""
 "Leave empty if no merchant reference should be used or if inferred from "
 "article link."
@@ -155,69 +164,96 @@ msgstr ""
 "Leave empty if no merchant reference should be used or if inferred from "
 "article link."
 
-#: admin/tulo-payway-paywall-settings.php:193
+#: admin/tulo-payway-paywall-settings.php:202
 msgid "Tulo Paywall Merchant Reference from link"
 msgstr "Tulo Paywall Merchant Reference from link"
 
-#: admin/tulo-payway-paywall-settings.php:193
+#: admin/tulo-payway-paywall-settings.php:202
 msgid "Get merchant reference from current article link"
 msgstr "Get merchant reference from current article link"
 
-#: admin/tulo-payway-paywall-settings.php:194
+#: admin/tulo-payway-paywall-settings.php:203
 msgid "Tulo Paywall Account Origin"
 msgstr "Account Origin"
 
-#: admin/tulo-payway-paywall-settings.php:194
+#: admin/tulo-payway-paywall-settings.php:203
 msgid "New accounts will be created with this account origin"
 msgstr "New accounts will be created with this account origin"
 
-#: admin/tulo-payway-paywall-settings.php:199
+#: admin/tulo-payway-paywall-settings.php:208
 msgid "Paywall look and feel settings"
 msgstr "Look and feel"
 
-#: admin/tulo-payway-paywall-settings.php:204
+#: admin/tulo-payway-paywall-settings.php:213
 msgid "Tulo Paywall CSS enabled"
 msgstr "Tulo Paywall CSS enabled"
 
-#: admin/tulo-payway-paywall-settings.php:204
+#: admin/tulo-payway-paywall-settings.php:213
 msgid "Check to include Tulo CSS for the paywall"
 msgstr "Check to include Tulo CSS for the paywall"
 
-#: admin/tulo-payway-paywall-settings.php:210
+#: admin/tulo-payway-paywall-settings.php:219
+msgid "Paywall error handling settings"
+msgstr "Error handling settings"
+
+#: admin/tulo-payway-paywall-settings.php:223
+msgid "Tulo Paywall Error header"
+msgstr "Error header text"
+
+#: admin/tulo-payway-paywall-settings.php:223
+msgid "Error header text shown when the paywall cannot be loaded"
+msgstr "Error header text shown when the paywall cannot be loaded"
+
+#: admin/tulo-payway-paywall-settings.php:224
+msgid "Tulo Paywall Error description"
+msgstr "Error description"
+
+#: admin/tulo-payway-paywall-settings.php:224
+msgid "Error description text shown when the paywall cannot be loaded"
+msgstr "Error description text shown when the paywall cannot be loaded"
+
+#: admin/tulo-payway-paywall-settings.php:229
+msgid "Tulo Paywall error handling."
+msgstr ""
+"If no specific error settings are defined, default values apply. <a "
+"href=“https://docs.worldoftulo.com/paywall/integration/plug-and-play/paywall-"
+"js/1-2/#error-handling”>Read more about error handling</a>."
+
+#: admin/tulo-payway-paywall-settings.php:234
 msgid "Paywall other settings"
 msgstr "Other settings"
 
-#: admin/tulo-payway-paywall-settings.php:214
+#: admin/tulo-payway-paywall-settings.php:238
 msgid "Tulo Paywall Login Url"
 msgstr "Login Url"
 
-#: admin/tulo-payway-paywall-settings.php:214
+#: admin/tulo-payway-paywall-settings.php:238
 msgid "Login URL that can be used in the Paywall template"
 msgstr ""
 "Enter URL used for logging in on the site, if left empty the standard Tulo "
 "login url will be used"
 
-#: admin/tulo-payway-paywall-settings.php:215
+#: admin/tulo-payway-paywall-settings.php:239
 msgid "Tulo Paywall Shop Url"
 msgstr "Shop Url"
 
-#: admin/tulo-payway-paywall-settings.php:215
+#: admin/tulo-payway-paywall-settings.php:239
 msgid "Shop URL that can be used in the Paywall template"
 msgstr "Enter URL for the shop you wish to display in the Paywall"
 
-#: admin/tulo-payway-paywall-settings.php:216
+#: admin/tulo-payway-paywall-settings.php:240
 msgid "Javascript debug enabled"
 msgstr "Javascript debug enabled"
 
-#: admin/tulo-payway-paywall-settings.php:216
+#: admin/tulo-payway-paywall-settings.php:240
 msgid "Check to see extra debug statements in the Javascript console"
 msgstr "Check to see extra debug statements in the Javascript console"
 
-#: admin/tulo-payway-paywall-settings.php:220
+#: admin/tulo-payway-paywall-settings.php:244
 msgid "Paywall custom variables"
-msgstr "Custom variabler"
+msgstr "Custom variables"
 
-#: admin/tulo-payway-paywall-settings.php:231
+#: admin/tulo-payway-paywall-settings.php:256
 #: admin/tulo-payway-server-settings.php:314
 msgid "Save Changes"
 msgstr "Save Changes"
@@ -368,6 +404,18 @@ msgstr ""
 msgid "New %s are restricted"
 msgstr "New %s are restricted"
 
+#: includes/class-tulo-paywall.php:108
+msgid "Error loading paywall"
+msgstr "An error has occured"
+
+#: includes/class-tulo-paywall.php:117
+msgid ""
+"The paywall could not be loaded due to an unexpected error. Please try again "
+"later."
+msgstr ""
+"Something unexpected happened. Please try again later, and if the problem "
+"persists, contact support."
+
 #: includes/class-tulo-payway-sso2-api.php:284
 msgid "Account locked until"
 msgstr "Account locked until"
@@ -382,7 +430,7 @@ msgstr "Wrong username or password. (%s attempts left)"
 msgid "Loading paywall..."
 msgstr "Loading..."
 
-#: public/class-tulo-payway-public.php:422
+#: public/class-tulo-payway-public.php:426
 msgid "Buy"
 msgstr "Buy"
 
@@ -405,6 +453,12 @@ msgstr "Adeprimo"
 #. Author URI of the plugin/theme
 msgid "https://adeprimo.se"
 msgstr "https://adeprimo.se"
+
+#~ msgid "Tulo Paywall Error function"
+#~ msgstr "Error function name"
+
+#~ msgid "External function called when the paywall cannot be loaded"
+#~ msgstr "Javascript function called when the paywall cannot be loaded"
 
 #~ msgid ""
 #~ "This plugin integrates with Tulo Payway via server-to-server "
