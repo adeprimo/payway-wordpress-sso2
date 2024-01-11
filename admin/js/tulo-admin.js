@@ -1,4 +1,4 @@
-﻿angular.module('tulo.admin', ['Tulo.Admin.ProductListController']);
+﻿angular.module('tulo.admin', ['Tulo.Admin.VariableListController', 'Tulo.Admin.ProductListController']);
 
 (function ($) {
 
@@ -6,12 +6,19 @@
         bindproductactions(this);
     });
     
+    $('.tulo_variable_row').each(function(){
+        bindvariableactions(this);
+    });
+    
+    function bindvariableactions(row)
+    {
+        $(row).find('.delete').on('click', deletevariable_clicked);
+    }
 
     function bindproductactions(row)
     {
         $(row).find('.delete').on('click', deleterow_clicked);
-        $(row).find('.shortcodes button').on('click', shortcode_clicked);
-        
+        $(row).find('.shortcodes button').on('click', shortcode_clicked);        
     }
 
     function shortcode_clicked(e)
@@ -27,6 +34,12 @@
         return false;
     }
 
+    function deletevariable_clicked(e)
+    {
+        e.preventDefault();
+        $(this).closest('.tulo_variable_row').remove();
+        return false;
+    }
     
     $.fn.insertAtCaret = function (inserttext, afterselection) {
         var element = $(this)[0];

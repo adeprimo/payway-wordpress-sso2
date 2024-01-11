@@ -181,6 +181,21 @@ class Tulo_Payway_Server {
           return $value;
      }
 
+     public static function get_available_variables()
+     {
+          $value = get_option('tulo_paywall_variables');
+          if($value == null)
+          {
+               return array();
+          }
+          if(!is_array($value))
+          {
+               return array();
+          }
+
+          return $value;
+     }
+
 
 
 
@@ -228,6 +243,7 @@ class Tulo_Payway_Server {
           $this->loader->add_shortcode( 'tulo_authentication_url', $plugin_public, 'shortcode_authentication_url' );
 
           $this->loader->add_action( 'wp_ajax_tulo_getproducts', $plugin_public, 'ajax_list_products', 1 );
+          $this->loader->add_action( 'wp_ajax_tulo_getvariables', $plugin_public, 'ajax_list_variables', 1 );
           $this->loader->add_action( 'wp_ajax_nopriv_tulo_login', $plugin_public, 'ajax_login', 1 );
           $this->loader->add_action( 'wp_ajax_tulo_login', $plugin_public, 'ajax_login', 1 );
           $this->loader->add_action( 'wp_ajax_nopriv_tulo_logout', $plugin_public, 'ajax_logout', 1 );

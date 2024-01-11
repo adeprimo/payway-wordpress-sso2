@@ -84,6 +84,10 @@ class Tulo_Payway_Server_Public {
         if (is_admin()) 
             return;
         
+        if (get_option("tulo_plugin_active") != "on") 
+            return;
+
+
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             if (get_query_var("tpw_session_refresh") == "1") {
                 $this->common->write_log("!! forced session session refresh using query param");
@@ -257,6 +261,9 @@ class Tulo_Payway_Server_Public {
 
     public function content_filter($content) {
 
+        if (get_option("tulo_plugin_active") != "on") 
+            return $content;
+
         if($this->has_access()) {  
 
             return $content;
@@ -275,18 +282,19 @@ class Tulo_Payway_Server_Public {
             $output .= '        </div>';
         }
 
-        $output .= '        <div class="info-box permission_required">';
-        if ($this->session->is_logged_in()) {
-            $output .= do_shortcode('[tulo_permission_required_loggedin]');
-        } else {
-            $output .= do_shortcode('[tulo_permission_required_not_loggedin]');
-        }
-        
-        $output .= '        </div>';
-
+        $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
         if (get_option("tulo_paywall_enabled") != "on") 
         {
-            $restrictions = Tulo_Payway_Server_Public::get_post_restrictions();
+
+            $output .= '        <div class="info-box permission_required">';
+            if ($this->session->is_logged_in()) {
+                $output .= do_shortcode('[tulo_permission_required_loggedin]');
+            } else {
+                $output .= do_shortcode('[tulo_permission_required_not_loggedin]');
+            }
+            
+            $output .= '        </div>';
+
             foreach($restrictions as $restriction) {
                 $product = $this->find_product($restriction->productid);
                 if($product == null)
@@ -301,46 +309,67 @@ class Tulo_Payway_Server_Public {
             }    
         }
 
-
-        $output .= '</div>';
-        $output .= '</div>';
-
         if (get_option("tulo_paywall_enabled") == "on") 
         {
-            $output .= $this->initialize_paywall();
+            $output .= $this->initialize_paywall($restrictions);
         }
+
+        $output .= '</div>';
+        $output .= '</div>';
 
         do_action('tulo_after_permission_required');
         return $output;
     }
 
-    private function initialize_paywall()
+
+    private function initialize_paywall($post_restrictions)    
     {
+        if (is_admin()) 
+            return;
+
+        if (get_option("tulo_plugin_active") != "on") 
+            return $content;
+
         $paywall = new Tulo_Paywall_Common();
         $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
 
-        $output = '<div id="paywall-container"></div>';
+        $custom_variables = $paywall->get_custom_variables();
+        $this->common->write_log("custom variables: ".print_r($custom_variables, true));
+
+        $spinner_html = get_option("tulo_paywall_spinner_html");
+        if ($spinner_html == "") {
+            $loading = __('Loading paywall...', 'tulo');
+            $spinner_html = '<div class="lds-dual-ring"></div><p><i>'.$loading.'</i></p>';
+        }
+        $output = '<div id="tulo-paywall"><template id="paywall-loader-template">'.$spinner_html.'</template><div id="paywall-container"></div></div>';
         if (get_option("tulo_paywall_css_enabled") == "on") {
             $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
         }
+
+        
+
+
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
         $output .= '<script type="text/javascript">
-                     new Paywall().Init({
+                     new TuloPaywall().Init({
                         debug: '.$debug.',
                         url: "'.$paywall->get_paywall_url().'",
-                        jwtToken: "'.$paywall->get_signature().'",
+                        jwtToken: "'.$paywall->get_signature($post_restrictions).'",
                         accountOrigin: "'.$paywall->get_account_origin().'",
                         trafficSource: "'.$paywall->get_traffic_source().'",
                         merchantReference: "'.$paywall->get_merchant_reference().'",
                         returnUrl: "'.$paywall->get_return_url().'",
                         backUrl: "'.$paywall->get_back_url().'",
                         utmSource: "",
+                        loginUrl: "'.$paywall->get_login_url().'",
+                        shopUrl: "'.$paywall->get_shop_url().'",
                         utmMedium: "",
                         utmCampaign: "",
                         utmContent: "",
+                        customVariables: '.$custom_variables.',
                         resources: {
-                            errorHeader: "An error occurred",
-                            errorDescription: "Please contact support if problem persists."
+                            errorHeader: "'.$paywall->get_error_header().'",
+                            errorDescription: "'.$paywall->get_error_message().'"
                         },
                         engageTracking: {
                             articleId: "'.$paywall->get_article_id().'",
@@ -351,6 +380,7 @@ class Tulo_Payway_Server_Public {
                     </script>';
         return $output;
     }
+
 
     private $available_products;
     private function find_product($productid) {
@@ -406,24 +436,19 @@ class Tulo_Payway_Server_Public {
     }
 
     public function shortcode_authentication_url() {
-        global $wp;
-        $currentUrl = home_url( $wp->request );
-        $permalinkStructure = get_option( 'permalink_structure' );
-        if ($permalinkStructure == "plain") {
-            $queryVars = $wp->query_vars;
-            $queryVars['tpw_session_refresh'] = '1';
-            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );    
-        } else {
-            $currentUrl .= "?tpw_session_refresh=1";
-        } 
-        $currentOrg = get_option('tulo_organisation_id');
-        $authUrl = get_option('tulo_authentication_url');
-        return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", urlencode($currentUrl), $authUrl));
+        return $this->common->get_authentication_url();
     }
 
     public function ajax_list_products() {
         header('Content-Type: application/json');
         echo json_encode(Tulo_Payway_Server::get_available_products());
+
+        die();
+    }
+
+    public function ajax_list_variables() {
+        header('Content-Type: application/json');
+        echo json_encode(Tulo_Payway_Server::get_available_variables());
 
         die();
     }
