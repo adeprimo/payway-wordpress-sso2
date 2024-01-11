@@ -45,7 +45,7 @@ class Tulo_Paywall_Common {
              "iss" => $client_id,
              "aud" => "pw-paywall",
              "nbf" => $time,
-             "exp" => $time + 60,
+             "exp" => $time + 300,
              "iat" => $time,
              "pc" => $key
         );
