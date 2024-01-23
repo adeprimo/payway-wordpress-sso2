@@ -148,7 +148,9 @@ class Tulo_Paywall_Common {
         $variables = get_option("tulo_paywall_variables");
         foreach($variables as $variable) {
             $value = $variable->value;
-            $custom_variables[$variable->key] = $value;
+            if ($value != "") {
+                $custom_variables[$variable->key] = $value;
+            }            
         }   
         return json_encode($custom_variables);
     }
@@ -156,8 +158,11 @@ class Tulo_Paywall_Common {
     private function get_user_custom_variables() {
         $custom_variables = array();
         $user_name = $this->session->get_user_name();
-        $value = $user_name != null ? $user_name : "";
+        if ($user_name == "") {
+            return $custom_variables;
+        }
 
+        $value = $user_name != null ? $user_name : "";
         $custom_variables["USER_NAME"] = $value;
         return $custom_variables;
     }
