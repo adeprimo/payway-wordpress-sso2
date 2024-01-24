@@ -1,6 +1,5 @@
 ﻿.tulo_no_access .paygate
 {
-    background-color: #c2d7e8;
     overflow:auto;
     padding: 0 40px 40px 40px;
 }
@@ -26,7 +25,6 @@
     min-width: 30%;
     margin: 16px auto;
     color: #FFF !important;
-    box-shadow: 0 0 12px #444;
     border:0;
 }
 .is-hidden {

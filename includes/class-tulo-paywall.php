@@ -151,7 +151,10 @@ class Tulo_Paywall_Common {
             if ($value != "") {
                 $custom_variables[$variable->key] = $value;
             }            
-        }   
+        }
+        if (count($custom_variables) == 0) {
+            return '{}';
+        }
         return json_encode($custom_variables);
     }
 
