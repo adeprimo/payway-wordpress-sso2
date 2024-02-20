@@ -10,7 +10,9 @@ use \Firebase\JWT\Key;
 class Tulo_Paywall_Common {
 
     private $session;
+    private $common;
     const PAYWALL_VERSION = "1.2";
+    
 
     public function __construct() {
         $this->session = new Tulo_Payway_Session();
@@ -59,7 +61,13 @@ class Tulo_Paywall_Common {
     }
     
     public function get_return_url() {
-        return $this->get_current_url();
+        $currentUrl = get_current_url();
+        if (str_contains($currentUrl, "?")) {
+            $currentUrl .= "&tpw_session_refresh=1";
+        } else {
+            $currentUrl .= "?tpw_session_refresh=1";
+        }            
+        return $currentUrl;
     }
 
     public function get_current_url() {

@@ -37,6 +37,17 @@ class Tulo_Payway_API {
         return null;
     }
 
+    /**
+     * server2server call to refresh user and products, needs a logged in user.
+     * not implemented yet
+     */
+    public function get_user_and_products() {
+        $token = $this->get_access_token_s2s("/external/account/w /external/account/r");
+        if (isset($token) && $token != "" ) {
+        }
+        return null;
+    }
+
     public function get_user_and_products_by_token($token) {
         $user = $this->get_user_details($token);
         if ($user != null) {
@@ -52,13 +63,12 @@ class Tulo_Payway_API {
     }
 
     public function get_user_details($token) {
-
         $url = $this->get_api_url("/external/api/v1/me");
         $response = $this->common->get_json_with_bearer($url, $token);
         if ($response["status"] == 200) {
             $data = json_decode($response["data"]);
             return $data->item;
-        }        
+        }    
         return null;
     }
 

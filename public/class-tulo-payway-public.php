@@ -186,7 +186,8 @@ class Tulo_Payway_Server_Public {
         }
 
         $user_products = $this->session->get_user_active_products();
-
+        $this->common->write_log("User products: ".print_r($user_products, true));
+        $this->common->write_log("Restrictions: ".print_r($restrictions, true));
         foreach($restrictions as $restriction)
         {
             foreach($user_products as $product)
@@ -265,8 +266,10 @@ class Tulo_Payway_Server_Public {
             return $content;
 
         if($this->has_access()) {  
-
+            $this->common->write_log("user is logged in and has access!");            
             return $content;
+        } else {
+            $this->common->write_log("user has no access!");  
         }
         
         do_action('tulo_before_permission_required');
