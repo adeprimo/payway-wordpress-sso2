@@ -87,6 +87,12 @@ class Tulo_Payway_Server_Public {
         if (get_option("tulo_plugin_active") != "on") 
             return;
 
+        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
+        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+            $this->common->write_log("!! whitelisted IP request, skipping session establishment.");
+            return true;
+        }
+    
 
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             if (get_query_var("tpw_session_refresh") == "1") {
@@ -266,7 +272,7 @@ class Tulo_Payway_Server_Public {
             return $content;
 
         if($this->has_access()) {  
-            $this->common->write_log("user is logged in and has access!");            
+            $this->common->write_log("user has access!");            
             return $content;
         } else {
             $this->common->write_log("user has no access!");  
@@ -403,6 +409,16 @@ class Tulo_Payway_Server_Public {
 
     public function shortcode_permission_required_not_loggedin() {
         return get_option('tulo_permission_required_not_loggedin');
+    }
+
+    public function shortcode_login_logout() {
+        $output = "";
+        if ($this->session->is_logged_in()) {
+            $output .= "<a href=\"#\" class=\"js-tuloLogout is-hidden\">Logout</a>";
+        } else {
+            $output .= "<a href=\"".$this->common->get_authentication_url()."\">Login</a>";
+        }
+        return $output;
     }
 
     public function shortcode_loggedin_user_id() {
