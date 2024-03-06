@@ -166,7 +166,7 @@ class Tulo_Payway_Server {
 
      }
 
-     public static function get_available_products()
+     public static function get_available_products($includeLoggedIn=true)
      {
           $value = get_option('tulo_products');
           if($value == null)
@@ -175,7 +175,15 @@ class Tulo_Payway_Server {
           }
           if(!is_array($value))
           {
-               return array();
+               $value = array();
+          }
+
+          if ($includeLoggedIn) {
+               // Logged in product
+               $loggedin = new stdClass();
+               $loggedin->productid = "tulo-loggedin";
+               $loggedin->label = "Visitor is logged in";
+               array_push($value, $loggedin);
           }
 
           return $value;

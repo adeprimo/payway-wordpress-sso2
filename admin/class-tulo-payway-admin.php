@@ -127,7 +127,6 @@ class Tulo_Payway_Server_Admin {
             <div>
                 <input type="checkbox" name="<?php echo $this->get_field_key($product->productid) ?>" <?php echo $checked ? 'checked="checked"':''?> />
                 <label><?php echo $product->label ?></label>
-
             </div>
         <?php }
     }
