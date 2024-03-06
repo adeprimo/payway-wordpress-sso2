@@ -401,6 +401,25 @@ class Tulo_Payway_API_SSO2 {
         }
     }
 
+    /**
+     * New function for refreshing user info.
+     * Place holder code, not yet completed and usable.
+     */
+    private function refresh_user() {
+        $this->common->write_log("Refreshing user and product info");
+        $data = $this->api->get_user_and_products();
+        if ($data != null) {
+            $this->set_user_id($data["user"]->id);
+            $this->set_user_name($data["user"]->first_name." ".$data["user"]->last_name);
+            $this->set_user_email($data["user"]->email);
+            $this->set_user_customer_number($data["user"]->customer_number);
+            $this->set_user_active_products($data["active_products"]);
+            $this->set_session_loggedin();
+        } else {
+            $this->common->write_log("!! Could not get user and product info from Payway!");
+        }
+    }
+
     private function fetch_user_and_login($auth_ticket) {
         $data = $this->api->get_user_and_products_by_ticket($auth_ticket);
         if ($data != null) {
