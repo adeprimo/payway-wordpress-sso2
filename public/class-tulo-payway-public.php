@@ -414,7 +414,8 @@ class Tulo_Payway_Server_Public {
     public function shortcode_login_logout() {
         $output = "";
         if ($this->session->is_logged_in()) {
-            $output .= "<a href=\"#\" class=\"js-tuloLogout is-hidden\">Logout</a>";
+            $user = trim($this->session->get_user_name()) == "" ? $this->session->get_user_email() : $this->session->get_user_name();
+            $output .= "<div class=\"user-greeting\">Hi <a href=\"#\" class=\"js-tuloMyAccount\" >".$user."</a>.</div><a href=\"#\" class=\"js-tuloLogout is-hidden\">Logout</a>";
         } else {
             $output .= "<a href=\"".$this->common->get_authentication_url()."\">Login</a>";
         }
