@@ -36,6 +36,75 @@ class Tulo_Payway_API_SSO2 {
         $this->api = new Tulo_Payway_API();
     }  
 
+    protected function process_paywall_checkout_login($payload) {
+        $this->common->write_log("---> process paywall checkout login");
+        if (isset($payload)) {
+            $delegated_ticket = $payload->dtid;
+            $account_id = $payload->aid;
+            $this->common->write_log("Authentication ticket: ".$delegated_ticket);
+            $this->common->write_log("Account id: ".$account_id);
+
+            $url = $this->get_sso2_url("authenticatewithticket");
+            $client_id = get_option('tulo_server_client_id');
+            $client_secret = get_option('tulo_server_secret');
+    
+            $token = $this->get_delegated_ticket_token($client_id, $client_secret, $delegated_ticket);
+            $payload = json_encode(array("t" => $token));
+    
+            $this->common->write_log("posting payload to: ".$url);
+            $response = $this->common->post_json_jwt($url, $payload);
+            if ($response["status"] == 200) {
+                $data = json_decode($response["data"]);
+                $decoded = $this->decode_token($data->t, $client_secret);
+                if ($decoded == null) {
+                    $this->common->write_log("[ERROR] error processing response from sso request, token could not be decoded");
+                } else {
+                    $sts = $decoded->sts; 
+                    $err = $decoded->err;
+                    $at = $decoded->at;
+                    $this->common->write_log(" sts.......: ".$sts);
+                    $this->common->write_log(" at........: ".$at);
+                    if ($sts == "loggedin" && $at != "") {
+                        $this->fetch_user_and_login($at);
+                        $this->common->write_log("<--- process paywall completed successfully, user is logged in, ready for reload.");
+                    } else {
+                        $this->common->write_log(" !! Error fetching access token => ".$err);
+                    }
+                }                
+    
+            } else {
+                $this->common->write_log("[ERROR] error posting authenticate with ticket request");
+                $this->common->write_log($response);
+            }
+
+    
+        }
+    }
+
+    private function get_delegated_ticket_token($client_id, $client_secret, $ticket) {
+        $organisation_id = get_option('tulo_organisation_id');
+        $ip_address = $_SERVER ['REMOTE_ADDR'];
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        
+        $time = time();
+        $payload = array(
+            "cid" => $client_id,
+            "iss" => $organisation_id,
+            "sid" => $this->sso_session_id(),
+            "ipa" => $ip_address,
+            "uas" => $user_agent,
+            "at" =>  $ticket, 
+            "aud" => "pw-sso",
+            "nbf" => $time,
+            "exp" => $time + 10,
+            "iat" => $time
+        );
+        $this->common->write_log("ticket token payload:");
+        $this->common->write_log($payload);
+        
+        $token = JWT::encode($payload, $client_secret, 'HS256');
+        return $token;
+    }
     /**
      * Called from the landing page, checks session status and sets user in session if logged in
      */

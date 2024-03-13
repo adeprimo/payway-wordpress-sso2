@@ -69,12 +69,16 @@ class Tulo_Paywall_Common {
         } else {
             $currentUrl .= "?tpw_session_refresh=1";
         }            
-        return $currentUrl;
+        return str_replace("http://", "https://", $currentUrl);
     }
 
     public function get_current_url() {
         global $wp;
         return add_query_arg( $wp->query_vars, home_url( $wp->request ) );
+    }
+
+    public function get_ticket_login_url() {
+        return plugin_dir_url(__DIR__)."checkout_landing.php";
     }
 
     public function get_account_origin() {
