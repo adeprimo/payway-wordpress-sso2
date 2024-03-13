@@ -25,7 +25,8 @@ class Tulo_Paywall_Common {
         $client_id = get_option('tulo_paywall_client_id');
         $client_secret = get_option('tulo_paywall_secret');
         $aid = $this->session->get_user_id();
-        
+        $tcid = get_option('tulo_server_client_id'); // in case of ticket login after successful purchase.
+
         $this->common->write_log("Fetching Paywall with aid: ".$aid);
 
         $key = get_option('tulo_paywall_static_selector_key');
@@ -49,7 +50,8 @@ class Tulo_Paywall_Common {
              "nbf" => $time,
              "exp" => $time + 300,
              "iat" => $time,
-             "pc" => $key
+             "pc" => $key,
+             "tcid" => $tcid
         );
 
         $token = JWT::encode($payload, $client_secret, 'HS256');
