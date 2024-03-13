@@ -3,7 +3,24 @@
         var loginForms      = document.querySelectorAll('.js-tuloLogin'),
             logoutButtons   = document.querySelectorAll('.js-tuloLogout'),
             buyButtons      = document.querySelectorAll('.js-tuloBuy'),
+            myAccountLinks  = document.querySelectorAll('.js-tuloMyAccount'),
             loggedIn        = document.cookie.indexOf('tpw_') !== -1;
+
+
+        if (myAccountLinks.length) {
+            myAccountLinks.forEach(function(myAccountLink) {
+                myAccountLink.onclick = function(e) {
+                    e.preventDefault();
+                 
+                    if (tulo_settings.env == "stage") {
+                        window.location = "https://" + tulo_settings.oid + ".payway-portal.stage.adeprimo.se";
+                    }   else if (tulo_settings.env == "prod") {
+                        window.location = "https://" + tulo_settings.oid + ".portal.worldoftulo.com";
+                    }
+                    return false;
+                }
+            });
+        }
 
         if (loginForms.length) {
             loginForms.forEach(function(loginForm) {
