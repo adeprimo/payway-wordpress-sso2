@@ -85,7 +85,13 @@ class Tulo_Paywall_Common {
     }
 
     public function get_ticket_login_url() {
-        return plugin_dir_url(__DIR__)."checkout_landing.php";
+        $url = plugin_dir_url(__DIR__)."checkout_landing.php";
+        if (str_contains($url, "http")) {
+            return $url;
+        } else {
+            $url = site_url().$url;
+        }
+        return $url;
     }
 
     public function get_account_origin() {
