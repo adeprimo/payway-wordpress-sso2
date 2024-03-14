@@ -10,6 +10,10 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         parent::__construct();
     }
 
+    public function process_checkout_landing($payload) {
+        $this->process_paywall_checkout_login($payload);
+    }
+
     public function is_logged_in() {
         return $this->is_session_logged_in();
     }

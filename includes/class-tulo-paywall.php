@@ -69,12 +69,23 @@ class Tulo_Paywall_Common {
         } else {
             $currentUrl .= "?tpw_session_refresh=1";
         }            
-        return $currentUrl;
+        return str_replace("http://", "https://", $currentUrl);
     }
 
     public function get_current_url() {
         global $wp;
-        return add_query_arg( $wp->query_vars, home_url( $wp->request ) );
+        $currentUrl = home_url( $wp->request );
+        $permalinkStructure = get_option( 'permalink_structure' );
+        if ($permalinkStructure == "plain" || $permalinkStructure == "") {
+            $queryVars = $wp->query_vars;
+            unset($queryVars['tpw_session_refresh']);
+            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+        }
+        return $currentUrl;
+    }
+
+    public function get_ticket_login_url() {
+        return plugin_dir_url(__DIR__)."checkout_landing.php";
     }
 
     public function get_account_origin() {

@@ -100,7 +100,7 @@ class Tulo_Payway_Server_Public {
                 $this->session->refresh();
                 $currentUrl = home_url( $wp->request );
                 $permalinkStructure = get_option( 'permalink_structure' );
-                if ($permalinkStructure == "plain") {
+                if ($permalinkStructure == "plain" || $permalinkStructure == "") {
                     $queryVars = $wp->query_vars;
                     unset($queryVars['tpw_session_refresh']);
                     $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
@@ -372,6 +372,7 @@ class Tulo_Payway_Server_Public {
                         utmSource: "",
                         loginUrl: "'.$paywall->get_login_url().'",
                         shopUrl: "'.$paywall->get_shop_url().'",
+                        ticketLoginUrl: "'.$paywall->get_ticket_login_url().'",
                         utmMedium: "",
                         utmCampaign: "",
                         utmContent: "",
