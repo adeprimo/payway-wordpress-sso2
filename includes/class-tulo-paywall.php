@@ -74,7 +74,14 @@ class Tulo_Paywall_Common {
 
     public function get_current_url() {
         global $wp;
-        return add_query_arg( $wp->query_vars, home_url( $wp->request ) );
+        $currentUrl = home_url( $wp->request );
+        $permalinkStructure = get_option( 'permalink_structure' );
+        if ($permalinkStructure == "plain" || $permalinkStructure == "") {
+            $queryVars = $wp->query_vars;
+            unset($queryVars['tpw_session_refresh']);
+            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+        }
+        return $currentUrl;
     }
 
     public function get_ticket_login_url() {

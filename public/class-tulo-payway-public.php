@@ -100,7 +100,7 @@ class Tulo_Payway_Server_Public {
                 $this->session->refresh();
                 $currentUrl = home_url( $wp->request );
                 $permalinkStructure = get_option( 'permalink_structure' );
-                if ($permalinkStructure == "plain") {
+                if ($permalinkStructure == "plain" || $permalinkStructure == "") {
                     $queryVars = $wp->query_vars;
                     unset($queryVars['tpw_session_refresh']);
                     $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
