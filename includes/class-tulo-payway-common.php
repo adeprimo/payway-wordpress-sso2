@@ -21,6 +21,18 @@ class Tulo_Payway_Server_Common {
     public function __construct() {
     }
 
+    public function get_tulo_myaccount_url() {
+        $url = "";
+        $currentOrg = get_option('tulo_organisation_id');
+        if (get_option('tulo_environment') == 'prod') {
+            $url = "https://".$currentOrg.".portal.worldoftulo.com";
+        }
+        else {
+            $url = "https://".$currentOrg.".payway-portal.stage.adeprimo.se"; 
+        }
+        return $url;    
+    }
+
     public function get_authentication_url() {
         global $wp;
         $currentUrl = home_url( $wp->request );

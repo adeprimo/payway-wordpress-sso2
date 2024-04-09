@@ -25,7 +25,8 @@ class Tulo_Paywall_Common {
         $client_id = get_option('tulo_paywall_client_id');
         $client_secret = get_option('tulo_paywall_secret');
         $aid = $this->session->get_user_id();
-        
+        $tcid = get_option('tulo_server_client_id'); // in case of ticket login after successful purchase.
+
         $this->common->write_log("Fetching Paywall with aid: ".$aid);
 
         $key = get_option('tulo_paywall_static_selector_key');
@@ -49,7 +50,8 @@ class Tulo_Paywall_Common {
              "nbf" => $time,
              "exp" => $time + 300,
              "iat" => $time,
-             "pc" => $key
+             "pc" => $key,
+             "tcid" => $tcid
         );
 
         $token = JWT::encode($payload, $client_secret, 'HS256');
@@ -67,12 +69,29 @@ class Tulo_Paywall_Common {
         } else {
             $currentUrl .= "?tpw_session_refresh=1";
         }            
-        return $currentUrl;
+        return str_replace("http://", "https://", $currentUrl);
     }
 
     public function get_current_url() {
         global $wp;
-        return add_query_arg( $wp->query_vars, home_url( $wp->request ) );
+        $currentUrl = home_url( $wp->request );
+        $permalinkStructure = get_option( 'permalink_structure' );
+        if ($permalinkStructure == "plain" || $permalinkStructure == "") {
+            $queryVars = $wp->query_vars;
+            unset($queryVars['tpw_session_refresh']);
+            $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+        }
+        return $currentUrl;
+    }
+
+    public function get_ticket_login_url() {
+        $url = plugin_dir_url(__DIR__)."checkout_landing.php";
+        if (str_contains($url, "http")) {
+            return $url;
+        } else {
+            $url = site_url().$url;
+        }
+        return $url;
     }
 
     public function get_account_origin() {
