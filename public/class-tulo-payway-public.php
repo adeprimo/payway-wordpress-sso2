@@ -134,7 +134,7 @@ class Tulo_Payway_Server_Public {
                     $this->common->write_log("logged in as: ".$this->session->get_user_name()." (".$this->session->get_user_email().")");
                     $this->common->write_log($this->session->get_user_active_products());
                 } else if ($status == "anon") {
-                    $this->common->write_log("not logged in, user needs to login if accessing restricted content");                    
+                    //$this->common->write_log("not logged in, user needs to login if accessing restricted content");                    
                 }
                 
             }
@@ -173,10 +173,13 @@ class Tulo_Payway_Server_Public {
     }
 
     public function has_access($post_id = null, $restrictions = null) {
+
+        if (is_admin()) 
+            return;
+
         if($restrictions == null) {
             $restrictions = Tulo_Payway_Server_Public::get_post_restrictions($post_id);
         }
-
         if(empty($restrictions)) {
             return true;
         }
@@ -185,11 +188,17 @@ class Tulo_Payway_Server_Public {
         if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
             return true;
         }
+        
+        // If restrictions only require logged in user, return true if user is logged in
+        if ($this->restrictions_require_login_only($restrictions)) {
+            return true;
+        }
 
         // Early return if the user is not logged in
         if(!$this->session->is_logged_in()) {
             return false;
         }
+
 
         $user_products = $this->session->get_user_active_products();
         $this->common->write_log("User products: ".print_r($user_products, true));
@@ -274,14 +283,15 @@ class Tulo_Payway_Server_Public {
 
         if (get_option("tulo_plugin_active") != "on") 
             return $content;
-
-        if($this->has_access()) {  
-            $this->common->write_log("user has access!");            
+            
+        if($this->has_access()) {              
             return $content;
-        } else {
-            $this->common->write_log("user has no access!");  
         }
-        
+
+        if (is_admin() || !wp_doing_ajax()) {
+            return $content;
+        }
+
         do_action('tulo_before_permission_required');
 
         global $post;
@@ -332,7 +342,7 @@ class Tulo_Payway_Server_Public {
     }
 
     private function restrictions_require_login_only($post_restrictions) {
-        foreach($restrictions as $restriction) {
+        foreach($post_restrictions as $restriction) {
             if ($restriction->productid == "tulo-loggedin")
                 return true;            
         }

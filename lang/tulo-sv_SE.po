@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 14:58+0100\n"
-"PO-Revision-Date: 2023-12-19 14:59+0100\n"
+"POT-Creation-Date: 2024-04-15 19:14+0200\n"
+"PO-Revision-Date: 2024-04-15 19:15+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.1\n"
+"X-Generator: Poedit 3.4.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: wp-tulo-payway.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -405,11 +405,11 @@ msgstr ""
 msgid "New %s are restricted"
 msgstr "Nya %s är låsta"
 
-#: includes/class-tulo-paywall.php:108
+#: includes/class-tulo-paywall.php:137
 msgid "Error loading paywall"
 msgstr "Fel inträffade"
 
-#: includes/class-tulo-paywall.php:117
+#: includes/class-tulo-paywall.php:146
 msgid ""
 "The paywall could not be loaded due to an unexpected error. Please try again "
 "later."
@@ -417,21 +417,25 @@ msgstr ""
 "Ohanterat fel inträffade vid laddning av prenumerations-dialogen, var vänlig "
 "försök senare."
 
-#: includes/class-tulo-payway-sso2-api.php:284
+#: includes/class-tulo-payway-sso2-api.php:353
 msgid "Account locked until"
 msgstr "Kontot är låst till och med"
 
-#: includes/class-tulo-payway-sso2-api.php:291
-#: includes/class-tulo-payway-sso2-api.php:297
+#: includes/class-tulo-payway-sso2-api.php:360
+#: includes/class-tulo-payway-sso2-api.php:366
 #, php-format
 msgid "Wrong username or password. (%s attempts left)"
 msgstr "Fel användarnamn eller lösenord. (%s försök kvar)"
 
-#: public/class-tulo-payway-public.php:341
+#: includes/class-tulo-payway.php:185
+msgid "Visitor is logged in"
+msgstr "Besökare måste vara inloggad"
+
+#: public/class-tulo-payway-public.php:369
 msgid "Loading paywall..."
 msgstr "Laddar..."
 
-#: public/class-tulo-payway-public.php:426
+#: public/class-tulo-payway-public.php:466
 msgid "Buy"
 msgstr "Köp"
 

@@ -182,7 +182,7 @@ class Tulo_Payway_Server {
                // Logged in product
                $loggedin = new stdClass();
                $loggedin->productid = "tulo-loggedin";
-               $loggedin->label = "Visitor is logged in";
+               $loggedin->label = __("Visitor is logged in", "tulo");
                array_push($value, $loggedin);
           }
 
