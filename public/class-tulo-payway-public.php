@@ -191,6 +191,7 @@ class Tulo_Payway_Server_Public {
         
         // If restrictions only require logged in user, return true if user is logged in
         if ($this->restrictions_require_login_only($restrictions)) {
+            $this->common->write_log("!! restrictions require login only");
             return true;
         }
 
@@ -288,7 +289,7 @@ class Tulo_Payway_Server_Public {
             return $content;
         }
 
-        if (is_admin() || !wp_doing_ajax()) {
+        if (is_admin()) {
             return $content;
         }
 
