@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 14:58+0100\n"
-"PO-Revision-Date: 2023-12-19 14:59+0100\n"
+"POT-Creation-Date: 2024-04-15 22:58+0200\n"
+"PO-Revision-Date: 2024-04-15 22:58+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.1\n"
+"X-Generator: Poedit 3.4.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: wp-tulo-payway.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -70,7 +70,7 @@ msgid "Tulo Paywall enabled"
 msgstr "Tulo Paywall aktiverad"
 
 #: admin/tulo-payway-paywall-settings.php:178
-#: admin/tulo-payway-server-settings.php:280
+#: admin/tulo-payway-server-settings.php:281
 msgid "API Client id"
 msgstr "API Klient-ID"
 
@@ -79,7 +79,7 @@ msgid "Paywall API user client id"
 msgstr "Paywall API Klient-ID"
 
 #: admin/tulo-payway-paywall-settings.php:179
-#: admin/tulo-payway-server-settings.php:281
+#: admin/tulo-payway-server-settings.php:282
 msgid "API Secret"
 msgstr "API Hemlig nyckel"
 
@@ -253,7 +253,7 @@ msgid "Paywall custom variables"
 msgstr "Utökade variabler"
 
 #: admin/tulo-payway-paywall-settings.php:256
-#: admin/tulo-payway-server-settings.php:314
+#: admin/tulo-payway-server-settings.php:315
 msgid "Save Changes"
 msgstr "Spara ändringar"
 
@@ -350,66 +350,74 @@ msgstr ""
 "Indikerar om Tulo funktionalitet är aktiverad på sajten, inga kontroller mot "
 "SSO eller behörighetskontroller på artiklar görs om Tulo inte är aktiverat"
 
-#: admin/tulo-payway-server-settings.php:282
+#: admin/tulo-payway-server-settings.php:280
+msgid "SSO session for restricted content only?"
+msgstr "SSO session endast för låst innehåll?"
+
+#: admin/tulo-payway-server-settings.php:280
+msgid "Help session restricted only"
+msgstr "Endast etablera SSO session för låst innehåll"
+
+#: admin/tulo-payway-server-settings.php:283
 msgid "Redirect url"
 msgstr "Omdirigera till URL"
 
-#: admin/tulo-payway-server-settings.php:283
+#: admin/tulo-payway-server-settings.php:284
 msgid "Authentication URL"
 msgstr "Autentiserings URL"
 
-#: admin/tulo-payway-server-settings.php:284
+#: admin/tulo-payway-server-settings.php:285
 msgid "Session refresh timeout"
 msgstr "Session timeout, hur ofta skall sessionen kontrolleras"
 
-#: admin/tulo-payway-server-settings.php:284
+#: admin/tulo-payway-server-settings.php:285
 msgid "seconds"
 msgstr "sekunder"
 
-#: admin/tulo-payway-server-settings.php:285
+#: admin/tulo-payway-server-settings.php:286
 msgid "Organisation id"
 msgstr "Organisationens id"
 
-#: admin/tulo-payway-server-settings.php:286
+#: admin/tulo-payway-server-settings.php:287
 msgid "Expose account id"
 msgstr "Exponera account ID"
 
-#: admin/tulo-payway-server-settings.php:286
+#: admin/tulo-payway-server-settings.php:287
 msgid "Help expose account id"
 msgstr ""
 "Om markerad, så kommer konto ID för inloggad användare exponeras i "
 "‘dataLayer’ och i ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:287
+#: admin/tulo-payway-server-settings.php:288
 msgid "Expose email"
 msgstr "Exponera e-postadress"
 
-#: admin/tulo-payway-server-settings.php:287
+#: admin/tulo-payway-server-settings.php:288
 msgid "Help expose email"
 msgstr ""
 "Om markerad, så kommer e-postadressen för inloggad användare exponeras i "
 "‘dataLayer’ och i ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:288
+#: admin/tulo-payway-server-settings.php:289
 msgid "Expose customer number"
 msgstr "Exponera kundnummer"
 
-#: admin/tulo-payway-server-settings.php:288
+#: admin/tulo-payway-server-settings.php:289
 msgid "Help expose customer number"
 msgstr ""
 "Om markerad, så kommer kundnummer för inloggad användare exponeras i "
 "‘dataLayer’ och i ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:298
+#: admin/tulo-payway-server-settings.php:299
 #, php-format
 msgid "New %s are restricted"
 msgstr "Nya %s är låsta"
 
-#: includes/class-tulo-paywall.php:108
+#: includes/class-tulo-paywall.php:135
 msgid "Error loading paywall"
 msgstr "Fel inträffade"
 
-#: includes/class-tulo-paywall.php:117
+#: includes/class-tulo-paywall.php:144
 msgid ""
 "The paywall could not be loaded due to an unexpected error. Please try again "
 "later."
@@ -417,21 +425,21 @@ msgstr ""
 "Ohanterat fel inträffade vid laddning av prenumerations-dialogen, var vänlig "
 "försök senare."
 
-#: includes/class-tulo-payway-sso2-api.php:284
+#: includes/class-tulo-payway-sso2-api.php:353
 msgid "Account locked until"
 msgstr "Kontot är låst till och med"
 
-#: includes/class-tulo-payway-sso2-api.php:291
-#: includes/class-tulo-payway-sso2-api.php:297
+#: includes/class-tulo-payway-sso2-api.php:360
+#: includes/class-tulo-payway-sso2-api.php:366
 #, php-format
 msgid "Wrong username or password. (%s attempts left)"
 msgstr "Fel användarnamn eller lösenord. (%s försök kvar)"
 
-#: public/class-tulo-payway-public.php:341
+#: public/class-tulo-payway-public.php:357
 msgid "Loading paywall..."
 msgstr "Laddar..."
 
-#: public/class-tulo-payway-public.php:426
+#: public/class-tulo-payway-public.php:454
 msgid "Buy"
 msgstr "Köp"
 

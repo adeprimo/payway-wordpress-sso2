@@ -20,8 +20,8 @@ $tab = isset($_GET['tab']) ? $_GET['tab'] : $default_tab;
 
 if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
-
     update_option('tulo_plugin_active', isset($_POST["tulo_plugin_active"]) ? "on" : "");
+    update_option('tulo_session_restricted_only', isset($_POST["tulo_session_restricted_only"]) ? "on" : "");
     update_option("tulo_session_refresh_timeout", $_POST["tulo_session_refresh_timeout"]);
     update_option("tulo_authentication_url", $_POST["tulo_authentication_url"]);
     update_option("tulo_server_client_id", $_POST["tulo_server_client_id"]);
@@ -277,6 +277,7 @@ function tulo_server_render_whitelist_ips() {
   <table class="form-table">
       <?php
       tulo_server_render_bool_option_setting(__('Tulo active?', 'tulo'), 'tulo_plugin_active', __('Help plugin active', 'tulo'));
+      tulo_server_render_bool_option_setting(__('SSO session for restricted content only?', 'tulo'), 'tulo_session_restricted_only', __('Help session restricted only', 'tulo'));
       tulo_server_render_text_option_setting(__('API Client id', 'tulo'), 'tulo_server_client_id');
       tulo_server_render_text_option_setting(__('API Secret', 'tulo'), 'tulo_server_secret');
       tulo_server_render_landing(__('Redirect url', 'tulo'), 'tulo_redirect_uri');
