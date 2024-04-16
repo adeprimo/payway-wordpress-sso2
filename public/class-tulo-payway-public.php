@@ -143,11 +143,11 @@ class Tulo_Payway_Server_Public {
                 $this->session->refresh();
             }
             else {
-                $restrictions = $this->get_post_restrictions($post->ID);
                 $restricted_only = get_option("tulo_session_restricted_only");
-                $this->common->write_log("session for restricted only: ".$restricted_only);
+                $this->common->write_log("session for restricted content only: ".$restricted_only);
 
                 if (isset($restricted_only) && $restricted_only == "on") {
+                    $restrictions = $this->get_post_restrictions($post->ID);
                     if (!empty($restrictions)) {
                         $this->common->write_log("!! post has restrictions, no session available. will identify");
                         $this->session->identify();
