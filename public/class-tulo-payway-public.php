@@ -190,7 +190,7 @@ class Tulo_Payway_Server_Public {
         }
         
         // If restrictions only require logged in user, return true if user is logged in
-        if ($this->restrictions_require_login_only($restrictions)) {
+        if ($this->restrictions_require_login_only($restrictions) && $this->session->is_logged_in()) {
             $this->common->write_log("!! restrictions require login only");
             return true;
         }
