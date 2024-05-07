@@ -116,7 +116,9 @@ class Tulo_Paywall_Common {
 
     public function get_article_id() {
         global $wp_query;
-        return $wp_query->post->ID;
+        if (isset($wp_query->post->ID))
+            return $wp_query->post->ID;
+        return "";
     }
 
     public function get_login_url() {
