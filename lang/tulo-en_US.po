@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-15 19:15+0200\n"
-"PO-Revision-Date: 2024-04-15 19:15+0200\n"
+"POT-Creation-Date: 2024-05-07 16:49+0200\n"
+"PO-Revision-Date: 2024-05-07 16:49+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -73,7 +73,7 @@ msgid "Tulo Paywall enabled"
 msgstr "Tulo Paywall enabled"
 
 #: admin/tulo-payway-paywall-settings.php:178
-#: admin/tulo-payway-server-settings.php:280
+#: admin/tulo-payway-server-settings.php:281
 msgid "API Client id"
 msgstr "API Client-ID"
 
@@ -82,7 +82,7 @@ msgid "Paywall API user client id"
 msgstr "Paywall API user client id"
 
 #: admin/tulo-payway-paywall-settings.php:179
-#: admin/tulo-payway-server-settings.php:281
+#: admin/tulo-payway-server-settings.php:282
 msgid "API Secret"
 msgstr "API Secret"
 
@@ -254,7 +254,7 @@ msgid "Paywall custom variables"
 msgstr "Custom variables"
 
 #: admin/tulo-payway-paywall-settings.php:256
-#: admin/tulo-payway-server-settings.php:314
+#: admin/tulo-payway-server-settings.php:315
 msgid "Save Changes"
 msgstr "Save Changes"
 
@@ -349,57 +349,65 @@ msgstr "Tulo Active?"
 msgid "Help plugin active"
 msgstr "Is the Tulo plugin activated"
 
-#: admin/tulo-payway-server-settings.php:282
+#: admin/tulo-payway-server-settings.php:280
+msgid "SSO session for restricted content only?"
+msgstr "SSO session for restricted content only?"
+
+#: admin/tulo-payway-server-settings.php:280
+msgid "Help session restricted only"
+msgstr "Only establish SSO session when visitor views restricted content"
+
+#: admin/tulo-payway-server-settings.php:283
 msgid "Redirect url"
 msgstr "Redirect url"
 
-#: admin/tulo-payway-server-settings.php:283
+#: admin/tulo-payway-server-settings.php:284
 msgid "Authentication URL"
 msgstr "Authentication URL"
 
-#: admin/tulo-payway-server-settings.php:284
+#: admin/tulo-payway-server-settings.php:285
 msgid "Session refresh timeout"
 msgstr "Session refresh timeout"
 
-#: admin/tulo-payway-server-settings.php:284
+#: admin/tulo-payway-server-settings.php:285
 msgid "seconds"
 msgstr "seconds"
 
-#: admin/tulo-payway-server-settings.php:285
+#: admin/tulo-payway-server-settings.php:286
 msgid "Organisation id"
 msgstr "Organisation id"
 
-#: admin/tulo-payway-server-settings.php:286
+#: admin/tulo-payway-server-settings.php:287
 msgid "Expose account id"
 msgstr "Expose account id"
 
-#: admin/tulo-payway-server-settings.php:286
+#: admin/tulo-payway-server-settings.php:287
 msgid "Help expose account id"
 msgstr ""
 "If checked, the account ID for logged in user will be exposed in ‘dataLayer’ "
 "and ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:287
+#: admin/tulo-payway-server-settings.php:288
 msgid "Expose email"
 msgstr "Expose email"
 
-#: admin/tulo-payway-server-settings.php:287
+#: admin/tulo-payway-server-settings.php:288
 msgid "Help expose email"
 msgstr ""
 "If checked, the email-address for logged in user will be exposed in "
 "‘dataLayer’ and ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:288
+#: admin/tulo-payway-server-settings.php:289
 msgid "Expose customer number"
 msgstr "Expose customer number"
 
-#: admin/tulo-payway-server-settings.php:288
+#: admin/tulo-payway-server-settings.php:289
 msgid "Help expose customer number"
 msgstr ""
 "If checked, the customer number for logged in user will be exposed in "
 "‘dataLayer’ and ‘localStorage’"
 
-#: admin/tulo-payway-server-settings.php:298
+#: admin/tulo-payway-server-settings.php:299
 #, php-format
 msgid "New %s are restricted"
 msgstr "New %s are restricted"
@@ -430,11 +438,11 @@ msgstr "Wrong username or password. (%s attempts left)"
 msgid "Visitor is logged in"
 msgstr "Visitor must be logged in"
 
-#: public/class-tulo-payway-public.php:369
+#: public/class-tulo-payway-public.php:385
 msgid "Loading paywall..."
 msgstr "Loading..."
 
-#: public/class-tulo-payway-public.php:466
+#: public/class-tulo-payway-public.php:482
 msgid "Buy"
 msgstr "Buy"
 

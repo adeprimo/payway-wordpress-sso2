@@ -167,7 +167,6 @@ class Tulo_Paywall_Common {
         return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/".$version."/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/".$version."/paywall.js";
     }
     public function get_paywall_url() {
-        //return "https://localhost:7172/api/paywall";
         return get_option('tulo_environment') == 'prod' ? "https://paywall.worldoftulo.com/api/paywall" : "https://payway-paywall-stage.adeprimo.se/api/paywall";
     }
 
