@@ -41,6 +41,15 @@ class Tulo_Payway_Server_Public {
         $this->session = new Tulo_Payway_Session();
     }
 
+    public static function get_portal_base_url() {
+        return Tulo_Payway_Server_Public::get_myaccount_url();
+    }
+    
+    public static function get_myaccount_url() {
+        return Tulo_Payway_Server_Common::get_tulo_myaccount_url();
+    }
+    
+
     public static function get_product_shop_url($product) {
         $orgid = get_option('tulo_organisation_id');
         $thisuri = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
