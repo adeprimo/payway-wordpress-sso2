@@ -176,7 +176,7 @@ function tulo_server_render_custom_variables()
 
         <?php
             tulo_server_render_bool_option_setting(__("Tulo Paywall enabled", "tulo"), "tulo_paywall_enabled");
-            tulo_server_render_bool_option_setting(__("Client-side rendering enabled", "tulo"), "tulo_paywall_clientside_enabled");
+            tulo_server_render_bool_option_setting(__("Client-side rendering enabled", "tulo"), "tulo_paywall_clientside_enabled", __("Check to render Paywall clientside to prevent signature caching issues.", "tulo"));
             tulo_server_render_text_option_setting(__("API Client id", "tulo"), "tulo_paywall_client_id", __("Paywall API user client id", "tulo"));
             tulo_server_render_text_option_setting(__("API Secret", "tulo"), "tulo_paywall_secret", __("Paywall API user secret", "tulo"));
         ?>
