@@ -257,6 +257,8 @@ class Tulo_Payway_Server {
           $this->loader->add_action( 'wp_ajax_tulo_login', $plugin_public, 'ajax_login', 1 );
           $this->loader->add_action( 'wp_ajax_nopriv_tulo_logout', $plugin_public, 'ajax_logout', 1 );
           $this->loader->add_action( 'wp_ajax_tulo_logout', $plugin_public, 'ajax_logout', 1 );
+          $this->loader->add_action( 'wp_ajax_nopriv_tulo_pw_signature', $plugin_public, 'ajax_paywall_jwt', 1 );
+          $this->loader->add_action( 'wp_ajax_tulo_pw_signature', $plugin_public, 'ajax_paywall_jwt', 1 );
 
      }
 

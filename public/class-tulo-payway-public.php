@@ -346,9 +346,14 @@ class Tulo_Payway_Server_Public {
             }    
         }
 
-        if (get_option("tulo_paywall_enabled") == "on") {
+        if (get_option("tulo_paywall_enabled") == "on" && get_option("tulo_paywall_clientside_enabled") != "on") {
             $output .= $this->initialize_paywall($restrictions);
         }
+
+        if (get_option("tulo_paywall_clientside_enabled") == "on") {
+            $output .= $this->initialize_paywall_clientside($restrictions);
+        }
+
 
         $output .= '</div>';
         $output .= '</div>';
@@ -365,8 +370,14 @@ class Tulo_Payway_Server_Public {
         return false;
     }
 
+    private function initialize_paywall_clientside($post_restrictions)    
+    {
+        $this->common->write_log("initialize paywall clientside");
+        $output = $this->initialize_paywall($post_restrictions, true);
+        return $output;
+    }
 
-    private function initialize_paywall($post_restrictions)    
+    private function initialize_paywall($post_restrictions, $late_init = false)    
     {
         if (is_admin()) 
             return;
@@ -390,15 +401,17 @@ class Tulo_Payway_Server_Public {
             $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
         }
 
-        
-
+        $jwtToken = "";
+        if (!$late_init) {
+            $jwtToken = $paywall->get_signature($post_restrictions);
+        }
 
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
         $output .= '<script type="text/javascript">
-                     new TuloPaywall().Init({
+                     var paywallCfg = {
                         debug: '.$debug.',
                         url: "'.$paywall->get_paywall_url().'",
-                        jwtToken: "'.$paywall->get_signature($post_restrictions).'",
+                        jwtToken: "'.$jwtToken.'",
                         accountOrigin: "'.$paywall->get_account_origin().'",
                         trafficSource: "'.$paywall->get_traffic_source().'",
                         merchantReference: "'.$paywall->get_merchant_reference().'",
@@ -421,8 +434,38 @@ class Tulo_Payway_Server_Public {
                             sections: [],
                             categories: []
                         }
-                    })
+                     };
                     </script>';
+        if (!$late_init) {
+            $output .= '<script type="text/javascript">new TuloPaywall().Init(paywallCfg);</script>';
+        } else {
+            $restrictions = base64_encode(serialize($post_restrictions));
+            $output .= '<script type="text/javascript">
+                var restrictions = "'.$restrictions.'";
+                async function generatePaywallSignature(restrictions) {
+                    var response = await fetch(tulo_params.url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: "action=tulo_pw_signature&restrictions="+restrictions
+                    });
+                    if (response.ok) {
+                        return await response.text();
+                    } else {
+                        return "error";
+                    }
+                }
+                async function initPaywall() {
+                    var pwJWT = await generatePaywallSignature(restrictions);
+                    if (pwJWT != "error") {
+                        paywallCfg.jwtToken = pwJWT;
+                        new TuloPaywall().Init(paywallCfg);
+                    }
+                }
+                initPaywall();
+            </script>';
+        }
         return $output;
     }
 
@@ -534,8 +577,23 @@ class Tulo_Payway_Server_Public {
         wp_die();
     }
 
+    public function ajax_paywall_jwt() {        
+        $restrictions = base64_decode(filter_input(INPUT_POST, 'restrictions'));
+        $post_restrictions = unserialize($restrictions);
+        $this->common->write_log("<CLIENT> post restrictions unserialized: ".print_r($post_restrictions, true));
+        $paywall = new Tulo_Paywall_Common();
+        $signature = $paywall->get_signature($post_restrictions);
+        $this->common->write_log("<CLIENT> generated signature: ".$signature);
+        
+        header('Content-Type: text/plain');
+        echo $signature;
+        wp_die();
+    }
+
     public function tulo_query_vars($qvars) {
         $qvars[] = "tpw_session_refresh";
         return $qvars;
     }
+
+
 }
