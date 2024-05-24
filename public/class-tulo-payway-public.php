@@ -454,6 +454,7 @@ class Tulo_Payway_Server_Public {
                 async function generatePaywallSignature(restrictions) {
                     var response = await fetch(tulo_params.url, {
                         method: "POST",
+                        credentials: "include",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded",
                         },
