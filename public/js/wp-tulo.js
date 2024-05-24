@@ -163,4 +163,5 @@
             // Insert error message before the form's first child node
             target.insertBefore(errorMessageNode, target.childNodes[0]);
         }
+
 });

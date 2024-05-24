@@ -21,7 +21,7 @@ class Tulo_Payway_Server_Common {
     public function __construct() {
     }
 
-    public function get_tulo_myaccount_url() {
+    public static function get_tulo_myaccount_url() {
         $url = "";
         $currentOrg = get_option('tulo_organisation_id');
         if (get_option('tulo_environment') == 'prod') {
