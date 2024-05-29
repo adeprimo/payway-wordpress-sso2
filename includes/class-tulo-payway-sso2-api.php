@@ -116,6 +116,7 @@ class Tulo_Payway_API_SSO2 {
             //$_SESSION[$this->sso_session_status_key] = $sso_payload->sts;
             //$_SESSION[$this->sso_session_established_key] = time();
             $this->set_sso_session_cookie($sso_payload->sid, $sso_payload->sts);
+            setcookie("tpw_session_established", 1, strtotime('+30 days'), '/');
 
             if ($sso_payload->sts == "loggedin" && $sso_payload->at != "") {
                 $this->fetch_user_and_login($sso_payload->at);
@@ -536,6 +537,7 @@ class Tulo_Payway_API_SSO2 {
             $this->set_user_customer_number($data["user"]->customer_number);
             $this->set_user_active_products($data["active_products"]);
             $this->set_session_loggedin();
+            $this->write_session_data();
         } else {
             $this->common->write_log("!! Could not get user and product info from Payway!");
         }
