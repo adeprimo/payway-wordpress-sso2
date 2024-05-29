@@ -116,7 +116,7 @@ class Tulo_Payway_API_SSO2 {
             //$_SESSION[$this->sso_session_status_key] = $sso_payload->sts;
             //$_SESSION[$this->sso_session_established_key] = time();
             $this->set_sso_session_cookie($sso_payload->sid, $sso_payload->sts);
-            setcookie("tpw_session_established", 1, strtotime('+30 days'), '/');
+            $this->set_sso_session_established_cookie();
 
             if ($sso_payload->sts == "loggedin" && $sso_payload->at != "") {
                 $this->fetch_user_and_login($sso_payload->at);
@@ -127,16 +127,16 @@ class Tulo_Payway_API_SSO2 {
     }
     
     protected function session_needs_refresh() {
-        $session_data = $this->get_session_data();
-        
-        if ($session_data != null) {
-            $established = $session_data->established;
+        $data = $this->get_sso_session_time();
+        if ($data != null) {
+            $established = $data->established;
+            $now = time();
             $diff = (time()-$established);
             $session_timeout = get_option('tulo_session_refresh_timeout');
-            $this->common->write_log("established: ".$established." diff: ".$diff." timeout: ".$session_timeout);
-            $this->write_session_data();
+            $this->common->write_log("established: ".$established." now: ".$now." diff: ".$diff." timeout: ".$session_timeout);
             if ($diff > $session_timeout)
                 return true;
+            
             return false;
         }
         return true;
@@ -224,13 +224,13 @@ class Tulo_Payway_API_SSO2 {
 
     protected function session_established() {
 
-        $cookieSessionId = $this->get_session_id_from_cookie();   
         $session_data = $this->get_session_data();
         if ($session_data != null) {            
             return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_WARM;
         }     
         //if (isset($_SESSION[$this->sso_session_id_key]) && $_SESSION[$this->sso_session_id_key] != "")
         //    return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_WARM;
+        $cookieSessionId = $this->get_session_id_from_cookie();   
         if ($cookieSessionId != "") {
             return Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_COLD;
         }
@@ -325,6 +325,8 @@ class Tulo_Payway_API_SSO2 {
                 return;
             }
 
+            // Update session time
+            $this->set_sso_session_time();
             $this->common->write_log("session status: <".$decoded->sts. "> at: ".$decoded->at);
             if ($decoded->sts == "terminated") {
                 $this->common->write_log("session terminated in other window, logging out user");
@@ -579,15 +581,25 @@ class Tulo_Payway_API_SSO2 {
         $_SESSION[$this->sso_session_user_active_products_key] = $products;
     }
 
+    private function set_sso_session_established_cookie() {
+        $cookie_data = $this->get_cookie("tpw_session_established");
+        if ($cookie_data != null) {
+            $this->common->write_log("Session established cookie already set, not setting again");
+            return;
+        }
+        $this->set_cookie("tpw_session_established", 1);        
+    }
+
     private function set_sso_session_cookie($sid, $sts) {
-        if (isset($_COOKIE[Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME])) {
+        $cookie_data = $this->get_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME);
+        if ($cookie_data != null) {
             $this->common->write_log("Session cookie already set, not setting again");
             return;
         }
-        $data = ["sid" => $sid, "sts" => $sts, "established" => time()];
-        $this->common->write_log("Setting initial sso cookie: ".json_encode($data));
-        $unique_id = base64_encode(json_encode($data));
-        setcookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME, $unique_id, strtotime('+30 days'), '/');
+        $data = json_encode(["sid" => $sid, "sts" => $sts]);
+        $this->common->write_log("Setting initial sso cookie: ".$data);
+        $this->set_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME, $data);
+        $this->set_sso_session_time();
     }
 
     private function set_session_loggedin() {
@@ -595,12 +607,17 @@ class Tulo_Payway_API_SSO2 {
         $unique_id = base64_encode($this->sso_session_id() .'^'. (string)microtime());
         setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
     }
-    
+
 
     private function get_session_id_from_cookie() {
-        $cookie_data = $this->get_cookie_data("tpw_id");
+        $cookie_data = $this->get_cookie("tpw_id");
         if ( $cookie_data != null) {
-            return $cookie_data[0];
+            if (str_contains($data, "^")) {
+                $vals = explode("^", $data);
+                if (count($vals) == 2) {
+                    return $vals[0];
+                }    
+            }
         }
         /*
         $session_data = $this->get_session_data();
@@ -614,6 +631,7 @@ class Tulo_Payway_API_SSO2 {
     }
 
     private function write_session_data() {
+        $this->common->write_log("[write_session_data]");
         $session_data = $this->get_session_data();
         if ($session_data != null) {
             $session_data->account_id = isset($_SESSION[$this->sso_session_user_id_key]) ? $_SESSION[$this->sso_session_user_id_key] : "";
@@ -621,37 +639,55 @@ class Tulo_Payway_API_SSO2 {
             $session_data->email = isset($_SESSION[$this->sso_session_user_email_key]) ? $_SESSION[$this->sso_session_user_email_key] : "";
             $session_data->customer_number = isset($_SESSION[$this->sso_session_user_custno_key]) ? $_SESSION[$this->sso_session_user_custno_key] : "";
             $session_data->active_products = isset($_SESSION[$this->sso_session_user_active_products_key]) ? $_SESSION[$this->sso_session_user_active_products_key] : "";
-            $session_data->established = time();
             if ($session_data->account_id != "") {
                 $session_data->sts = "loggedin";
             } else {
                 $session_data->sts = "anon";
             }
-            $this->common->write_log("Writing session data: ".json_encode($session_data));
-            setcookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME, base64_encode(json_encode($session_data)), strtotime('+30 days'), '/');
-        }
-    }
 
-    private function get_cookie_data($cookie) {
-        if (isset($_COOKIE[$cookie]) && $_COOKIE[$cookie] != "")  {
-            $data = base64_decode($_COOKIE[$cookie]);
-            if (str_contains($data, "^")) {
-                $vals = explode("^", $data);
-                if (count($vals) == 2) {
-                    return $vals;
-                }    
+            $current_data = $this->get_session_data();
+            $this->common->write_log("Current session data: ".json_encode($current_data));
+            $this->common->write_log("New session data: ".json_encode($session_data));
+            if ($current_data == $session_data) {
+                $this->common->write_log("Session data unchanged, not writing to cookie");
+                return;
             }
+
+            $this->common->write_log("!! Writing session data: ".json_encode($session_data));
+            $this->set_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME, json_encode($session_data));
         }
-        return null;        
     }
 
     private function get_session_data() {
-        if (isset($_COOKIE[Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME]) && $_COOKIE[Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME] != "")  {
-            $data = json_decode(base64_decode($_COOKIE[Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME]));
+        $data = $this->get_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME);
+        if ($data != null)  {
+            $data = json_decode($data);            
             return $data;
         }
         return null;
     }
+
+    private function set_sso_session_time() {
+        $data = ["established" => time()];
+        $this->set_cookie("tpw_sso_session_time", json_encode($data));
+    }
+    private function get_sso_session_time() {
+        return json_decode($this->get_cookie("tpw_sso_session_time"));
+    }
+
+
+    private function get_cookie($cookie) {
+        if (isset($_COOKIE[$cookie]))  {
+            $data = base64_decode($_COOKIE[$cookie]);
+            return $data;
+        }
+        return null;
+    }
+
+    private function set_cookie($cookie_name, $data) {
+        setcookie($cookie_name, base64_encode($data), strtotime('+30 days'), '/');
+    }
+
 
     private static function get_sso2_url($path) {       
         $url = "";

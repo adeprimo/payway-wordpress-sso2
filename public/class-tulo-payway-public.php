@@ -81,9 +81,9 @@ class Tulo_Payway_Server_Public {
     }
 
     public function register_session() {
-        if( !session_id() ) {
-            session_start();
-        }
+        //if( !session_id() ) {
+        //    session_start();
+        //}
     }
 
     public function check_session($wp) 
