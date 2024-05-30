@@ -463,6 +463,7 @@ class Tulo_Payway_API_SSO2 {
         setcookie('tpw_id', null, -1, '/');
         setcookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME, null, -1, '/');
         setcookie('tpw_session_established', null, -1, '/');
+        setcookie('tpw_session_error', null, -1, '/');
         return true;
     }
 
@@ -595,7 +596,8 @@ class Tulo_Payway_API_SSO2 {
             $this->common->write_log("Session established cookie already set, not setting again");
             return;
         }
-        $this->set_cookie("tpw_session_established", 1);        
+        setcookie('tpw_session_established', 1, time() + 60*60*24*30, '/');
+        setcookie('tpw_session_error', null, -1, '/');
     }
 
     private function set_sso_session_cookie($sid, $sts) {
