@@ -23,7 +23,7 @@ use \Firebase\JWT\JWT;
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
- * @since      1.0.0
+ * @since      1.2.4.1
  * @package    Tulo_Payway_Server
  * @subpackage Tulo_Payway_Server/includes
  */
@@ -66,7 +66,7 @@ class Tulo_Payway_Server {
      public function __construct() {
 
           $this->plugin_name = 'payway-wordpress-sso2';
-          $this->version = '1.0.0';
+          $this->version = '1.2.4.1';
 
           $this->load_dependencies();
           $this->set_locale();

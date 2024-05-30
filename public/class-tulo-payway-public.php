@@ -96,6 +96,17 @@ class Tulo_Payway_Server_Public {
         if (get_option("tulo_plugin_active") != "on") 
             return;
 
+        if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
+            return true;
+        }
+
+        if ($this->session->has_session_error()) {
+            $this->common->write_log("!! Skipping identification. Currently session identification problems");
+            return;
+        }
+
+        $this->common->write_log("PHP SESSION status: ".session_status());
+
         $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
         if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
             $this->common->write_log("!! whitelisted IP request, skipping session establishment.");
@@ -104,7 +115,7 @@ class Tulo_Payway_Server_Public {
     
 
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            if (get_query_var("tpw_session_refresh") == "1") {
+            if (get_query_var("tpw_session_refresh") != "") {
                 $this->common->write_log("!! forced session session refresh using query param");
                 $this->session->refresh();
                 $currentUrl = home_url( $wp->request );
@@ -113,6 +124,11 @@ class Tulo_Payway_Server_Public {
                     $queryVars = $wp->query_vars;
                     unset($queryVars['tpw_session_refresh']);
                     $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+                }
+                if (strpos($currentUrl, "?") === false) {
+                    $currentUrl .= "?tpw=".time();
+                } else {
+                    $currentUrl .= "&tpw=".time();
                 }
                 $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
                 header("Location: ".$currentUrl, true, 302);

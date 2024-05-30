@@ -23,12 +23,19 @@ $client_secret = get_option('tulo_server_secret');
 $session = new Tulo_Payway_Session();
 
 write_log("Return url: ".$redirect_url);
+write_log("Token: ".$token);
 
 try
 {
     $payload = $session->decode_jwt($token, $client_secret);
-    if (isset($payload)) {        
-        $session->register($payload);
+    if (isset($payload)) {             
+        if (isset($payload->err)) {
+            write_log("Error in JWT from Payway! Message: ".$payload->err);
+            $session->register_session_error($payload->err);            
+        } else {       
+            write_log("Decode OK, payload: ".json_encode($payload));     
+            $session->register($payload);
+        }
     }
     header("Location: ".$redirect_url);    
 } catch(Firebase\JWT\ExpiredException $e) {

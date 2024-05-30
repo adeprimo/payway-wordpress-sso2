@@ -47,6 +47,10 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         $this->register_basic_session($payload);
     }
 
+    public function register_session_error($error) {
+        $this->set_session_error($error);
+    }
+    
     public function established() {
         return $this->session_established();
     }
