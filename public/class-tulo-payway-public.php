@@ -86,6 +86,81 @@ class Tulo_Payway_Server_Public {
         //}
     }
 
+    public function should_request_be_excepted() {        
+        $this->common->write_log("Checking for SSO exceptions");
+
+        if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
+            return true;
+        }
+
+        //$this->common->write_log("SERVER: ".print_r($_SERVER, true));
+
+        $this->common->write_log("Checking IP for excepted request.");
+        $except_ip = false;
+        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
+        if (in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+            $except_ip = true;
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $iplist = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            foreach ($iplist as $ip) {
+                if (in_array($ip, $whitelisted_ips, false)) {
+                    $except_ip = true;
+                }
+                if ($except_ip) {
+                    break;
+                }
+            }
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED'])) {
+           if (in_array($_SERVER['HTTP_X_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+           }
+        }
+   
+        if (!empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
+            if (in_array($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }          
+        }
+
+        if (!empty($_SERVER['HTTP_FORWARDED_FOR'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED_FOR'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }
+        } 
+  
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+
+            }        
+        }
+
+        if ($except_ip) {
+            $this->common->write_log("IP match, excepting this request from SSO.");
+            return true;
+        }
+
+        $this->common->write_log("Checking headers for excepted request.");
+        // check header?
+        if (get_option('tulo_except_header_name') != "") {
+            $header = get_option('tulo_except_header_name');
+            $value = get_option('tulo_except_header_value');
+            if (isset($_SERVER[$header])) {
+                if ($_SERVER[$header] == $value) {
+                    $this->common->write_log("Header value match, excepting this request from SSO.");
+                    return true;
+                }
+            } 
+        }
+    
+        $this->common->write_log("No exceptions found, proceeding with SSO identification if needed.");
+        return false;
+    }
+
     public function check_session($wp) 
     {
         global $wp;
@@ -96,24 +171,16 @@ class Tulo_Payway_Server_Public {
         if (get_option("tulo_plugin_active") != "on") 
             return;
 
-        if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
-            return true;
-        }
-
+    
         if ($this->session->has_session_error()) {
             $this->common->write_log("!! Skipping identification. Currently session identification problems");
             return;
         }
 
-        $this->common->write_log("PHP SESSION status: ".session_status());
-
-        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
-        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
-            $this->common->write_log("!! whitelisted IP request, skipping session establishment.");
-            return true;
+        if ($this->should_request_be_excepted()) {
+            return;
         }
-    
-
+        
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             if (get_query_var("tpw_session_refresh") != "") {
                 $this->common->write_log("!! forced session session refresh using query param");
@@ -224,11 +291,10 @@ class Tulo_Payway_Server_Public {
             return true;
         }
 
-        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
-        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+        if ($this->should_request_be_excepted()) {
             return true;
         }
-        
+
         // If restrictions only require logged in user, return true if user is logged in
         if ($this->restrictions_require_login_only($restrictions) && $this->session->is_logged_in()) {
             $this->common->write_log("!! restrictions require login only");
