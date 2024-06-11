@@ -28,6 +28,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option("tulo_server_client_id", $_POST["tulo_server_client_id"]);
     update_option("tulo_server_secret", $_POST["tulo_server_secret"]);
     update_option("tulo_organisation_id", $_POST["tulo_organisation_id"]);
+    update_option("tulo_cookie_domain", $_POST["tulo_cookie_domain"]);
     update_option("tulo_environment", $_POST["tulo_environment"]);
     update_option('tulo_whitelist_ip', $_POST["tulo_whitelist_ip"]);
     update_option('tulo_except_header_name', $_POST["tulo_except_header_name"]);
@@ -354,6 +355,7 @@ function tulo_server_render_whitelist_ips() {
       tulo_server_render_text_option_setting(__('Authentication URL', 'tulo'), 'tulo_authentication_url');
       tulo_server_render_text_option_setting(__('Session refresh timeout', 'tulo'), 'tulo_session_refresh_timeout', __('seconds', 'tulo'));
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
+      tulo_server_render_text_option_setting(__('Cookie domain', 'tulo'), 'tulo_cookie_domain', __('Help cookie domain.', 'tulo'));
       tulo_server_render_bool_option_setting(__('Expose account id', 'tulo'), 'tulo_expose_account_id', __('Help expose account id', 'tulo'));
       tulo_server_render_bool_option_setting(__('Expose email', 'tulo'), 'tulo_expose_email', __('Help expose email', 'tulo'));
       tulo_server_render_bool_option_setting(__('Expose customer number', 'tulo'), 'tulo_expose_customer_number', __('Help expose customer number', 'tulo'));

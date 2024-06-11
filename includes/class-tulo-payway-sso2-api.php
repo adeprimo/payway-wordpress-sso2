@@ -677,7 +677,7 @@ class Tulo_Payway_API_SSO2 {
             $this->common->write_log("Session established cookie already set, not setting again");
             return;
         }
-        setcookie('tpw_session_established', 1, time() + 60*60*24*30, '/');
+        $this->set_cookie('tpw_session_established', 1, time() + 60*60*24*30, $encode=false);
         setcookie('tpw_session_error', null, -1, '/');
     }
 
@@ -696,8 +696,9 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_session_loggedin() {
         $_SESSION[$this->sso_session_established_key] = time();
-        $unique_id = base64_encode($this->sso_session_id() .'^'. (string)microtime());
-        setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
+        $unique_id = $this->sso_session_id() .'^'. (string)microtime();
+        $this->set_cookie("tpw_id", $unique_id, strtotime('+30 days'));
+        //setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
     }
 
 
@@ -794,11 +795,29 @@ class Tulo_Payway_API_SSO2 {
         return null;
     }
 
-    public function set_cookie($cookie_name, $data, $expire = "") {
+    public function set_cookie($cookie_name, $data, $expire = "", $encode = true) {
         if ($expire == "") {
             $expire = time() + 60*60*24*30;
         }
-        setcookie($cookie_name, base64_encode($data), $expire, '/');
+
+        if ($encode) {
+            $cookie_data = base64_encode($data);
+        } else {
+            $cookie_data = $data;
+        }
+
+        $domain = get_option('tulo_cookie_domain');
+        if (!isset($domain)) {
+            $domain = "";
+        }
+        
+        $secure = false;
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+            $secure = true;
+        }                
+        $httponly = true;
+
+        setcookie($cookie_name, $cookie_data, $expire, '/', $domain, $secure, $httponly);        
     }
 
 
