@@ -1,7 +1,9 @@
 <?php
 
+
 function write_log($log) {
-    if (true === WP_DEBUG) {
+    $debug_active = get_option('tulo_debug_log_active');
+    if (true === WP_DEBUG && $debug_active == "on") {
         if (is_array($log) || is_object($log)) {
             error_log(print_r($log, true));
         } else {

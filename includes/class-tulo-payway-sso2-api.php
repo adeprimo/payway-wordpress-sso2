@@ -158,11 +158,11 @@ class Tulo_Payway_API_SSO2 {
     }
 
     protected function is_session_logged_in() {
-        $this->common->write_log("[is_session_logged_in]");
+        //$this->common->write_log("[is_session_logged_in]");
         if ($this->session_established()) {
-            $this->common->write_log("[is_session_logged_in] session established");
-            $this->common->write_log("[is_session_logged_in] user name: ".$this->get_user_name());
-            $this->common->write_log("[is_session_logged_in] email: ". $this->get_user_email());
+            //$this->common->write_log("[is_session_logged_in] session established");
+            //$this->common->write_log("[is_session_logged_in] user name: ".$this->get_user_name());
+            //$this->common->write_log("[is_session_logged_in] email: ". $this->get_user_email());
             if ($this->get_user_name() !="" || $this->get_user_email() != "") {
                 return true;
             }
@@ -226,6 +226,87 @@ class Tulo_Payway_API_SSO2 {
         return null;
     }
 
+    public function should_request_be_excepted() {        
+        $this->common->write_log("Checking for SSO exceptions");
+
+        if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
+            return true;
+        }
+
+        if ($this->isBot()) {
+            $this->common->write_log("bot detected, request excepted!");
+            return true;
+        }
+
+
+        //$this->common->write_log("SERVER: ".print_r($_SERVER, true));
+
+        $this->common->write_log("Checking IP for excepted request.");
+        $except_ip = false;
+        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
+        if (in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+            $except_ip = true;
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $iplist = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            foreach ($iplist as $ip) {
+                if (in_array($ip, $whitelisted_ips, false)) {
+                    $except_ip = true;
+                }
+                if ($except_ip) {
+                    break;
+                }
+            }
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED'])) {
+           if (in_array($_SERVER['HTTP_X_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+           }
+        }
+   
+        if (!empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
+            if (in_array($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }          
+        }
+
+        if (!empty($_SERVER['HTTP_FORWARDED_FOR'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED_FOR'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }
+        } 
+  
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+
+            }        
+        }
+
+        if ($except_ip) {
+            $this->common->write_log("IP match, excepting this request from SSO.");
+            return true;
+        }
+
+        $this->common->write_log("Checking headers for excepted request.");
+        // check header?
+        if (get_option('tulo_except_header_name') != "") {
+            $header = get_option('tulo_except_header_name');
+            $value = get_option('tulo_except_header_value');
+            if (isset($_SERVER[$header])) {
+                if ($_SERVER[$header] == $value) {
+                    $this->common->write_log("Header value match, excepting this request from SSO.");
+                    return true;
+                }
+            } 
+        }
+    
+        $this->common->write_log("No exceptions found, proceeding with SSO identification if needed.");
+        return false;
+    }
+
     protected function session_established() {
 
         $session_data = $this->get_session_data();
@@ -279,7 +360,7 @@ class Tulo_Payway_API_SSO2 {
     }
 
     private function isBot() {
-        $crawlers = "alexa|bot|crawl(er|ing)|facebookexternalhit|feedburner|google web preview|nagios|postrank|pingdom|slurp|spider|yahoo!|yandex";
+        $crawlers = "alexa|bot|crawl(er|ing)|facebookexternalhit|feedburner|google web preview|nagios|postrank|pingdom|slurp|spider|yahoo!|yandex|ias-or|integralads|verity";
         $pattern = "/".$crawlers."/i";
         $agent = $_SERVER['HTTP_USER_AGENT'];
         if ( preg_match($pattern, $agent) ) {
@@ -609,6 +690,7 @@ class Tulo_Payway_API_SSO2 {
         $data = json_encode(["sid" => $sid, "sts" => $sts]);
         $this->common->write_log("Setting initial sso cookie: ".$data);
         $this->set_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME, $data);
+        $_SESSION["initial_sso_data"] = $data;
         $this->set_sso_session_time();
     }
 
@@ -672,6 +754,10 @@ class Tulo_Payway_API_SSO2 {
         $data = $this->get_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME);
         if ($data != null)  {
             $data = json_decode($data);            
+            return $data;
+        }
+        if (isset($_SESSION["initial_sso_data"])) {
+            $data = json_decode($_SESSION["initial_sso_data"]);
             return $data;
         }
         return null;
