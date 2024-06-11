@@ -697,7 +697,7 @@ class Tulo_Payway_API_SSO2 {
     private function set_session_loggedin() {
         $_SESSION[$this->sso_session_established_key] = time();
         $unique_id = $this->sso_session_id() .'^'. (string)microtime();
-        $this->set_cookie("tpw_id", $unique_id, strtotime('+30 days'));
+        $this->set_cookie("tpw_id", $unique_id, strtotime('+30 days'), $encode=true, $httponly=false);
         //setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
     }
 
@@ -795,7 +795,7 @@ class Tulo_Payway_API_SSO2 {
         return null;
     }
 
-    public function set_cookie($cookie_name, $data, $expire = "", $encode = true) {
+    public function set_cookie($cookie_name, $data, $expire = "", $encode = true, $httponly = true) {
         if ($expire == "") {
             $expire = time() + 60*60*24*30;
         }
@@ -810,12 +810,11 @@ class Tulo_Payway_API_SSO2 {
         if (!isset($domain)) {
             $domain = "";
         }
-        
+
         $secure = false;
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $secure = true;
         }                
-        $httponly = true;
 
         setcookie($cookie_name, $cookie_data, $expire, '/', $domain, $secure, $httponly);        
     }
