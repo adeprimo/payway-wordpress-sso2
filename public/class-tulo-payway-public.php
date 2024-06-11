@@ -218,7 +218,7 @@ class Tulo_Payway_Server_Public {
             return true;
         }
 
-        if ($this->should_request_be_excepted()) {
+        if ($this->session->should_request_be_excepted()) {
             return true;
         }
 
