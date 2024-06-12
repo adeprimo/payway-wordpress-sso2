@@ -96,6 +96,7 @@ class Tulo_Payway_Server_Public {
         if (get_option("tulo_plugin_active") != "on") 
             return;
 
+        //$this->common->write_log(print_r($_COOKIE, true));
     
         if ($this->session->has_session_error()) {
             $this->common->write_log("!! Skipping identification. Currently session identification problems");

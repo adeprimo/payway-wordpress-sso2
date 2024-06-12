@@ -541,10 +541,16 @@ class Tulo_Payway_API_SSO2 {
         $_SESSION[$this->sso_session_established_key] = null;
         $_SESSION[$this->sso_session_id_key] = null;
         $_SESSION[$this->sso_session_status_key] = null;
+        $this->delete_cookie('tpw_id', $httponly=false);
+        $this->delete_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME);
+        $this->delete_cookie('tpw_session_established');
+        $this->delete_cookie('tpw_session_error');
+        $this->delete_cookie('tpw_sso_session_time');
         setcookie('tpw_id', null, -1, '/');
         setcookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME, null, -1, '/');
         setcookie('tpw_session_established', null, -1, '/');
         setcookie('tpw_session_error', null, -1, '/');
+        setcookie('tpw_sso_session_time', null, -1, '/');
         return true;
     }
 
@@ -819,6 +825,18 @@ class Tulo_Payway_API_SSO2 {
         setcookie($cookie_name, $cookie_data, $expire, '/', $domain, $secure, $httponly);        
     }
 
+    public function delete_cookie($cookie_name, $httponly=true) {
+        $domain = get_option('tulo_cookie_domain');
+        if (!isset($domain)) {
+            $domain = "";
+        }
+
+        $secure = false;
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+            $secure = true;
+        }                
+        setcookie($cookie_name, null, -1, '/', $domain, $secure, $httponly);
+    }
 
     private static function get_sso2_url($path) {       
         $url = "";
