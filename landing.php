@@ -4,10 +4,10 @@
 function write_log($log) {
     $debug_active = get_option('tulo_debug_log_active');
     if (true === WP_DEBUG && $debug_active == "on") {
-        if (is_array($log) || is_object($log)) {
+            if (is_array($log) || is_object($log)) {
             error_log(print_r($log, true));
         } else {
-            error_log("[SSO2][Landing] ".$log);
+            error_log("[SSO2][LANDING] ".$log);
         }
     }
 }
@@ -39,6 +39,7 @@ try
             $session->register($payload);
         }
     }
+    write_log("Redirecting to: ".$redirect_url);
     header("Location: ".$redirect_url);    
 } catch(Firebase\JWT\ExpiredException $e) {
     // we land here if the JWT token can not be decoded properly, in this case some claims have expired.

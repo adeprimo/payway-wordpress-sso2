@@ -92,12 +92,10 @@ class Tulo_Payway_Server_Public {
         global $post;
         if (is_admin()) 
             return;
-        
+            
         if (get_option("tulo_plugin_active") != "on") 
             return;
-
-        //$this->common->write_log(print_r($_COOKIE, true));
-    
+            
         if ($this->session->has_session_error()) {
             $this->common->write_log("!! Skipping identification. Currently session identification problems");
             return;
@@ -109,7 +107,14 @@ class Tulo_Payway_Server_Public {
         
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             if (get_query_var("tpw_session_refresh") != "") {
-                $this->common->write_log("!! forced session session refresh using query param");
+                $this->common->write_log("!! forced session refresh using query param");
+                $established = $this->session->established();
+                if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_NOEXIST) {
+                    // we need to identify the user if the session is not established
+                    // cookie could be corrupt or user has added refresh parameter manually
+                    $this->common->write_log("!! forced refresh has no session established, identifying session.");
+                    $this->session->identify();
+                }
                 $this->session->refresh();
                 $currentUrl = home_url( $wp->request );
                 $permalinkStructure = get_option( 'permalink_structure' );
@@ -152,7 +157,7 @@ class Tulo_Payway_Server_Public {
                 $status = $this->session->get_status();
                 if ($status == "loggedin" && $this->session->is_logged_in()) {                    
                     $this->common->write_log("logged in as: ".$this->session->get_user_name()." (".$this->session->get_user_email().")");
-                    $this->common->write_log($this->session->get_user_active_products());
+                    //$this->common->write_log($this->session->get_user_active_products());
                 } else if ($status == "anon") {
                     //$this->common->write_log("not logged in, user needs to login if accessing restricted content");                    
                 }
@@ -225,7 +230,7 @@ class Tulo_Payway_Server_Public {
 
         // If restrictions only require logged in user, return true if user is logged in
         if ($this->restrictions_require_login_only($restrictions) && $this->session->is_logged_in()) {
-            $this->common->write_log("!! restrictions require login only");
+            //$this->common->write_log("!! restrictions require login only");
             return true;
         }
 
@@ -236,8 +241,8 @@ class Tulo_Payway_Server_Public {
 
 
         $user_products = $this->session->get_user_active_products();
-        $this->common->write_log("User products: ".print_r($user_products, true));
-        $this->common->write_log("Restrictions: ".print_r($restrictions, true));
+        //$this->common->write_log("User products: ".print_r($user_products, true));
+        //$this->common->write_log("Restrictions: ".print_r($restrictions, true));
         foreach($restrictions as $restriction)
         {
             if ($restriction->productid == "tulo-loggedin") {

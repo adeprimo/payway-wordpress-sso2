@@ -50,10 +50,10 @@ class Tulo_Payway_API {
 
     public function get_user_and_products_by_token($token) {
         $user = $this->get_user_details($token);
-        $this->common->write_log("[get_user_and_products_by_token] User: ".json_encode($user));
+        //$this->common->write_log("[get_user_and_products_by_token] User: ".json_encode($user));
         if ($user != null) {
             $active_products = $this->get_user_active_products($token);
-            $this->common->write_log("[get_user_and_products_by_token] Active products: ".json_encode($active_products));
+            //$this->common->write_log("[get_user_and_products_by_token] Active products: ".json_encode($active_products));
             return array(
                 "user" => $user,
                 "active_products" => $active_products

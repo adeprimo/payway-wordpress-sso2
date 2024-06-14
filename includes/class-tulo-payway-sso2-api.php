@@ -227,7 +227,6 @@ class Tulo_Payway_API_SSO2 {
     }
 
     public function should_request_be_excepted() {        
-        $this->common->write_log("Checking for SSO exceptions");
 
         if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
             return true;
@@ -238,10 +237,8 @@ class Tulo_Payway_API_SSO2 {
             return true;
         }
 
-
         //$this->common->write_log("SERVER: ".print_r($_SERVER, true));
 
-        $this->common->write_log("Checking IP for excepted request.");
         $except_ip = false;
         $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
         if (in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
@@ -290,7 +287,6 @@ class Tulo_Payway_API_SSO2 {
             return true;
         }
 
-        $this->common->write_log("Checking headers for excepted request.");
         // check header?
         if (get_option('tulo_except_header_name') != "") {
             $header = get_option('tulo_except_header_name');
@@ -303,7 +299,6 @@ class Tulo_Payway_API_SSO2 {
             } 
         }
     
-        $this->common->write_log("No exceptions found, proceeding with SSO identification if needed.");
         return false;
     }
 
@@ -352,11 +347,33 @@ class Tulo_Payway_API_SSO2 {
         $token = JWT::encode($payload, $client_secret, 'HS256');
         $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
         $continueUrl = sprintf("%s://%s%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
-        $this->common->write_log(("Redirect url: ".$continueUrl));
+        
+        $filteredUrl = $this->rewriteContinueUrl($continueUrl);
+        $this->common->write_log(("Redirect url: ".$filteredUrl));
 
-        $url = sprintf("%s?t=%s&r=%s", $url, $token, $continueUrl);
+        $url = sprintf("%s?t=%s&r=%s", $url, $token, $filteredUrl);
         header("Location: ".$url);
         die();
+    }
+
+    private function rewriteContinueUrl($url) {
+        if (strpos($url, "tpw_session_refresh") !== false) {
+            $this->common->write_log("Continue url contains tpw_session_refresh, removing it");
+            $url = $this->removeParamFromUrl($url, "tpw_session_refresh");
+            if (strpos($url, "?") === false) {
+                $url .= "?tpw=".time();
+            } else {
+                $url .= "&tpw=".time();
+            }
+
+        }
+        return $url;
+    }
+
+    private function removeParamFromUrl($url, $param) {
+        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*$/', '', $url);
+        $url = preg_replace('/(&|\?)'.preg_quote($param).'=[^&]*&/', '$1', $url);
+        return $url;
     }
 
     private function isBot() {
@@ -415,8 +432,10 @@ class Tulo_Payway_API_SSO2 {
             $this->set_sso_session_time();
             $this->common->write_log("session status: <".$decoded->sts. "> at: ".$decoded->at);
             if ($decoded->sts == "terminated") {
-                $this->common->write_log("session terminated in other window, logging out user");
+                $this->common->write_log("session terminated in other window, logging out user locally also and establishing new session");
                 $this->logout_user(false);
+                $this->identify_session();  // Re-establish session after logout
+
             } else if ($decoded->sts == "loggedin") {
                 $this->register_basic_session($decoded);    
                 if ($lks == "anon" || $lks == "terminated") {
@@ -572,18 +591,18 @@ class Tulo_Payway_API_SSO2 {
 
         $session_data = $this->get_session_data();
         if ($session_data != null) {
-            $this->common->write_log("[SESSIONID] sso session id found in cookie session data");
+            $this->common->write_log("[SESSIONID] sso session id found in cookie session data: ".$session_data->sid);
             return $session_data->sid;
         }
 
         if (isset($_SESSION[$this->sso_session_id_key])) {
-            $this->common->write_log("[SESSIONID] sso session id found in SESSION session data");
+            $this->common->write_log("[SESSIONID] sso session id found in SESSION session data: ".$_SESSION[$this->sso_session_id_key]);
             return $_SESSION[$this->sso_session_id_key];
         }
         
         $sessionId = $this->get_session_id_from_cookie();         
         if ($sessionId != "") {
-            $this->common->write_log("[SESSIONID] sso session id not found in session but found in cookie");
+            $this->common->write_log("[SESSIONID] sso session id not found in session but found in cookie: ".$sessionId);
         }
         return $sessionId;
     }
@@ -688,9 +707,8 @@ class Tulo_Payway_API_SSO2 {
     }
 
     private function set_sso_session_cookie($sid, $sts) {
-        $cookie_data = $this->get_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME);
-        if ($cookie_data != null) {
-            $this->common->write_log("Session cookie already set, not setting again");
+        $cookie_data = $this->get_session_data();
+        if ($cookie_data != null && isset($cookie_data->sid) && $cookie_data == $sid) {
             return;
         }
         $data = json_encode(["sid" => $sid, "sts" => $sts]);
@@ -760,8 +778,14 @@ class Tulo_Payway_API_SSO2 {
     private function get_session_data() {
         $data = $this->get_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME);
         if ($data != null)  {
-            $data = json_decode($data);            
-            return $data;
+            $data = json_decode($data);
+            if (isset($data->sts))
+                return $data;
+            else {
+                $this->common->write_log("Session data corrupted, resetting session data");
+                $this->delete_cookie(Tulo_Payway_API_SSO2::SESSION_COOKIE_NAME);
+                return null;
+            }
         }
         if (isset($_SESSION["initial_sso_data"])) {
             $data = json_decode($_SESSION["initial_sso_data"]);
@@ -822,6 +846,7 @@ class Tulo_Payway_API_SSO2 {
             $secure = true;
         }                
 
+        $_COOKIE[$cookie_name] = $cookie_data;
         setcookie($cookie_name, $cookie_data, $expire, '/', $domain, $secure, $httponly);        
     }
 
@@ -835,6 +860,7 @@ class Tulo_Payway_API_SSO2 {
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $secure = true;
         }                
+        unset($_COOKIE[$cookie_name]);
         setcookie($cookie_name, null, -1, '/', $domain, $secure, $httponly);
     }
 

@@ -17,7 +17,7 @@ class Tulo_Paywall_Server_Common extends Tulo_Payway_Server_Common {
 class Tulo_Payway_Server_Common {
 
     const LOG_PREFIX = "SSO";
-
+    
     public function __construct() {
     }
 
@@ -50,7 +50,6 @@ class Tulo_Payway_Server_Common {
     }
 
     public function get_json_with_bearer($url, $token) {
-        $this->write_log("[get_json_with_bearer]");
         $ch = curl_init();
 
         curl_setopt_array($ch, array(
@@ -116,7 +115,7 @@ class Tulo_Payway_Server_Common {
             if (is_array($log) || is_object($log)) {
                 error_log(print_r($log, true));
             } else {
-                error_log("[".static::LOG_PREFIX."] ".$log);
+                error_log("[".static::LOG_PREFIX."] ".$log);                
             }
         }
     }
