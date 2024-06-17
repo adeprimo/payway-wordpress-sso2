@@ -708,7 +708,7 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_sso_session_cookie($sid, $sts) {
         $cookie_data = $this->get_session_data();
-        if ($cookie_data != null && isset($cookie_data->sid) && $cookie_data == $sid) {
+        if ($cookie_data != null && isset($cookie_data->sid) && $cookie_data->sid == $sid) {
             return;
         }
         $data = json_encode(["sid" => $sid, "sts" => $sts]);
