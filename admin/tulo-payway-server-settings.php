@@ -99,7 +99,7 @@ function tulo_server_render_landing($label, $name)
     </tr>
 <?php }
 
-function tulo_server_render_bool_option_setting($label, $name, $helper = null)
+function tulo_server_render_bool_option_setting($label, $name, $helper = null, $disabled = false)
 {
 
     $value = get_option($name);
@@ -112,7 +112,7 @@ function tulo_server_render_bool_option_setting($label, $name, $helper = null)
                 </label>
         </th>
         <td>
-            <input class="regular-checkbox " type="checkbox" name="<?php echo $name ?>" id="<?php echo $name ?>" <?php echo $value ? 'checked="checked"':''?> />
+            <input <?php echo $disabled==true ? "disabled": ""?> class="regular-checkbox " type="checkbox" name="<?php echo $name ?>" id="<?php echo $name ?>" <?php echo $value ? 'checked="checked"':''?> />
             <?php if($helper != null){
                       echo $helper;
                   } ?>
@@ -356,9 +356,9 @@ function tulo_server_render_whitelist_ips() {
       tulo_server_render_text_option_setting(__('Session refresh timeout', 'tulo'), 'tulo_session_refresh_timeout', __('seconds', 'tulo'));
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
       tulo_server_render_text_option_setting(__('Cookie domain', 'tulo'), 'tulo_cookie_domain', __('Help cookie domain.', 'tulo'));
-      tulo_server_render_bool_option_setting(__('Expose account id', 'tulo'), 'tulo_expose_account_id', __('Help expose account id', 'tulo'));
-      tulo_server_render_bool_option_setting(__('Expose email', 'tulo'), 'tulo_expose_email', __('Help expose email', 'tulo'));
-      tulo_server_render_bool_option_setting(__('Expose customer number', 'tulo'), 'tulo_expose_customer_number', __('Help expose customer number', 'tulo'));
+      tulo_server_render_bool_option_setting(__('Expose account id', 'tulo'), 'tulo_expose_account_id', __('Help expose account id', 'tulo'), $disabled=true);
+      tulo_server_render_bool_option_setting(__('Expose email', 'tulo'), 'tulo_expose_email', __('Help expose email', 'tulo'), $disabled=true);
+      tulo_server_render_bool_option_setting(__('Expose customer number', 'tulo'), 'tulo_expose_customer_number', __('Help expose customer number', 'tulo'), $disabled=true);
 
       $posttypes = Tulo_Payway_Server_Admin::get_post_types();
 

@@ -431,8 +431,8 @@ class Tulo_Payway_API_SSO2 {
             // Update session time
             $this->set_sso_session_time();
             $this->common->write_log("session status: <".$decoded->sts. "> at: ".$decoded->at);
-            if ($decoded->sts == "terminated") {
-                $this->common->write_log("session terminated in other window, logging out user locally also and establishing new session");
+            if ($decoded->sts == "terminated" || $decoded->err == "session_not_found") {
+                $this->common->write_log("session terminated in other window or expired, logging out user locally also and establishing new session");
                 $this->logout_user(false);
                 $this->identify_session();  // Re-establish session after logout
 

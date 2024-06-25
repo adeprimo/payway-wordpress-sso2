@@ -282,6 +282,10 @@ class Tulo_Payway_Server_Public {
         $userEmail = "";
         $userCustomerNumber = "";
         $userProducts = '[]';
+        
+        // set empty for now
+        return '  if (window.dataLayer!==undefined) { dataLayer.push({"tulo": {"user" : { "id": "'.$userId.'", "email": "'.$userEmail.'", "customer_number": "'.$userCustomerNumber.'", "products":'.$userProducts.'}}}); }';
+                
         if ($this->session->is_logged_in()) {
             if (get_option('tulo_expose_account_id', false)) {
                 $userId = $this->session->get_user_id();
@@ -303,6 +307,10 @@ class Tulo_Payway_Server_Public {
         $userEmail = "";
         $userCustomerNumber = "";
         $userProducts = '[]';
+
+        // set empty for now
+        return ' if (window.localStorage) { localStorage.setItem("tulo.account_name", "'.$userName.'"); localStorage.setItem("tulo.account_email", "'.$userEmail.'"); localStorage.setItem("tulo.account_customer_number", "'.$userCustomerNumber.'"); localStorage.setItem("tulo.account_id", "'.$userId.'"); localStorage.setItem("tulo.account_user_products", '.$userProducts.'); }';  
+
         if ($this->session->is_logged_in()) {
             if (get_option('tulo_expose_account_id', false)) {
                 $userId = $this->session->get_user_id();
