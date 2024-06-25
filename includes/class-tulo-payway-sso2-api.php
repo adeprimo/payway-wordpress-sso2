@@ -280,9 +280,11 @@ class Tulo_Payway_API_SSO2 {
             }
 
             $this->common->write_log("session status: <".$decoded->sts. "> at: ".$decoded->at);
-            if ($decoded->sts == "terminated") {
-                $this->common->write_log("session terminated in other window, logging out user");
+            if ($decoded->sts == "terminated" || $decoded->err == "session_not_found") {
+                $this->common->write_log("session terminated in other window or expired, logging out user locally also and establishing new session");
                 $this->logout_user(false);
+                $this->identify_session();  // Re-establish session after logout
+
             } else if ($decoded->sts == "loggedin") {
                 $this->register_basic_session($decoded);    
                 if ($lks == "anon" || $lks == "terminated") {
