@@ -104,7 +104,7 @@ class Tulo_Payway_Server_Public {
     
 
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            if (get_query_var("tpw_session_refresh") == "1") {
+            if (get_query_var("tpw_session_refresh") != "") {
                 $this->common->write_log("!! forced session session refresh using query param");
                 $this->session->refresh();
                 $currentUrl = home_url( $wp->request );
@@ -113,6 +113,11 @@ class Tulo_Payway_Server_Public {
                     $queryVars = $wp->query_vars;
                     unset($queryVars['tpw_session_refresh']);
                     $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+                }
+                if (strpos($currentUrl, "?") === false) {
+                    $currentUrl .= "?tpw=".time();
+                } else {
+                    $currentUrl .= "&tpw=".time();
                 }
                 $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
                 header("Location: ".$currentUrl, true, 302);

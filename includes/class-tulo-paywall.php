@@ -65,9 +65,9 @@ class Tulo_Paywall_Common {
     public function get_return_url() {
         $currentUrl = $this->get_current_url();
         if (str_contains($currentUrl, "?")) {
-            $currentUrl .= "&tpw_session_refresh=1";
+            $currentUrl .= "&tpw_session_refresh=".time();
         } else {
-            $currentUrl .= "?tpw_session_refresh=1";
+            $currentUrl .= "?tpw_session_refresh=".time();
         }            
         return str_replace("http://", "https://", $currentUrl);
     }
