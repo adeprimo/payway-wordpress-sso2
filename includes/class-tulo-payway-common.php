@@ -39,10 +39,10 @@ class Tulo_Payway_Server_Common {
         $permalinkStructure = get_option( 'permalink_structure' );
         if ($permalinkStructure == "plain") {
             $queryVars = $wp->query_vars;
-            $queryVars['tpw_session_refresh'] = '1';
+            $queryVars['tpw_session_refresh'] = time();
             $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );    
         } else {
-            $currentUrl .= "?tpw_session_refresh=1";
+            $currentUrl .= "?tpw_session_refresh=".time();
         } 
         $currentOrg = get_option('tulo_organisation_id');
         $authUrl = get_option('tulo_authentication_url');

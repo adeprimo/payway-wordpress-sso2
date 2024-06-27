@@ -104,7 +104,7 @@ class Tulo_Payway_Server_Public {
     
 
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            if (get_query_var("tpw_session_refresh") == "1") {
+            if (get_query_var("tpw_session_refresh") != "") {
                 $this->common->write_log("!! forced session session refresh using query param");
                 $this->session->refresh();
                 $currentUrl = home_url( $wp->request );
@@ -113,6 +113,11 @@ class Tulo_Payway_Server_Public {
                     $queryVars = $wp->query_vars;
                     unset($queryVars['tpw_session_refresh']);
                     $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+                }
+                if (strpos($currentUrl, "?") === false) {
+                    $currentUrl .= "?tpw=".time();
+                } else {
+                    $currentUrl .= "&tpw=".time();
                 }
                 $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
                 header("Location: ".$currentUrl, true, 302);
@@ -267,6 +272,10 @@ class Tulo_Payway_Server_Public {
         $userEmail = "";
         $userCustomerNumber = "";
         $userProducts = '[]';
+
+        // set empty for now
+        return '  if (window.dataLayer!==undefined) { dataLayer.push({"tulo": {"user" : { "id": "'.$userId.'", "email": "'.$userEmail.'", "customer_number": "'.$userCustomerNumber.'", "products":'.$userProducts.'}}}); }';
+
         if ($this->session->is_logged_in()) {
             if (get_option('tulo_expose_account_id', false)) {
                 $userId = $this->session->get_user_id();
@@ -288,6 +297,10 @@ class Tulo_Payway_Server_Public {
         $userEmail = "";
         $userCustomerNumber = "";
         $userProducts = '[]';
+
+        // set empty for now
+        return ' if (window.localStorage) { localStorage.setItem("tulo.account_name", "'.$userName.'"); localStorage.setItem("tulo.account_email", "'.$userEmail.'"); localStorage.setItem("tulo.account_customer_number", "'.$userCustomerNumber.'"); localStorage.setItem("tulo.account_id", "'.$userId.'"); localStorage.setItem("tulo.account_user_products", '.$userProducts.'); }';  
+
         if ($this->session->is_logged_in()) {
             if (get_option('tulo_expose_account_id', false)) {
                 $userId = $this->session->get_user_id();
