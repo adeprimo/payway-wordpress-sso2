@@ -345,6 +345,7 @@ class Tulo_Payway_API_SSO2 {
         $this->common->write_log($payload);
 
         $token = JWT::encode($payload, $client_secret, 'HS256');
+        $this->common->write_log("identify token: ".$token);
         $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
         $continueUrl = sprintf("%s://%s%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
         
@@ -801,7 +802,13 @@ class Tulo_Payway_API_SSO2 {
 
     protected function set_session_error($error) {
         $data = ["error" => $error];
+        $this->common->write_log("!! Got token error establishing session: ".$error);
         $this->set_cookie("tpw_session_error", json_encode($data), time() + 60);
+        // also remove other cookies that might have been previously set.
+        $this->delete_cookie("tpw_session_established");
+        $this->delete_cookie("tpw_sso");
+        $this->delete_cookie("tpw_id");
+        $this->delete_cookie("tpw_sso_session_time");
     }
 
     public function has_session_error() {

@@ -33,7 +33,14 @@ try
     if (isset($payload)) {             
         if (isset($payload->err)) {
             write_log("Error in JWT from Payway! Message: ".$payload->err);
-            $session->register_session_error($payload->err);            
+            $session->register_session_error($payload->err);
+            if (strpos($redirect_url, "tpw") === false) {
+                if (strpos($redirect_url, "?") === false) {
+                    $redirect_url .= "?tpw=".time();
+                } else {
+                    $redirect_url .= "&tpw=".time();
+                }
+            }        
         } else {       
             write_log("Decode OK, payload: ".json_encode($payload));     
             $session->register($payload);
@@ -41,9 +48,10 @@ try
     }
     write_log("Redirecting to: ".$redirect_url);
     header("Location: ".$redirect_url);    
-} catch(Firebase\JWT\ExpiredException $e) {
-    // we land here if the JWT token can not be decoded properly, in this case some claims have expired.
+} catch(Exception $e) {
+    // we land here if the JWT token can not be decoded properly, in this case some claims have expired.    
     write_log("Could not decode JWT from Payway! Message: ".$e->getMessage());
+    write_log("Token: ".$token);
 }
 
 die();
