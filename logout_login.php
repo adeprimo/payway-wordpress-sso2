@@ -45,12 +45,7 @@ $tulo = new Tulo_Payway_Server_Common();
 $login_url = $tulo->get_authentication_url($redirect_url);
 
 $session = new Tulo_Payway_Session();
-if ($session->is_logged_in()) {
-    write_log("User is logged in, logging out.");
-    $session->logout(true);
-} else {
-    write_log("User is not logged in, redirecting.");
-}
+$session->logout(true);
 
 write_log("Redirecting to: ".$login_url);
 header("Location: ".$login_url);    
