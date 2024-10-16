@@ -33,10 +33,12 @@ class Tulo_Payway_Server_Common {
         return $url;    
     }
 
-    public function get_authentication_url() {
+    public function get_authentication_url($currentUrl="") {
         global $wp;
-        $currentUrl = home_url( $wp->request );
         $permalinkStructure = get_option( 'permalink_structure' );
+        if ($currentUrl == "") {
+            $currentUrl = home_url( $wp->request );
+        }
         if ($permalinkStructure == "plain") {
             $queryVars = $wp->query_vars;
             $queryVars['tpw_session_refresh'] = time();
@@ -44,6 +46,7 @@ class Tulo_Payway_Server_Common {
         } else {
             $currentUrl .= "?tpw_session_refresh=".time();
         } 
+
         $currentOrg = get_option('tulo_organisation_id');
         $authUrl = get_option('tulo_authentication_url');
         return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", urlencode($currentUrl), $authUrl));
