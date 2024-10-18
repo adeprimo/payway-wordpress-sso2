@@ -396,7 +396,7 @@ class Tulo_Payway_API_SSO2 {
         $this->common->write_log("[logout_user]");
         $this->common->write_log("locallyInitiated: ".$locallyInitiated);
 
-        if ($locallyInitiated) {
+        if ($locallyInitiated && $this->sso_session_id() != "") {
             // Terminate session in Payway
             $this->sso_logout();
         }
