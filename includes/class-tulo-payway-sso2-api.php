@@ -287,6 +287,7 @@ class Tulo_Payway_API_SSO2 {
 
             } else if ($decoded->sts == "loggedin") {
                 $this->register_basic_session($decoded);    
+                $this->update_session_cookie();
                 if ($lks == "anon" || $lks == "terminated") {
                     if ($decoded->at != "") {
                         //$this->fetch_user_and_login($decoded->at);
@@ -295,6 +296,14 @@ class Tulo_Payway_API_SSO2 {
                         $this->identify_session();
                     }                    
                 } else if ($lks == "loggedin" && !$this->is_logged_in()) {
+                    $this->identify_session();
+                }
+            } else if ($decoded->sts == "anon") {
+                if ($this->get_session_id_from_cookie() != "") {
+                    // A scenario that should not happen unless session data has been purged.
+                    // Logout user and re-establish session
+                    $this->common->write_log("anon session detected with cookie session id, logging out user locally also and establishing new session");  
+                    $this->logout_user(false);
                     $this->identify_session();
                 }
             }
@@ -529,6 +538,21 @@ class Tulo_Payway_API_SSO2 {
         $_SESSION[$this->sso_session_established_key] = time();
         $unique_id = base64_encode($this->sso_session_id() .'^'. (string)microtime());
         setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
+    }
+
+    private function update_session_cookie() {
+        if (isset($_COOKIE["tpw_id"]) && $_COOKIE["tpw_id"] != "")  {
+            $data = base64_decode($_COOKIE["tpw_id"]);
+            if (str_contains($data, "^")) {
+                $vals = explode("^", $data);
+                if (count($vals) == 2) {
+                    $new_data = base64_encode($vals[0] .'^'. (string)microtime());
+                    $new_expiration = strtotime('+30 days');
+                    $this->common->write_log("updating cookie with new timestamp: ".$new_expiration);
+                    setcookie("tpw_id", $new_data, $new_expiration, '/');
+                }    
+            }
+        }
     }
 
     private function get_session_id_from_cookie() {
