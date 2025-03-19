@@ -438,7 +438,8 @@ class Tulo_Payway_API_SSO2 {
                 $this->identify_session();  // Re-establish session after logout
 
             } else if ($decoded->sts == "loggedin") {
-                $this->register_basic_session($decoded);    
+                $this->register_basic_session($decoded); 
+                $this->update_session_cookie();   
                 if ($lks == "anon" || $lks == "terminated") {
                     if ($decoded->at != "") {
                         //$this->fetch_user_and_login($decoded->at);
@@ -726,6 +727,20 @@ class Tulo_Payway_API_SSO2 {
         //setcookie("tpw_id", $unique_id, strtotime('+30 days'), '/');
     }
 
+    /*
+    * Update tpw_id cookie with new timestamp
+    */
+    private function update_session_cookie() {
+        $data = $this->get_cookie("tpw_id");
+        if ($data != null) {
+            $vals = explode("^", $data);
+            if (count($vals) == 2) {
+                $new_data = base64_encode($vals[0] .'^'. (string)microtime());
+                $new_expiration = strtotime('+30 days');
+                $this->set_cookie("tpw_id", $new_data, $new_expiration, $encode=true, $httponly=false);
+            }            
+        }
+    }
 
     private function get_session_id_from_cookie() {
         $cookie_data = $this->get_cookie("tpw_id");
@@ -737,14 +752,6 @@ class Tulo_Payway_API_SSO2 {
                 }    
             }
         }
-        /*
-        $session_data = $this->get_session_data();
-        if ( $session_data != null) {            
-            $this->common->write_log("Session data found in session cookie, id: ".$session_data->sid);
-            return $session_data->sid;
-        }
-        */
-
         return "";
     }
 
