@@ -346,8 +346,10 @@ class Tulo_Payway_API_SSO2 {
 
         $token = JWT::encode($payload, $client_secret, 'HS256');
         $this->common->write_log("identify token: ".$token);
+        
         $protocol = isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) ? 'https' : 'http';
-        $continueUrl = sprintf("%s://%s%s", $protocol, $_SERVER["HTTP_HOST"], $_SERVER["REQUEST_URI"]);
+        $host = apply_filters("tulo_sso_redirect_host", $_SERVER["HTTP_HOST"]);
+        $continueUrl = sprintf("%s://%s%s", $protocol, $host, $_SERVER["REQUEST_URI"]);
         
         $filteredUrl = $this->rewriteContinueUrl($continueUrl);
         $this->common->write_log(("Redirect url: ".$filteredUrl));

@@ -434,8 +434,9 @@ class Tulo_Payway_Server_Public {
         }
 
         $jwtToken = "";
+        $onlyLoggedInRequired = $this->restrictions_require_login_only($post_restrictions);
         if (!$late_init) {
-            $jwtToken = $paywall->get_signature($post_restrictions);
+            $jwtToken = $paywall->get_signature($post_restrictions, $onlyLoggedInRequired);
         }
 
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
@@ -613,9 +614,10 @@ class Tulo_Payway_Server_Public {
     public function ajax_paywall_jwt() {        
         $restrictions = base64_decode(filter_input(INPUT_POST, 'restrictions'));
         $post_restrictions = unserialize($restrictions);
+        $onlyLoggedInRequired = $this->restrictions_require_login_only($post_restrictions);
         $this->common->write_log("<CLIENT> post restrictions unserialized: ".print_r($post_restrictions, true));
         $paywall = new Tulo_Paywall_Common();
-        $signature = $paywall->get_signature($post_restrictions);
+        $signature = $paywall->get_signature($post_restrictions, $onlyLoggedInRequired);
         $this->common->write_log("<CLIENT> generated signature: ".$signature);
         
         header('Content-Type: text/plain');
