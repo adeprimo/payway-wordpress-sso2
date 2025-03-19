@@ -19,7 +19,7 @@ class Tulo_Paywall_Common {
         $this->common = new Tulo_Paywall_Server_Common();
     }
 
-    public function get_signature($post_restrictions) {
+    public function get_signature($post_restrictions, $onlyLoggedInRequired = false) {
 
         $title = get_option("tulo_paywall_title");
         $client_id = get_option('tulo_paywall_client_id');
@@ -30,6 +30,7 @@ class Tulo_Paywall_Common {
         $this->common->write_log("Fetching Paywall with aid: ".$aid);
 
         $key = get_option('tulo_paywall_static_selector_key');
+        $free_key = get_option('tulo_paywall_loggedin_selector_key'); 
         $dynamic_key = get_option('tulo_paywall_dynamic_selector_key');
         
         if ($dynamic_key != "" && isset($_SESSION[$dynamic_key])) {
@@ -40,6 +41,11 @@ class Tulo_Paywall_Common {
             $key = $this->get_product_codes($post_restrictions);
         }
 
+        $this->common->write_log("onlyLoggedInRequired: ".$onlyLoggedInRequired);
+        $this->common->write_log("free_key: ".$free_key);
+        if ($onlyLoggedInRequired && $free_key != "") {
+            $key = $free_key;
+        }
         $this->common->write_log("Fetching Paywall with key: ".$key);
         $time = time();
         $payload = array(
