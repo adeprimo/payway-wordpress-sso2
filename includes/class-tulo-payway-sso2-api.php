@@ -23,6 +23,7 @@ class Tulo_Payway_API_SSO2 {
     private $sso_session_user_email_key = "sso2_session_user_email";
     private $sso_session_user_custno_key = "sso2_session_user_customer_number";
     private $sso_session_user_active_products_key = "sso2_session_user_active_products";
+    private $sso_session_user_active_articles_key = "sso2_session_user_active_articles";
 
     const SESSION_ESTABLISHED_STATUS_COLD = "cold";
     const SESSION_ESTABLISHED_STATUS_WARM = "warm";
@@ -179,6 +180,12 @@ class Tulo_Payway_API_SSO2 {
             return $_SESSION[$this->sso_session_user_active_products_key]; 
         return null;
     }
+    
+    protected function get_session_user_active_articles() {
+        if (isset($_SESSION[$this->sso_session_user_active_articles_key]))
+            return $_SESSION[$this->sso_session_user_active_articles_key];
+        return null;
+    }
 
     public function should_request_be_excepted() {        
 
@@ -255,7 +262,7 @@ class Tulo_Payway_API_SSO2 {
     
         return false;
     }
-    
+
     protected function session_established() {
 
         $cookieSessionId = $this->get_session_id_from_cookie();        
@@ -586,6 +593,7 @@ class Tulo_Payway_API_SSO2 {
             $this->set_user_email($data["user"]->email);
             $this->set_user_customer_number($data["user"]->customer_number);
             $this->set_user_active_products($data["active_products"]);
+            $this->set_user_active_articles($data["active_articles"]);
             $this->set_session_loggedin();
         } else {
             $this->common->write_log("!! Could not get user and product info from Payway!");
@@ -610,6 +618,10 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_user_active_products($products) {
         $_SESSION[$this->sso_session_user_active_products_key] = $products;
+    }
+    
+    private function set_user_active_articles($articles) {
+        $_SESSION[$this->sso_session_user_active_articles_key] = $articles;
     }
 
     private function set_session_loggedin() {

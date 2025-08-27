@@ -226,6 +226,10 @@ class Tulo_Payway_Server_Public {
             return false;
         }
 
+        $article_purchase_enabled = get_option('tulo_article_purchase_enabled') == "on";
+        if ($article_purchase_enabled && $this->check_article_acccess()) {
+            return true;
+        }
 
         $user_products = $this->session->get_user_active_products();
         $this->common->write_log("User products: ".print_r($user_products, true));
@@ -241,6 +245,20 @@ class Tulo_Payway_Server_Public {
                 if($restriction->productid == $product) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public function check_article_acccess() {
+        global $post;
+        $this->common->write_log("Checking article access for article ID: ".$post->ID);
+        $purchased_articles = $this->session->get_user_active_articles();
+        foreach($purchased_articles as $article) {
+            $this->common->write_log("Article ID: ".$article->article_id);
+            if($article->article_id == $post->ID) {
+                $this->common->write_log("User has access to article ID: ".$post->ID);
+                return true;
             }
         }
         return false;
