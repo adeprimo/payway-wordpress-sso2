@@ -180,6 +180,82 @@ class Tulo_Payway_API_SSO2 {
         return null;
     }
 
+    public function should_request_be_excepted() {        
+
+        if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
+            return true;
+        }
+
+        if ($this->isBot()) {
+            $this->common->write_log("bot detected, request excepted!");
+            return true;
+        }
+
+        //$this->common->write_log("SERVER: ".print_r($_SERVER, true));
+
+        $except_ip = false;
+        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
+        if (in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+            $except_ip = true;
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $iplist = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            foreach ($iplist as $ip) {
+                if (in_array($ip, $whitelisted_ips, false)) {
+                    $except_ip = true;
+                }
+                if ($except_ip) {
+                    break;
+                }
+            }
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED'])) {
+           if (in_array($_SERVER['HTTP_X_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+           }
+        }
+   
+        if (!empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
+            if (in_array($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }          
+        }
+
+        if (!empty($_SERVER['HTTP_FORWARDED_FOR'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED_FOR'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }
+        } 
+  
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+
+            }        
+        }
+
+        if ($except_ip) {
+            $this->common->write_log("IP match, excepting this request from SSO.");
+            return true;
+        }
+
+        // check header?
+        if (get_option('tulo_except_header_name') != "") {
+            $header = get_option('tulo_except_header_name');
+            $value = get_option('tulo_except_header_value');
+            if (isset($_SERVER[$header])) {
+                if ($_SERVER[$header] == $value) {
+                    $this->common->write_log("Header value match, excepting this request from SSO.");
+                    return true;
+                }
+            } 
+        }
+    
+        return false;
+    }
+    
     protected function session_established() {
 
         $cookieSessionId = $this->get_session_id_from_cookie();        

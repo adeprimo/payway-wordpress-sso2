@@ -96,12 +96,9 @@ class Tulo_Payway_Server_Public {
         if (get_option("tulo_plugin_active") != "on") 
             return;
 
-        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
-        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
-            $this->common->write_log("!! whitelisted IP request, skipping session establishment.");
-            return true;
+        if ($this->session->should_request_be_excepted()) {
+            return;
         }
-    
 
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
             if (get_query_var("tpw_session_refresh") != "") {
@@ -401,6 +398,7 @@ class Tulo_Payway_Server_Public {
 
     private function initialize_paywall($post_restrictions, $late_init = false)    
     {
+        global $post;
         if (is_admin()) 
             return;
 
@@ -410,7 +408,7 @@ class Tulo_Payway_Server_Public {
         $paywall = new Tulo_Paywall_Common();
         $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
 
-        $custom_variables = $paywall->get_custom_variables();
+        $custom_variables = $paywall->get_custom_variables($post);
         $this->common->write_log("custom variables: ".print_r($custom_variables, true));
 
         $spinner_html = get_option("tulo_paywall_spinner_html");

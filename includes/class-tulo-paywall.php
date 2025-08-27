@@ -176,9 +176,11 @@ class Tulo_Paywall_Common {
         return get_option('tulo_environment') == 'prod' ? "https://paywall.worldoftulo.com/api/paywall" : "https://payway-paywall-stage.adeprimo.se/api/paywall";
     }
 
-    public function get_custom_variables() {
+    public function get_custom_variables($post) {
         $custom_variables = $this->get_user_custom_variables();
-
+        $article_variables = $this->get_article_purchase_variables($post);
+        $custom_variables = array_merge($custom_variables, $article_variables);
+        
         $variables = get_option("tulo_paywall_variables");
         foreach($variables as $variable) {
             $value = $variable->value;
@@ -202,6 +204,17 @@ class Tulo_Paywall_Common {
         $value = $user_name != null ? $user_name : "";
         $custom_variables["USER_NAME"] = $value;
         return $custom_variables;
+    }
+
+    private function get_article_purchase_variables($post) {
+        if (get_option('tulo_article_purchase_enabled') != "on") {
+            return array();
+        }
+        $variables = array();
+        $variables["TULO_ARTICLE_ID"] = $post->ID;
+        $variables["TULO_ARTICLE_URL"] = get_permalink($post);
+        $variables["TULO_ARTICLE_SUBJECT"] = get_the_title($post);
+        return $variables;
     }
 
     private function get_product_codes($post_restrictions) {
