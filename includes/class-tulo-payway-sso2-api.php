@@ -180,7 +180,7 @@ class Tulo_Payway_API_SSO2 {
             return $_SESSION[$this->sso_session_user_active_products_key]; 
         return null;
     }
-    
+
     protected function get_session_user_active_articles() {
         if (isset($_SESSION[$this->sso_session_user_active_articles_key]))
             return $_SESSION[$this->sso_session_user_active_articles_key];
@@ -322,8 +322,8 @@ class Tulo_Payway_API_SSO2 {
         return false;    
     }
 
-    protected function refresh_session() {
-        $this->common->write_log("[refresh_session]");            
+    protected function refresh_session($triggerNewTicket=false) {
+        $this->common->write_log("[refresh_session] triggerNewTicket: ".$triggerNewTicket);            
 
         $url = $this->get_sso2_url("sessionstatus");
         $client_id = get_option('tulo_server_client_id');
@@ -331,7 +331,7 @@ class Tulo_Payway_API_SSO2 {
         $organisation_id = get_option('tulo_organisation_id');
         $ip_address = $_SERVER ['REMOTE_ADDR'];
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
-        $lks = $this->get_session_status();
+        $lks = $triggerNewTicket ? "anon" :$this->get_session_status();
 
         $time = time();
         $payload = array(
@@ -374,9 +374,7 @@ class Tulo_Payway_API_SSO2 {
                 $this->register_basic_session($decoded);    
                 $this->update_session_cookie();
                 if ($lks == "anon" || $lks == "terminated") {
-                    if ($decoded->at != "") {
-                        //$this->fetch_user_and_login($decoded->at);
-                    } else {
+                    if ($decoded->at == "") {
                         // No "at" available at this time, let's do another "identify" session call
                         $this->identify_session();
                     }                    

@@ -185,6 +185,11 @@ class Tulo_Payway_Server {
                $loggedin->label = __("Visitor is logged in", "tulo");
                array_push($value, $loggedin);
           }
+          // Article purchase
+          $purchase = new stdClass();
+          $purchase->productid = "tulo-article-purchase";
+          $purchase->label = __("Requires purchase to access?", "tulo");
+          array_push($value, $purchase);
 
           return $value;
      }

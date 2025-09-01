@@ -92,7 +92,11 @@ class Tulo_Payway_Server_Public {
         global $post;
         if (is_admin()) 
             return;
-        
+        if ( wp_doing_ajax() )
+            return;
+        if (defined("REST_REQUEST") && REST_REQUEST )
+            return;
+
         if (get_option("tulo_plugin_active") != "on") 
             return;
 
@@ -101,9 +105,16 @@ class Tulo_Payway_Server_Public {
         }
 
         if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            if (get_query_var("tpw_session_refresh") != "") {
+            if (get_query_var("tpw_session_refresh") != "" || get_query_var("refresh_entitlements") == "true") {
                 $this->common->write_log("!! forced session session refresh using query param");
-                $this->session->refresh();
+                if ( get_query_var("refresh_entitlements") == "true" ) {
+                    $this->common->write_log("!! forced refresh of entitlements");                    
+                    $this->session->refresh(true);                    
+                } else {
+                    $this->common->write_log("!! forced refresh of session only");
+                    $this->session->refresh();
+                }
+
                 $currentUrl = home_url( $wp->request );
                 $permalinkStructure = get_option( 'permalink_structure' );
                 if ($permalinkStructure == "plain" || $permalinkStructure == "") {
@@ -112,7 +123,7 @@ class Tulo_Payway_Server_Public {
                     $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
                 }
                 if (strpos($currentUrl, "?") === false) {
-                    $currentUrl .= "?tpw=".time();
+                    $currentUrl .= "/?tpw=".time();
                 } else {
                     $currentUrl .= "&tpw=".time();
                 }
@@ -232,12 +243,9 @@ class Tulo_Payway_Server_Public {
         }
 
         $user_products = $this->session->get_user_active_products();
-        $this->common->write_log("User products: ".print_r($user_products, true));
-        $this->common->write_log("Restrictions: ".print_r($restrictions, true));
         foreach($restrictions as $restriction)
         {
             if ($restriction->productid == "tulo-loggedin") {
-                $this->common->write_log("user has access through 'logged-in' requirement");
                 return true;
             }
             foreach($user_products as $product)
@@ -252,12 +260,9 @@ class Tulo_Payway_Server_Public {
 
     public function check_article_acccess() {
         global $post;
-        $this->common->write_log("Checking article access for article ID: ".$post->ID);
         $purchased_articles = $this->session->get_user_active_articles();
         foreach($purchased_articles as $article) {
-            $this->common->write_log("Article ID: ".$article->article_id);
             if($article->article_id == $post->ID) {
-                $this->common->write_log("User has access to article ID: ".$post->ID);
                 return true;
             }
         }
@@ -426,7 +431,7 @@ class Tulo_Payway_Server_Public {
         $paywall = new Tulo_Paywall_Common();
         $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
 
-        $custom_variables = $paywall->get_custom_variables($post);
+        $custom_variables = $paywall->get_custom_variables($post, $post_restrictions);
         $this->common->write_log("custom variables: ".print_r($custom_variables, true));
 
         $spinner_html = get_option("tulo_paywall_spinner_html");
@@ -633,6 +638,7 @@ class Tulo_Payway_Server_Public {
 
     public function tulo_query_vars($qvars) {
         $qvars[] = "tpw_session_refresh";
+        $qvars[] = "refresh_entitlements";
         return $qvars;
     }
 

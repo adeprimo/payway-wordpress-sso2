@@ -124,6 +124,13 @@ class Tulo_Payway_Server_Admin {
             }
 
         ?>
+            <?php if ($product->productid == "tulo-loggedin") { ?>
+                <br/>
+            <?php } ?>
+            <?php if ($product->productid == "tulo-article-purchase") { ?>
+                <br/>
+                <b><?php _e('Article purchase', 'tulo'); ?></b>
+            <?php } ?>
             <div>
                 <input type="checkbox" name="<?php echo $this->get_field_key($product->productid) ?>" <?php echo $checked ? 'checked="checked"':''?> />
                 <label><?php echo $product->label ?></label>
