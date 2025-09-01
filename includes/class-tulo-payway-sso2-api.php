@@ -23,6 +23,7 @@ class Tulo_Payway_API_SSO2 {
     private $sso_session_user_email_key = "sso2_session_user_email";
     private $sso_session_user_custno_key = "sso2_session_user_customer_number";
     private $sso_session_user_active_products_key = "sso2_session_user_active_products";
+    private $sso_session_user_active_articles_key = "sso2_session_user_active_articles";
 
     const SESSION_ESTABLISHED_STATUS_COLD = "cold";
     const SESSION_ESTABLISHED_STATUS_WARM = "warm";
@@ -140,21 +141,6 @@ class Tulo_Payway_API_SSO2 {
             return false;
         }
         return true;
-        /*
-        if (!isset($_SESSION[$this->sso_session_established_key])) {
-            return true;
-        }
-
-        $established = $_SESSION[$this->sso_session_established_key];
-        $diff = (time()-$established);
-        $session_timeout = get_option('tulo_session_refresh_timeout');
-        $this->common->write_log("established: ".$established." diff: ".$diff." timeout: ".$session_timeout);
-        if ($diff > $session_timeout)
-            return true;
-
-        $_SESSION[$this->sso_session_established_key] = time();            
-        return false;
-        */
     }
 
     protected function is_session_logged_in() {
@@ -225,6 +211,14 @@ class Tulo_Payway_API_SSO2 {
         //    return $_SESSION[$this->sso_session_user_active_products_key]; 
         return null;
     }
+    
+    protected function get_session_user_active_articles() {
+        $session_data = $this->get_session_data();
+        if ($session_data != null) {
+            return $session_data->active_articles;
+        }
+        return null;
+    }    
 
     public function should_request_be_excepted() {        
 
@@ -389,8 +383,9 @@ class Tulo_Payway_API_SSO2 {
         return false;    
     }
 
-    protected function refresh_session() {
-        $this->common->write_log("[refresh_session]");            
+    protected function refresh_session($triggerNewTicket = false) {
+        $this->common->write_log("[refresh_session] triggerNewTicket: ".$triggerNewTicket);            
+
 
         $url = $this->get_sso2_url("sessionstatus");
         $client_id = get_option('tulo_server_client_id');
@@ -398,7 +393,8 @@ class Tulo_Payway_API_SSO2 {
         $organisation_id = get_option('tulo_organisation_id');
         $ip_address = $_SERVER ['REMOTE_ADDR'];
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
-        $lks = $this->get_session_status();
+        $lks = $triggerNewTicket ? "anon" :$this->get_session_status();
+
 
         $time = time();
         $payload = array(
@@ -443,9 +439,7 @@ class Tulo_Payway_API_SSO2 {
                 $this->register_basic_session($decoded); 
                 $this->update_session_cookie();   
                 if ($lks == "anon" || $lks == "terminated") {
-                    if ($decoded->at != "") {
-                        //$this->fetch_user_and_login($decoded->at);
-                    } else {
+                    if ($decoded->at == "") {
                         // No "at" available at this time, let's do another "identify" session call
                         $this->identify_session();
                     }                    
@@ -672,6 +666,8 @@ class Tulo_Payway_API_SSO2 {
             $this->set_user_email($data["user"]->email);
             $this->set_user_customer_number($data["user"]->customer_number);
             $this->set_user_active_products($data["active_products"]);
+            $this->set_user_active_articles($data["active_articles"]);
+
             $this->set_session_loggedin();
             $this->write_session_data();
             
@@ -698,6 +694,10 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_user_active_products($products) {
         $_SESSION[$this->sso_session_user_active_products_key] = $products;
+    }
+
+    private function set_user_active_articles($articles) {
+        $_SESSION[$this->sso_session_user_active_articles_key] = $articles;
     }
 
     private function set_sso_session_established_cookie() {
@@ -766,6 +766,7 @@ class Tulo_Payway_API_SSO2 {
             $session_data->email = isset($_SESSION[$this->sso_session_user_email_key]) ? $_SESSION[$this->sso_session_user_email_key] : "";
             $session_data->customer_number = isset($_SESSION[$this->sso_session_user_custno_key]) ? $_SESSION[$this->sso_session_user_custno_key] : "";
             $session_data->active_products = isset($_SESSION[$this->sso_session_user_active_products_key]) ? $_SESSION[$this->sso_session_user_active_products_key] : "";
+            $session_data->active_articles = isset($_SESSION[$this->sso_session_user_active_articles_key]) ? $_SESSION[$this->sso_session_user_active_articles_key] : "";
             if ($session_data->account_id != "") {
                 $session_data->sts = "loggedin";
             } else {

@@ -37,6 +37,9 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
     public function get_user_active_products() {
         return $this->get_session_user_active_products();
     }
+    public function get_user_active_articles() {
+        return $this->get_session_user_active_articles();
+    }
 
     public function user_has_subscription() {
         $products = $this->get_user_active_products();
