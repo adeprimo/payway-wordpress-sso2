@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tulo Payway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-01 15:57+0200\n"
-"PO-Revision-Date: 2025-09-01 15:58+0200\n"
+"POT-Creation-Date: 2025-09-02 08:22+0200\n"
+"PO-Revision-Date: 2025-09-02 08:22+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -494,9 +494,9 @@ msgstr "Fel användarnamn eller lösenord. (%s försök kvar)"
 msgid "Visitor is logged in"
 msgstr "Besökare måste vara inloggad"
 
-#: includes/class-tulo-payway.php:191
-msgid "Requires purchase to access?"
-msgstr "Artikel går att köpa separat?"
+#: includes/class-tulo-payway.php:192
+msgid "Single article purchase allowed?"
+msgstr "Artikel köp aktiverat?"
 
 #: public/class-tulo-payway-public.php:439
 msgid "Loading paywall..."
@@ -525,6 +525,9 @@ msgstr "Adeprimo"
 #. Author URI of the plugin/theme
 msgid "https://adeprimo.se"
 msgstr "https://adeprimo.se"
+
+#~ msgid "Requires purchase to access?"
+#~ msgstr "Artikel går att köpa separat?"
 
 #~ msgid "Expose account id"
 #~ msgstr "Exponera account ID"

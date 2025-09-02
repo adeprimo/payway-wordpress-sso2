@@ -184,12 +184,15 @@ class Tulo_Payway_Server {
                $loggedin->productid = "tulo-loggedin";
                $loggedin->label = __("Visitor is logged in", "tulo");
                array_push($value, $loggedin);
+
+               if (get_option('tulo_article_purchase_enabled') == "on") {  
+                    // Article purchase
+                    $purchase = new stdClass();
+                    $purchase->productid = "tulo-article-purchase";
+                    $purchase->label = __("Single article purchase allowed?", "tulo");
+                    array_push($value, $purchase);
+               }
           }
-          // Article purchase
-          $purchase = new stdClass();
-          $purchase->productid = "tulo-article-purchase";
-          $purchase->label = __("Requires purchase to access?", "tulo");
-          array_push($value, $purchase);
 
           return $value;
      }

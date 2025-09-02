@@ -86,7 +86,7 @@ class Tulo_Payway_API {
             $data = json_decode($response["data"]);
             $response = array();
             $response["products"] = $data->item->active_products;
-            $response["articles"] = $data->item->active_articles;
+            $response["articles"] = isset($data->item->active_articles) ? $data->item->active_articles : array();
             return $response;
         }        
         return array();
