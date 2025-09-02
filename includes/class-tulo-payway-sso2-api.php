@@ -189,6 +189,10 @@ class Tulo_Payway_API_SSO2 {
 
     public function should_request_be_excepted() {        
 
+        if (strpos($_SERVER["REQUEST_URI"], "favicon") !== false ) {
+            return true;
+        }
+
         if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
             return true;
         }

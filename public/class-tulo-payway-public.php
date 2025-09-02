@@ -104,36 +104,36 @@ class Tulo_Payway_Server_Public {
             return;
         }
 
-        if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            if (get_query_var("tpw_session_refresh") != "" || get_query_var("refresh_entitlements") == "true") {
-                $this->common->write_log("!! forced session session refresh using query param");
-                if ( get_query_var("refresh_entitlements") == "true" ) {
-                    $this->common->write_log("!! forced refresh of entitlements");                    
-                    $this->session->refresh(true);                    
-                } else {
-                    $this->common->write_log("!! forced refresh of session only");
-                    $this->session->refresh();
-                }
-
-                $currentUrl = home_url( $wp->request );
-                $permalinkStructure = get_option( 'permalink_structure' );
-                if ($permalinkStructure == "plain" || $permalinkStructure == "") {
-                    $queryVars = $wp->query_vars;
-                    unset($queryVars['tpw_session_refresh']);
-                    $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
-                }
-                if (strpos($currentUrl, "?") === false) {
-                    $currentUrl .= "/?tpw=".time();
-                } else {
-                    $currentUrl .= "&tpw=".time();
-                }
-                $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
-                header("Location: ".$currentUrl, true, 302);
-                die();
+        
+        if (get_query_var("tpw_session_refresh") != "" || get_query_var("refresh_entitlements") == "true") {
+            $this->common->write_log("!! forced session session refresh using query param");
+            if ( get_query_var("refresh_entitlements") == "true" ) {
+                $this->common->write_log("!! forced refresh of entitlements");                    
+                $this->session->refresh(true);                    
+            } else {
+                $this->common->write_log("!! forced refresh of session only");
+                $this->session->refresh();
             }
-        }
 
-        if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
+            $currentUrl = home_url( $wp->request );
+            $permalinkStructure = get_option( 'permalink_structure' );
+            if ($permalinkStructure == "plain" || $permalinkStructure == "") {
+                $queryVars = $wp->query_vars;
+                unset($queryVars['tpw_session_refresh']);
+                $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+            }
+            if (strpos($currentUrl, "?") === false) {
+                $currentUrl .= "/?tpw=".time();
+            } else {
+                $currentUrl .= "&tpw=".time();
+            }
+            $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
+            header("Location: ".$currentUrl, true, 302);
+            die();
+        }
+    
+
+        if ( isset($post->ID) ) {
             $this->common->write_log("[check_session]");            
             $established = $this->session->established();
             $this->common->write_log("established status: ".$established);            
