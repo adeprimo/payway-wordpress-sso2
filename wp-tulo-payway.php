@@ -9,7 +9,6 @@
  * that starts the plugin.
  *
  * @link              https://adeprimo.se
- * @since             1.2.6.0-cookie
  * @package           Tulo_Payway_Server
  *
  * @wordpress-plugin
