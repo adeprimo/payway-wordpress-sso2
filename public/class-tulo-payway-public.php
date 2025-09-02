@@ -109,43 +109,41 @@ class Tulo_Payway_Server_Public {
             return;
         }
         
-        if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            if (get_query_var("tpw_session_refresh") != "" || get_query_var("refresh_entitlements") == "true") {
-                $this->common->write_log("!! forced session refresh using query param");
-                $established = $this->session->established();
-                if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_NOEXIST) {
-                    // we need to identify the user if the session is not established
-                    // cookie could be corrupt or user has added refresh parameter manually
-                    $this->common->write_log("!! forced refresh has no session established, identifying session.");
-                    $this->session->identify();
-                }
-                if ( get_query_var("refresh_entitlements") == "true" ) {
-                    $this->common->write_log("!! forced refresh of entitlements");                    
-                    $this->session->refresh(true);                    
-                } else {
-                    $this->common->write_log("!! forced refresh of session only");
-                    $this->session->refresh();
-                }
-
-                $currentUrl = home_url( $wp->request );
-                $permalinkStructure = get_option( 'permalink_structure' );
-                if ($permalinkStructure == "plain" || $permalinkStructure == "") {
-                    $queryVars = $wp->query_vars;
-                    unset($queryVars['tpw_session_refresh']);
-                    $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
-                }
-                if (strpos($currentUrl, "?") === false) {
-                    $currentUrl .= "?/tpw=".time();
-                } else {
-                    $currentUrl .= "&tpw=".time();
-                }
-                $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
-                header("Location: ".$currentUrl, true, 302);
-                die();
+        if (get_query_var("tpw_session_refresh") != "" || get_query_var("refresh_entitlements") == "true") {
+            $this->common->write_log("!! forced session refresh using query param");
+            $established = $this->session->established();
+            if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_NOEXIST) {
+                // we need to identify the user if the session is not established
+                // cookie could be corrupt or user has added refresh parameter manually
+                $this->common->write_log("!! forced refresh has no session established, identifying session.");
+                $this->session->identify();
             }
+            if ( get_query_var("refresh_entitlements") == "true" ) {
+                $this->common->write_log("!! forced refresh of entitlements");                    
+                $this->session->refresh(true);                    
+            } else {
+                $this->common->write_log("!! forced refresh of session only");
+                $this->session->refresh();
+            }
+
+            $currentUrl = home_url( $wp->request );
+            $permalinkStructure = get_option( 'permalink_structure' );
+            if ($permalinkStructure == "plain" || $permalinkStructure == "") {
+                $queryVars = $wp->query_vars;
+                unset($queryVars['tpw_session_refresh']);
+                $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
+            }
+            if (strpos($currentUrl, "?") === false) {
+                $currentUrl .= "?/tpw=".time();
+            } else {
+                $currentUrl .= "&tpw=".time();
+            }
+            $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
+            header("Location: ".$currentUrl, true, 302);
+            die();
         }
 
-        if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
+        if ( isset($post->ID) ){
             $this->common->write_log("[check_session]");            
             $this->common->write_log("Request URI: ".$_SERVER["REQUEST_URI"]);
             $this->common->write_log("Request UA: ".$_SERVER["HTTP_USER_AGENT"]);
