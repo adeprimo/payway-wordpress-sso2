@@ -240,7 +240,9 @@ class Tulo_Paywall_Common {
         $restrictions = array();
         $this->common->write_log("Getting product code for restrictions: ".print_r($post_restrictions, true));
         if (isset($post_restrictions) && is_array($post_restrictions)) {
-            foreach($post_restrictions as $restriction) {                
+            foreach($post_restrictions as $restriction) { 
+                if ($restriction->productid == "tulo-article-purchase")
+                    continue;
                 if (isset($restriction->paywallkey))
                     array_push($restrictions, $restriction->paywallkey);
                 else
