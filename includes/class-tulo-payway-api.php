@@ -51,10 +51,11 @@ class Tulo_Payway_API {
     public function get_user_and_products_by_token($token) {
         $user = $this->get_user_details($token);
         if ($user != null) {
-            $active_products = $this->get_user_active_products($token);
+            $product_data = $this->get_user_product_data($token);
             return array(
                 "user" => $user,
-                "active_products" => $active_products
+                "active_products" => isset($product_data["products"]) ? $product_data["products"] : array(),
+                "active_articles" => isset($product_data["articles"]) ? $product_data["articles"] : array()
             );
         } else {
             $this->common->write_log("!! Could not get user from Payway");
@@ -72,14 +73,21 @@ class Tulo_Payway_API {
         return null;
     }
 
-    public function get_user_active_products($token) {
+    public function get_user_product_data($token) {
         $url = $this->get_api_url("/external/api/v1/me/active_products");
+        $article_purchase_enabled = get_option('tulo_article_purchase_enabled') == "on";
+        if ($article_purchase_enabled) {
+            $url .= "?include_articles=true";
+        }
 
         $response = $this->common->get_json_with_bearer($url, $token);
 
         if ($response["status"] == 200) {
             $data = json_decode($response["data"]);
-            return $data->item->active_products;
+            $response = array();
+            $response["products"] = $data->item->active_products;
+            $response["articles"] = isset($data->item->active_articles) ? $data->item->active_articles : array();
+            return $response;
         }        
         return array();
     }

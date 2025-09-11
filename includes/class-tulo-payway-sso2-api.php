@@ -23,6 +23,7 @@ class Tulo_Payway_API_SSO2 {
     private $sso_session_user_email_key = "sso2_session_user_email";
     private $sso_session_user_custno_key = "sso2_session_user_customer_number";
     private $sso_session_user_active_products_key = "sso2_session_user_active_products";
+    private $sso_session_user_active_articles_key = "sso2_session_user_active_articles";
 
     const SESSION_ESTABLISHED_STATUS_COLD = "cold";
     const SESSION_ESTABLISHED_STATUS_WARM = "warm";
@@ -180,6 +181,94 @@ class Tulo_Payway_API_SSO2 {
         return null;
     }
 
+    protected function get_session_user_active_articles() {
+        if (isset($_SESSION[$this->sso_session_user_active_articles_key]))
+            return $_SESSION[$this->sso_session_user_active_articles_key];
+        return null;
+    }
+
+    public function should_request_be_excepted() {        
+
+        if (strpos($_SERVER["REQUEST_URI"], "favicon") !== false ) {
+            return true;
+        }
+
+        /*
+        if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
+            return true;
+        }
+        */
+
+        if ($this->isBot()) {
+            $this->common->write_log("bot detected, request excepted!");
+            return true;
+        }
+
+        //$this->common->write_log("SERVER: ".print_r($_SERVER, true));
+
+        $except_ip = false;
+        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
+        if (in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+            $except_ip = true;
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $iplist = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            foreach ($iplist as $ip) {
+                if (in_array($ip, $whitelisted_ips, false)) {
+                    $except_ip = true;
+                }
+                if ($except_ip) {
+                    break;
+                }
+            }
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED'])) {
+           if (in_array($_SERVER['HTTP_X_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+           }
+        }
+   
+        if (!empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
+            if (in_array($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }          
+        }
+
+        if (!empty($_SERVER['HTTP_FORWARDED_FOR'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED_FOR'], $whitelisted_ips, false)) {
+                $except_ip = true;
+            }
+        } 
+  
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            if (in_array($_SERVER['HTTP_FORWARDED'], $whitelisted_ips, false)) {
+                $except_ip = true;
+
+            }        
+        }
+
+        if ($except_ip) {
+            $this->common->write_log("IP match, excepting this request from SSO.");
+            return true;
+        }
+
+        // check header?
+        if (get_option('tulo_except_header_name') != "") {
+            $header = get_option('tulo_except_header_name');
+            $value = get_option('tulo_except_header_value');
+            if (isset($_SERVER[$header])) {
+                if ($_SERVER[$header] == $value) {
+                    $this->common->write_log("Header value match, excepting this request from SSO.");
+                    return true;
+                }
+            } 
+        }
+    
+        return false;
+    }
+
     protected function session_established() {
 
         $cookieSessionId = $this->get_session_id_from_cookie();        
@@ -239,8 +328,8 @@ class Tulo_Payway_API_SSO2 {
         return false;    
     }
 
-    protected function refresh_session() {
-        $this->common->write_log("[refresh_session]");            
+    protected function refresh_session($triggerNewTicket=false) {
+        $this->common->write_log("[refresh_session] triggerNewTicket: ".$triggerNewTicket);            
 
         $url = $this->get_sso2_url("sessionstatus");
         $client_id = get_option('tulo_server_client_id');
@@ -248,7 +337,7 @@ class Tulo_Payway_API_SSO2 {
         $organisation_id = get_option('tulo_organisation_id');
         $ip_address = $_SERVER ['REMOTE_ADDR'];
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
-        $lks = $this->get_session_status();
+        $lks = $triggerNewTicket ? "anon" :$this->get_session_status();
 
         $time = time();
         $payload = array(
@@ -291,9 +380,7 @@ class Tulo_Payway_API_SSO2 {
                 $this->register_basic_session($decoded);    
                 $this->update_session_cookie();
                 if ($lks == "anon" || $lks == "terminated") {
-                    if ($decoded->at != "") {
-                        //$this->fetch_user_and_login($decoded->at);
-                    } else {
+                    if ($decoded->at == "") {
                         // No "at" available at this time, let's do another "identify" session call
                         $this->identify_session();
                     }                    
@@ -510,6 +597,7 @@ class Tulo_Payway_API_SSO2 {
             $this->set_user_email($data["user"]->email);
             $this->set_user_customer_number($data["user"]->customer_number);
             $this->set_user_active_products($data["active_products"]);
+            $this->set_user_active_articles($data["active_articles"]);
             $this->set_session_loggedin();
         } else {
             $this->common->write_log("!! Could not get user and product info from Payway!");
@@ -534,6 +622,10 @@ class Tulo_Payway_API_SSO2 {
 
     private function set_user_active_products($products) {
         $_SESSION[$this->sso_session_user_active_products_key] = $products;
+    }
+    
+    private function set_user_active_articles($articles) {
+        $_SESSION[$this->sso_session_user_active_articles_key] = $articles;
     }
 
     private function set_session_loggedin() {
