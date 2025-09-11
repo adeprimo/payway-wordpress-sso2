@@ -193,9 +193,11 @@ class Tulo_Payway_API_SSO2 {
             return true;
         }
 
+        /*
         if (isset($_SERVER["HTTP_PURPOSE"]) && $_SERVER["HTTP_PURPOSE"] == "prefetch") {
             return true;
         }
+        */
 
         if ($this->isBot()) {
             $this->common->write_log("bot detected, request excepted!");
