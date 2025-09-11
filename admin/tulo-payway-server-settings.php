@@ -22,6 +22,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
     update_option('tulo_plugin_active', isset($_POST["tulo_plugin_active"]) ? "on" : "");
     update_option('tulo_debug_log_active', isset($_POST["tulo_debug_log_active"]) ? "on" : "");
+    update_option('tulo_article_purchase_enabled', isset($_POST["tulo_article_purchase_enabled"]) ? "on" : "");
     update_option('tulo_session_restricted_only', isset($_POST["tulo_session_restricted_only"]) ? "on" : "");
     update_option("tulo_session_refresh_timeout", $_POST["tulo_session_refresh_timeout"]);
     update_option("tulo_authentication_url", $_POST["tulo_authentication_url"]);
@@ -236,6 +237,29 @@ function get_admin_page_url(string $menu_slug, $query = null, array $esc_options
     return esc_url($url, ...$esc_options);
 }
 
+function tulo_server_article_purchase() {
+    $active_key = 'tulo_article_purchase_enabled';
+    $active_value = get_option($active_key);  
+
+?>
+    <h2><?php _e('Article purchases', 'tulo') ?></h2>
+    <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="<?php echo $active_key; ?>">
+                    <?php _e('Article purchases enabled', 'tulo'); ?>                    
+                </label>
+                
+            </th>
+            <td>
+                <input class="regular-checkbox" type="checkbox" name="<?php echo $active_key; ?>" id="<?php echo $active_key?>" <?php echo $active_value ? 'checked="checked"':''?>">
+                <i><?php _e('Check if article purchases are enabled in Tulo Payway', 'tulo'); ?></i>
+            </td>
+        </tr>
+    </table>
+<?php
+}
+
 function tulo_server_render_exceptions() {
     $whitelist_key = 'tulo_whitelist_ip';
     $whitelist_value = get_option($whitelist_key);  
@@ -356,9 +380,11 @@ function tulo_server_render_whitelist_ips() {
       tulo_server_render_text_option_setting(__('Session refresh timeout', 'tulo'), 'tulo_session_refresh_timeout', __('seconds', 'tulo'));
       tulo_server_render_text_option_setting(__('Organisation id', 'tulo'), 'tulo_organisation_id');
       tulo_server_render_text_option_setting(__('Cookie domain', 'tulo'), 'tulo_cookie_domain', __('Help cookie domain.', 'tulo'));
+      /*
       tulo_server_render_bool_option_setting(__('Expose account id', 'tulo'), 'tulo_expose_account_id', __('Help expose account id', 'tulo'), $disabled=true);
       tulo_server_render_bool_option_setting(__('Expose email', 'tulo'), 'tulo_expose_email', __('Help expose email', 'tulo'), $disabled=true);
       tulo_server_render_bool_option_setting(__('Expose customer number', 'tulo'), 'tulo_expose_customer_number', __('Help expose customer number', 'tulo'), $disabled=true);
+      */
 
       $posttypes = Tulo_Payway_Server_Admin::get_post_types();
 
@@ -381,9 +407,12 @@ function tulo_server_render_whitelist_ips() {
 
   </table>
   <hr/>
-  <?php tulo_server_render_exceptions(); ?>
-  <hr/>
   <?php tulo_server_render_product_list(); ?>
+  <hr/>
+  <?php tulo_server_article_purchase(); ?>
+  <hr/>
+  <?php tulo_server_render_exceptions(); ?>
+
 
   <?php submit_button( __( 'Save Changes' ), 'primary', 'Update' ); ?>
 

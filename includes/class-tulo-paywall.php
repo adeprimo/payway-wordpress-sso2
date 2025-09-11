@@ -11,7 +11,7 @@ class Tulo_Paywall_Common {
 
     private $session;
     private $common;
-    const PAYWALL_VERSION = "1.2";
+    const PAYWALL_VERSION = "1.4";
     
 
     public function __construct() {
@@ -160,25 +160,37 @@ class Tulo_Paywall_Common {
 
 
     public function get_paywall_css() {
-        $version = Tulo_Paywall_Common::PAYWALL_VERSION;
+        $version = get_option("tulo_paywall_version");
+        if ($version == "") {
+            $version = Tulo_Paywall_Common::PAYWALL_VERSION;
+        }
+
         if ($version == '1.0') {
             return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/paywall.css";
         }
         return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/".$version."/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/".$version."/paywall.css";
     }
+    
     public function get_paywall_js() {
-        $version = Tulo_Paywall_Common::PAYWALL_VERSION;
+        $version = get_option("tulo_paywall_version");
+        if ($version == "") {
+            $version = Tulo_Paywall_Common::PAYWALL_VERSION;
+        }
+        
         if ($version == '1.0') {
             return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/paywall.js";
         }
         return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/".$version."/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/".$version."/paywall.js";
     }
+
     public function get_paywall_url() {
         return get_option('tulo_environment') == 'prod' ? "https://paywall.worldoftulo.com/api/paywall" : "https://payway-paywall-stage.adeprimo.se/api/paywall";
     }
 
-    public function get_custom_variables() {
+    public function get_custom_variables($post, $post_restrictions) {
         $custom_variables = $this->get_user_custom_variables();
+        $article_variables = $this->get_article_purchase_variables($post, $post_restrictions);
+        $custom_variables = array_merge($custom_variables, $article_variables);
 
         $variables = get_option("tulo_paywall_variables");
         foreach($variables as $variable) {
@@ -203,6 +215,25 @@ class Tulo_Paywall_Common {
         $value = $user_name != null ? $user_name : "";
         $custom_variables["USER_NAME"] = $value;
         return $custom_variables;
+    }
+
+    private function get_article_purchase_variables($post, $post_restrictions) {
+        if (get_option('tulo_article_purchase_enabled') != "on") {
+            return array();
+        }
+        $purchaseable = false;
+        foreach($post_restrictions as $restriction) {
+            if ($restriction->productid == "tulo-article-purchase")
+                $purchaseable = true;
+        }
+
+
+        $variables = array();
+        $variables["TULO_ARTICLE_PURCHASABLE"] = $purchaseable ? "true" : "false";
+        $variables["TULO_ARTICLE_ID"] = (string)$post->ID;
+        $variables["TULO_ARTICLE_URL"] = get_permalink($post);
+        $variables["TULO_ARTICLE_SUBJECT"] = get_the_title($post);
+        return $variables;
     }
 
     private function get_product_codes($post_restrictions) {
