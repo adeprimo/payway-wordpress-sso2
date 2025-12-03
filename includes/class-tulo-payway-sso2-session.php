@@ -62,8 +62,8 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         return $this->session_needs_refresh();
     }
 
-    public function refresh() {
-        $this->refresh_session();
+    public function refresh($triggerNewTicket=false) {
+        $this->refresh_session($triggerNewTicket);
     }
 
     public function get_status() {
