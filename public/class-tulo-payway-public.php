@@ -118,13 +118,9 @@ class Tulo_Payway_Server_Public {
                 $this->common->write_log("!! forced refresh has no session established, identifying session.");
                 $this->session->identify();
             }
-            if ( get_query_var("refresh_entitlements") == "true" ) {
-                $this->common->write_log("!! forced refresh of entitlements");                    
-                $this->session->refresh(true);                    
-            } else {
-                $this->common->write_log("!! forced refresh of session only");
-                $this->session->refresh();
-            }
+
+            $this->common->write_log("!! forced refresh of session and entitlements");                    
+            $this->session->refresh(true);                    
 
             $currentUrl = home_url( $wp->request );
             $permalinkStructure = get_option( 'permalink_structure' );
