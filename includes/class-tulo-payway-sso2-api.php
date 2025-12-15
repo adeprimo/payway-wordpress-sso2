@@ -319,7 +319,7 @@ class Tulo_Payway_API_SSO2 {
     }
 
     private function isBot() {
-        $crawlers = "alexa|bot|crawl(er|ing)|facebookexternalhit|feedburner|google web preview|nagios|postrank|pingdom|slurp|spider|yahoo!|yandex";
+        $crawlers = "alexa|bot|crawl(er|ing)|facebookexternalhit|feedburner|google web preview|nagios|postrank|pingdom|slurp|spider|yahoo!|yandex|ias-or|integralads|verity";
         $pattern = "/".$crawlers."/i";
         $agent = $_SERVER['HTTP_USER_AGENT'];
         if ( preg_match($pattern, $agent) ) {
@@ -377,7 +377,7 @@ class Tulo_Payway_API_SSO2 {
                 $this->identify_session();  // Re-establish session after logout
 
             } else if ($decoded->sts == "loggedin") {
-                $this->register_basic_session($decoded);    
+                $this->register_basic_session($decoded);
                 $this->update_session_cookie();
                 if ($lks == "anon" || $lks == "terminated") {
                     if ($decoded->at == "") {

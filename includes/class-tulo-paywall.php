@@ -70,9 +70,9 @@ class Tulo_Paywall_Common {
     public function get_return_url() {
         $currentUrl = $this->get_current_url();
         if (str_contains($currentUrl, "?")) {
-            $currentUrl .= "&tpw_session_refresh=".time();
+            $currentUrl .= "&tpw_session_refresh=".time()."&refresh_entitlements=true";
         } else {
-            $currentUrl .= "?tpw_session_refresh=".time();
+            $currentUrl .= "?tpw_session_refresh=".time()."&refresh_entitlements=true";
         }            
         return str_replace("http://", "https://", $currentUrl);
     }
@@ -234,7 +234,7 @@ class Tulo_Paywall_Common {
         $restrictions = array();
         $this->common->write_log("Getting product code for restrictions: ".print_r($post_restrictions, true));
         if (isset($post_restrictions) && is_array($post_restrictions)) {
-            foreach($post_restrictions as $restriction) {                
+            foreach($post_restrictions as $restriction) { 
                 if ($restriction->productid == "tulo-article-purchase")
                     continue;
                 if (isset($restriction->paywallkey))

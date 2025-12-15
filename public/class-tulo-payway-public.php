@@ -106,15 +106,10 @@ class Tulo_Payway_Server_Public {
 
         
         if (get_query_var("tpw_session_refresh") != "" || get_query_var("refresh_entitlements") == "true") {
-            $this->common->write_log("!! forced session session refresh using query param");
-            if ( get_query_var("refresh_entitlements") == "true" ) {
-                $this->common->write_log("!! forced refresh of entitlements");                    
-                $this->session->refresh(true);                    
-            } else {
-                $this->common->write_log("!! forced refresh of session only");
-                $this->session->refresh();
-            }
-
+            
+            $this->common->write_log("!! forced refresh of session and entitlements");
+            $this->session->refresh(true);                    
+            
             $currentUrl = home_url( $wp->request );
             $permalinkStructure = get_option( 'permalink_structure' );
             if ($permalinkStructure == "plain" || $permalinkStructure == "") {
@@ -221,8 +216,7 @@ class Tulo_Payway_Server_Public {
             return true;
         }
 
-        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
-        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+        if ($this->session->should_request_be_excepted()) {
             return true;
         }
         
