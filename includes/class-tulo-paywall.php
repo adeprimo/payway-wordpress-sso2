@@ -19,15 +19,7 @@ class Tulo_Paywall_Common {
         $this->common = new Tulo_Paywall_Server_Common();
     }
 
-    public function get_signature($post_restrictions, $onlyLoggedInRequired = false) {
-
-        $title = get_option("tulo_paywall_title");
-        $client_id = get_option('tulo_paywall_client_id');
-        $client_secret = get_option('tulo_paywall_secret');
-        $aid = $this->session->get_user_id();
-        $tcid = get_option('tulo_server_client_id'); // in case of ticket login after successful purchase.
-
-        $this->common->write_log("Fetching Paywall with aid: ".$aid);
+    public function get_paywall_code($post_restrictions, $onlyLoggedInRequired = false) {
 
         $key = get_option('tulo_paywall_static_selector_key');
         $free_key = get_option('tulo_paywall_loggedin_selector_key'); 
@@ -46,6 +38,24 @@ class Tulo_Paywall_Common {
         if ($onlyLoggedInRequired && $free_key != "") {
             $key = $free_key;
         }
+        return $key;
+    }
+
+    public function get_title_code() {
+        return get_option("tulo_paywall_title");
+    }   
+
+    public function get_signature($post_restrictions, $onlyLoggedInRequired = false) {
+
+        $title = $this->get_title_code();
+        $client_id = get_option('tulo_paywall_client_id');
+        $client_secret = get_option('tulo_paywall_secret');
+        $aid = $this->session->get_user_id();
+        $tcid = get_option('tulo_server_client_id'); // in case of ticket login after successful purchase.
+
+        $this->common->write_log("Fetching Paywall with aid: ".$aid);
+
+        $key = $this->get_paywall_code($post_restrictions, $onlyLoggedInRequired);
 
         $this->common->write_log("Fetching Paywall with key: ".$key);
         $time = time();
@@ -168,6 +178,12 @@ class Tulo_Paywall_Common {
         if ($version == '1.0') {
             return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/paywall.css";
         }
+
+        $liteEnabled = get_option("tulo_paywall_lite_enabled") == "on" ? true: false;
+        if ($liteEnabled) {
+            return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/lite/".$version."/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/lite/".$version."/paywall.css";
+        }
+
         return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/css/".$version."/paywall.css" : "https://payway-cdn-stage.adeprimo.se/css/".$version."/paywall.css";
     }
     
@@ -177,13 +193,24 @@ class Tulo_Paywall_Common {
             $version = Tulo_Paywall_Common::PAYWALL_VERSION;
         }
         
+        $liteEnabled = get_option("tulo_paywall_lite_enabled") == "on" ? true: false;
+
         if ($version == '1.0') {
             return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/paywall.js";
         }
+
+        if ($liteEnabled) {
+            return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/lite/".$version."/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/lite/".$version."/paywall.js";
+        }
+
         return get_option('tulo_environment') == 'prod' ? "https://payway-cdn.worldoftulo.com/js/".$version."/paywall.js" : "https://payway-cdn-stage.adeprimo.se/js/".$version."/paywall.js";
     }
 
     public function get_paywall_url() {
+        $liteEnabled = get_option("tulo_paywall_lite_enabled") == "on" ? true: false;
+        if ($liteEnabled) {
+            return get_option('tulo_environment') == 'prod' ? "https://paywall.worldoftulo.com/api/paywall/lite" : "https://payway-paywall-stage.adeprimo.se/api/paywall/lite";
+        }
         return get_option('tulo_environment') == 'prod' ? "https://paywall.worldoftulo.com/api/paywall" : "https://payway-paywall-stage.adeprimo.se/api/paywall";
     }
 

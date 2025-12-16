@@ -437,6 +437,7 @@ class Tulo_Payway_Server_Public {
 
         $paywall = new Tulo_Paywall_Common();
         $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
+        $liteEnabled = get_option("tulo_paywall_lite_enabled") == "on" ? true: false;
 
         $custom_variables = $paywall->get_custom_variables($post, $post_restrictions);
 
@@ -450,14 +451,62 @@ class Tulo_Payway_Server_Public {
             $output .= '<link rel="stylesheet" href="'.$paywall->get_paywall_css().'"/>';
         }
 
-        $jwtToken = "";
         $onlyLoggedInRequired = $this->restrictions_require_login_only($post_restrictions);
-        if (!$late_init) {
-            $jwtToken = $paywall->get_signature($post_restrictions, $onlyLoggedInRequired);
-        }
+        
 
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
-        $output .= '<script type="text/javascript">
+
+        if ($liteEnabled) {
+            $organisationId = get_option('tulo_organisation_id');
+            $titleCode = $paywall->get_title_code();
+            $paywallCode = $paywall->get_paywall_code($post_restrictions, $onlyLoggedInRequired);
+
+            $output .= '<script type="text/javascript">
+                            // Paywall Lite initialization
+                            var paywallCfg = {
+                                debug: '.$debug.',
+                                url: "'.$paywall->get_paywall_url().'",
+                                organisationId: "'.$organisationId.'",
+                                titleCode: "'.$titleCode.'",
+                                accountId: "'.$this->session->get_user_id().'",
+                                paywallCode: "'.$paywallCode.'",
+                                accountOrigin: "'.$paywall->get_account_origin().'",
+                                trafficSource: "'.$paywall->get_traffic_source().'",
+                                merchantReference: "'.$paywall->get_merchant_reference().'",
+                                returnUrl: "'.$paywall->get_return_url().'",
+                                backUrl: "'.$paywall->get_back_url().'",
+                                utmSource: "",
+                                loginUrl: "'.$paywall->get_login_url().'",
+                                shopUrl: "'.$paywall->get_shop_url().'",
+                                ticketLoginUrl: "'.$paywall->get_ticket_login_url().'",
+                                utmMedium: "",
+                                utmCampaign: "",
+                                utmContent: "",
+                                customVariables: '.$custom_variables.',
+                                resources: {
+                                    errorHeader: "'.$paywall->get_error_header().'",
+                                    errorDescription: "'.$paywall->get_error_message().'"
+                                },
+                                engageTracking: {
+                                    articleId: "'.$paywall->get_article_id().'",
+                                    sections: [],
+                                    categories: []
+                                }
+                            };
+                            new TuloPaywall().Init(paywallCfg);
+                        </script>';
+
+        } else {
+
+            $jwtToken = "";
+            if (!$liteEnabled) {
+                if (!$late_init) {
+                    $jwtToken = $paywall->get_signature($post_restrictions, $onlyLoggedInRequired);
+                }
+            }
+
+            $output .= '<script type="text/javascript">
+                     // Paywall standard initialization
                      var paywallCfg = {
                         debug: '.$debug.',
                         url: "'.$paywall->get_paywall_url().'",
@@ -486,37 +535,41 @@ class Tulo_Payway_Server_Public {
                         }
                      };
                     </script>';
-        if (!$late_init) {
-            $output .= '<script type="text/javascript">new TuloPaywall().Init(paywallCfg);</script>';
-        } else {
-            $restrictions = base64_encode(serialize($post_restrictions));
-            $output .= '<script type="text/javascript">
-                var restrictions = "'.$restrictions.'";
-                async function generatePaywallSignature(restrictions) {
-                    var response = await fetch(tulo_params.url, {
-                        method: "POST",
-                        credentials: "include",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: "action=tulo_pw_signature&restrictions="+restrictions
-                    });
-                    if (response.ok) {
-                        return await response.text();
-                    } else {
-                        return "error";
+
+            if (!$late_init) {
+                $output .= '<script type="text/javascript">new TuloPaywall().Init(paywallCfg);</script>';
+            } else {
+                $restrictions = base64_encode(serialize($post_restrictions));
+                $output .= '<script type="text/javascript">
+                    var restrictions = "'.$restrictions.'";
+                    async function generatePaywallSignature(restrictions) {
+                        var response = await fetch(tulo_params.url, {
+                            method: "POST",
+                            credentials: "include",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                            },
+                            body: "action=tulo_pw_signature&restrictions="+restrictions
+                        });
+                        if (response.ok) {
+                            return await response.text();
+                        } else {
+                            return "error";
+                        }
                     }
-                }
-                async function initPaywall() {
-                    var pwJWT = await generatePaywallSignature(restrictions);
-                    if (pwJWT != "error") {
-                        paywallCfg.jwtToken = pwJWT;
-                        new TuloPaywall().Init(paywallCfg);
+                    async function initPaywall() {
+                        var pwJWT = await generatePaywallSignature(restrictions);
+                        if (pwJWT != "error") {
+                            paywallCfg.jwtToken = pwJWT;
+                            new TuloPaywall().Init(paywallCfg);
+                        }
                     }
-                }
-                initPaywall();
-            </script>';
+                    initPaywall();
+                </script>';
+            }
+
         }
+
         return $output;
     }
 
