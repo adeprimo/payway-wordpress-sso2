@@ -507,7 +507,7 @@ class Tulo_Payway_API_SSO2 {
         $_SESSION[$this->sso_session_established_key] = null;
         $_SESSION[$this->sso_session_id_key] = null;
         $_SESSION[$this->sso_session_status_key] = null;
-        setcookie('tpw_id', null, -1, '/');
+        setcookie('tpw_id', '', -1, '/');
         return true;
     }
 
