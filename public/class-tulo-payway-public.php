@@ -80,12 +80,6 @@ class Tulo_Payway_Server_Public {
         wp_add_inline_script( Tulo_Payway_Server::instance()->plugin_name, $this->get_local_storage());
     }
 
-    public function register_session() {
-        //if( !session_id() ) {
-        //    session_start();
-        //}
-    }
-
     public function check_session($wp) 
     {
         global $wp;

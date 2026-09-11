@@ -15,6 +15,15 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 
 ## Changelog
 
+### 1.3.0
+
+* The plugin no longer uses PHP sessions. All visitor state is kept in cookies, so the plugin works on hosts where PHP sessions are disabled.
+* The previous PHP-session based line (versions with a `-session` suffix) is retired. Its final release is tagged `v1.2.6.1-session` in git and receives no further updates. See [Upgrading from the session version](#upgrading-from-the-session-version).
+* The "Dynamic Paywall key" setting can now be supplied through the `tulo_paywall_dynamic_key` filter (see [Paywall selection settings](#paywall-selection-settings)).
+* Fixed the `tpw_id` cookie being double base64-encoded when a session was refreshed.
+
+### Earlier
+
 * Wordpress: Tested with 6.1.1
 * PHP: Tested with php 8.0.27
 * [Tulo Paywall](#tulo-paywall) support 
@@ -24,6 +33,18 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 * Download the latest version of the plugin from github and unzip it in the `wp-content/plugins` directory.
 * Activate the plugin through the "Plugins" menu in Wordpress.
 * Configure the plugin.
+
+## Upgrading from the session version
+
+Versions up to `1.2.6.1-session` stored visitor state in PHP sessions. From 1.3.0 everything is stored in cookies. No configuration or content changes are required; all `tulo_*` settings and the per-post restrictions are read unchanged.
+
+1. Take a backup of the site.
+2. Replace the plugin folder `wp-content/plugins/payway-wordpress-sso2` with the new version (or update through the Plugins page).
+3. Purge any full-page cache.
+4. Open `Settings/Tulo Payway Settings` and confirm the values are intact. If the site is served on several sub-domains, set "Cookie domain" so the `tpw_*` cookies are shared.
+5. If a theme relied on the "Dynamic Paywall key" being read from `$_SESSION`, either keep starting the PHP session in the theme (it still works) or provide the value through the `tulo_paywall_dynamic_key` filter.
+
+Returning visitors keep their `tpw_id` cookie from the old version. The first page view after the upgrade treats it as a cold session and silently refreshes it from Tulo Payway; no visible re-login happens. Any leftover `PHPSESSID` cookie is ignored.
 
 ## Configuration
 
@@ -224,7 +245,13 @@ These settings determine which Paywall configured in Tulo Payway is going to be 
 
 * Tulo Paywall title - Define the Payway title code where the Paywall has been configured. [Read more ...](https://docs.worldoftulo.com/paywall/core_concept/overview/).
 * Static Paywall key - If you have multiple active Paywalls you can set a static key selecting the Paywall you want to display on the website.
-* Dynamic Paywall key - Enter a name of a session variable that should be used for Paywall selection, if left empty, the static key is used.
+* Dynamic Paywall key - Enter a name of a variable that should be used for Paywall selection, if left empty, the static key is used. The value is taken from the `tulo_paywall_dynamic_key` filter, or from `$_SESSION[<name>]` if the theme has started a PHP session:
+
+```php
+add_filter('tulo_paywall_dynamic_key', function ($value, $name, $post_restrictions) {
+    return is_category('sport') ? 'sport-paywall' : $value;
+}, 10, 3);
+```
 * Product Paywall key - If checked, Paywall is selected based on the products required to read the article where the Paywall is displayed. 
 
 > [!NOTE]

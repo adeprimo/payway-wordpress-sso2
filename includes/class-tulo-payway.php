@@ -244,7 +244,6 @@ class Tulo_Payway_Server {
 
           $plugin_public = new Tulo_Payway_Server_Public( $this->get_version() );
           $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-          $this->loader->add_action( 'init', $plugin_public, 'register_session');
           $this->loader->add_action( 'wp', $plugin_public, 'check_session');
           $this->loader->add_filter( 'the_content', $plugin_public, 'content_filter' );
           $this->loader->add_filter( 'post_class', $plugin_public, 'post_class_filter' );

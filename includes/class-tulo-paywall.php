@@ -33,8 +33,18 @@ class Tulo_Paywall_Common {
         $free_key = get_option('tulo_paywall_loggedin_selector_key'); 
         $dynamic_key = get_option('tulo_paywall_dynamic_selector_key');
         
-        if ($dynamic_key != "" && isset($_SESSION[$dynamic_key])) {
-            $key = $_SESSION[$dynamic_key];
+        if ($dynamic_key != "") {
+            // The plugin no longer starts PHP sessions. A theme that still keeps the
+            // selector in $_SESSION (and starts the session itself) keeps working;
+            // the recommended way is the 'tulo_paywall_dynamic_key' filter.
+            $dynamic_value = "";
+            if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION[$dynamic_key])) {
+                $dynamic_value = $_SESSION[$dynamic_key];
+            }
+            $dynamic_value = apply_filters('tulo_paywall_dynamic_key', $dynamic_value, $dynamic_key, $post_restrictions);
+            if ($dynamic_value != "") {
+                $key = $dynamic_value;
+            }
         }
 
         if (get_option('tulo_paywall_product_selector_key') == "on") {
@@ -71,7 +81,7 @@ class Tulo_Paywall_Common {
     
     public function get_return_url() {
         $currentUrl = $this->get_current_url();
-        if (str_contains($currentUrl, "?")) {
+        if (strpos($currentUrl, "?") !== false) {
             $currentUrl .= "&tpw_session_refresh=".time()."&refresh_entitlements=true";
         } else {
             $currentUrl .= "?tpw_session_refresh=".time()."&refresh_entitlements=true";
@@ -93,7 +103,7 @@ class Tulo_Paywall_Common {
 
     public function get_ticket_login_url() {
         $url = plugin_dir_url(__DIR__)."checkout_landing.php";
-        if (str_contains($url, "http")) {
+        if (strpos($url, "http") !== false) {
             return $url;
         } else {
             $url = site_url().$url;
