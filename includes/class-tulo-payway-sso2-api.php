@@ -267,6 +267,8 @@ class Tulo_Payway_API_SSO2 {
         if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $iplist = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
             foreach ($iplist as $ip) {
+                // proxies conventionally write "client, proxy1, proxy2" with spaces
+                $ip = trim($ip);
                 if (in_array($ip, $whitelisted_ips, false)) {
                     $except_ip = true;
                 }
@@ -277,25 +279,25 @@ class Tulo_Payway_API_SSO2 {
         }
 
         if (!empty($_SERVER['HTTP_X_FORWARDED'])) {
-           if (in_array($_SERVER['HTTP_X_FORWARDED'], $whitelisted_ips, false)) {
+           if (in_array(trim($_SERVER['HTTP_X_FORWARDED']), $whitelisted_ips, false)) {
                 $except_ip = true;
            }
         }
    
         if (!empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
-            if (in_array($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'], $whitelisted_ips, false)) {
+            if (in_array(trim($_SERVER['HTTP_X_CLUSTER_CLIENT_IP']), $whitelisted_ips, false)) {
                 $except_ip = true;
             }          
         }
 
         if (!empty($_SERVER['HTTP_FORWARDED_FOR'])) {
-            if (in_array($_SERVER['HTTP_FORWARDED_FOR'], $whitelisted_ips, false)) {
+            if (in_array(trim($_SERVER['HTTP_FORWARDED_FOR']), $whitelisted_ips, false)) {
                 $except_ip = true;
             }
         } 
   
         if (!empty($_SERVER['HTTP_FORWARDED'])) {
-            if (in_array($_SERVER['HTTP_FORWARDED'], $whitelisted_ips, false)) {
+            if (in_array(trim($_SERVER['HTTP_FORWARDED']), $whitelisted_ips, false)) {
                 $except_ip = true;
 
             }        

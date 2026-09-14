@@ -116,18 +116,14 @@ class Tulo_Payway_Server_Public {
             $this->common->write_log("!! forced refresh of session and entitlements");                    
             $this->session->refresh(true);                    
 
-            $currentUrl = home_url( $wp->request );
-            $permalinkStructure = get_option( 'permalink_structure' );
-            if ($permalinkStructure == "plain" || $permalinkStructure == "") {
-                $queryVars = $wp->query_vars;
-                unset($queryVars['tpw_session_refresh']);
-                $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
-            }
-            if (strpos($currentUrl, "?") === false) {
-                $currentUrl .= "?/tpw=".time();
-            } else {
-                $currentUrl .= "&tpw=".time();
-            }
+            // Redirect back to the same URL without the refresh params, plus a
+            // cache-busting tpw timestamp. Built from the request URI so query
+            // strings survive regardless of permalink structure (e.g. ?p=123).
+            $currentUrl = home_url( add_query_arg( array(
+                'tpw_session_refresh' => false,
+                'refresh_entitlements' => false,
+                'tpw' => time()
+            ), $_SERVER['REQUEST_URI'] ) );
             $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
             header("Location: ".$currentUrl, true, 302);
             die();
