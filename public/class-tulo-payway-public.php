@@ -261,13 +261,11 @@ class Tulo_Payway_Server_Public {
 
     public function check_article_acccess() {
         global $post;
-        $purchased_articles = $this->session->get_user_active_articles();
-        foreach($purchased_articles as $article) {
-            if($article->article_id == $post->ID) {
-                return true;
-            }
+        $purchased_article_ids = $this->session->get_user_active_articles();
+        if (!is_array($purchased_article_ids)) {
+            return false;
         }
-        return false;
+        return in_array((string)$post->ID, $purchased_article_ids, true);
     }
 
     public function post_class_filter($classes) {

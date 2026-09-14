@@ -26,8 +26,15 @@ class Tulo_Payway_API_SSO2 {
         "email" => "",
         "customer_number" => "",
         "active_products" => "",
-        "active_articles" => ""
+        "active_article_ids" => ""
     );
+
+    /**
+     * Browsers silently drop a cookie whose name+value exceeds 4096 bytes. Warn well
+     * before that so growth in session data shows up in the debug log instead of as a
+     * redirect loop.
+     */
+    const COOKIE_SIZE_WARN_BYTES = 4000;
 
     const SESSION_ESTABLISHED_STATUS_COLD = "cold";
     const SESSION_ESTABLISHED_STATUS_WARM = "warm";
@@ -201,13 +208,38 @@ class Tulo_Payway_API_SSO2 {
         return null;
     }
     
+    /**
+     * Returns the ids of articles the user has purchased, as strings. Only the ids are
+     * kept in the cookie; the full article objects returned by Payway made the tpw_sso
+     * cookie exceed the browser limit for users with many purchases.
+     */
     protected function get_session_user_active_articles() {
         $session_data = $this->get_session_data();
-        if ($session_data != null) {
-            return $session_data->active_articles;
+        if ($session_data == null) {
+            return null;
         }
-        return null;
-    }    
+        if (isset($session_data->active_article_ids) && is_array($session_data->active_article_ids)) {
+            return $session_data->active_article_ids;
+        }
+        // Cookie written by a version that stored the full article objects
+        if (isset($session_data->active_articles) && is_array($session_data->active_articles)) {
+            return self::article_ids($session_data->active_articles);
+        }
+        return array();
+    }
+
+    private static function article_ids($articles) {
+        $ids = array();
+        if (is_array($articles)) {
+            foreach ($articles as $article) {
+                $id = is_object($article) ? ($article->article_id ?? null) : (is_array($article) ? ($article["article_id"] ?? null) : $article);
+                if ($id !== null && $id !== "") {
+                    $ids[] = (string)$id;
+                }
+            }
+        }
+        return array_values(array_unique($ids));
+    }
 
     public function should_request_be_excepted() {        
 
@@ -676,7 +708,7 @@ class Tulo_Payway_API_SSO2 {
     }
 
     private function set_user_active_articles($articles) {
-        $this->pending["active_articles"] = $articles;
+        $this->pending["active_article_ids"] = self::article_ids($articles);
     }
 
     private function reset_pending() {
@@ -757,6 +789,8 @@ class Tulo_Payway_API_SSO2 {
             foreach ($this->pending as $key => $value) {
                 $session_data->$key = isset($value) ? $value : "";
             }
+            // Drop the pre-1.3.0 full article list; ids are kept in active_article_ids
+            unset($session_data->active_articles);
             if ($session_data->account_id != "") {
                 $session_data->sts = "loggedin";
             } else {
@@ -848,6 +882,11 @@ class Tulo_Payway_API_SSO2 {
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $secure = true;
         }                
+
+        $size = strlen($cookie_name) + strlen($cookie_data);
+        if ($size > self::COOKIE_SIZE_WARN_BYTES) {
+            $this->common->write_log("[WARN] cookie ".$cookie_name." is ".$size." bytes; browsers drop cookies over 4096 bytes");
+        }
 
         $_COOKIE[$cookie_name] = $cookie_data;
         setcookie($cookie_name, $cookie_data, $expire, '/', $domain, $secure, $httponly);        

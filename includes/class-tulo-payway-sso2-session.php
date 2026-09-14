@@ -37,6 +37,10 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
     public function get_user_active_products() {
         return $this->get_session_user_active_products();
     }
+    /**
+     * Ids (strings) of single articles the user has purchased, or null when there is no session.
+     * Since 1.3.0 only the ids are returned, not the full article objects from Payway.
+     */
     public function get_user_active_articles() {
         return $this->get_session_user_active_articles();
     }

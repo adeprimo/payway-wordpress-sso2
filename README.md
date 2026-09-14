@@ -21,6 +21,7 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 * The previous PHP-session based line (versions with a `-session` suffix) is retired. Its final release is tagged `v1.2.6.2-session` in git and receives no further updates. See [Upgrading from the session version](#upgrading-from-the-session-version).
 * The "Dynamic Paywall key" setting can now be supplied through the `tulo_paywall_dynamic_key` filter (see [Paywall selection settings](#paywall-selection-settings)).
 * Fixed the `tpw_id` cookie being double base64-encoded when a session was refreshed.
+* Fixed a redirect loop for users with many purchased single articles: the `tpw_sso` cookie stored the full article objects and could exceed the 4096 byte browser cookie limit, so the browser dropped it. Only article ids are stored now. `Tulo_Payway_Session::get_user_active_articles()` therefore returns an array of id strings instead of article objects. A warning is written to the debug log if any cookie grows past 4000 bytes.
 
 ### Earlier
 
@@ -171,6 +172,7 @@ If a user is authenticated with Tulo Payway SSO2 and logged into Wordpress sessi
  $session->get_user_email();
  $session->get_user_customer_number();
  $session->get_user_active_products();
+ $session->get_user_active_articles(); // ids of purchased single articles, as strings
  $session->user_has_subscription();
 ```
 If user is logged in, the following properties are also available in `localStorage`:
