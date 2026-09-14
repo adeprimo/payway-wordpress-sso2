@@ -21,6 +21,7 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 * The previous PHP-session based line (versions with a `-session` suffix) is retired. Its final release is tagged `v1.2.6.2-session` in git and receives no further updates. See [Upgrading from the session version](#upgrading-from-the-session-version).
 * The "Dynamic Paywall key" setting can now be supplied through the `tulo_paywall_dynamic_key` filter (see [Paywall selection settings](#paywall-selection-settings)).
 * Fixed the `tpw_id` cookie being double base64-encoded when a session was refreshed.
+* New "Paywall Lite" setting on the Paywall settings page, see [Basic settings](#basic-settings).
 * Fixed the redirect after `?tpw_session_refresh` / `?refresh_entitlements=true`: it now returns to the same URL with the parameter removed (previously `?p=123` style URLs lost their query string and a stray `?/tpw=` parameter was added).
 * Fixed whitelisted IP matching when `X-Forwarded-For` contains spaces after the commas.
 * Fixed a redirect loop for users with many purchased single articles: the `tpw_sso` cookie stored the full article objects and could exceed the 4096 byte browser cookie limit, so the browser dropped it. Only article ids are stored now. `Tulo_Payway_Session::get_user_active_articles()` therefore returns an array of id strings instead of article objects. A warning is written to the debug log if any cookie grows past 4000 bytes.
@@ -242,6 +243,7 @@ When the API user has been created, reach out to [Payway support](https://docs.w
 
 * Enable Tulo Paywall
 * Add API clientId and secret
+* Paywall Lite - if checked, the plugin loads the Paywall Lite JavaScript and CSS (`/js/lite/<version>/paywall.js`, `/css/lite/<version>/paywall.css`) and initialises it with organisation id, title code, paywall code and account id instead of a signed JWT. No signature is generated and the client-side rendering setting has no effect in Lite mode. Requires Paywall version 1.1 or later. Read more about [Paywall Lite](https://docs.worldoftulo.com/paywall/lite/integration/overview/).
 
 #### Paywall selection settings
 

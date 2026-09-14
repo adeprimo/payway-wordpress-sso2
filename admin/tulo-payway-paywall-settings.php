@@ -17,6 +17,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
     update_option('tulo_paywall_enabled', isset($_POST["tulo_paywall_enabled"]) ? "on" : "" );
     update_option('tulo_paywall_clientside_enabled', isset($_POST["tulo_paywall_clientside_enabled"]) ? "on" : "" );
+    update_option('tulo_paywall_lite_enabled', isset($_POST["tulo_paywall_lite_enabled"]) ? "on" : "" );
     update_option('tulo_paywall_version', $_POST["tulo_paywall_version"]);
     update_option('tulo_paywall_error_header', $_POST["tulo_paywall_error_header"]);
     update_option('tulo_paywall_error_message', $_POST["tulo_paywall_error_message"]);
@@ -179,6 +180,7 @@ function tulo_server_render_custom_variables()
         <?php
             tulo_server_render_bool_option_setting(__("Tulo Paywall enabled", "tulo"), "tulo_paywall_enabled");
             tulo_server_render_bool_option_setting(__("Client-side rendering enabled", "tulo"), "tulo_paywall_clientside_enabled", __("Check to render Paywall clientside to prevent signature caching issues.", "tulo"));
+            tulo_server_render_bool_option_setting(__("Paywall Lite", "tulo"), "tulo_paywall_lite_enabled", __("Enable lite mode for Paywall. <a target=\"_blank\" href=\"https://docs.worldoftulo.com/paywall/lite/integration/overview/\">Read more</a>", "tulo"));
             tulo_server_render_text_option_setting(__("API Client id", "tulo"), "tulo_paywall_client_id", __("Paywall API user client id", "tulo"));
             tulo_server_render_text_option_setting(__("API Secret", "tulo"), "tulo_paywall_secret", __("Paywall API user secret", "tulo"));
             tulo_server_render_text_option_setting(__("Paywall version", "tulo"), "tulo_paywall_version", __("Paywall version help", "tulo"));
