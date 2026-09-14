@@ -18,7 +18,7 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 ### 1.3.0
 
 * The plugin no longer uses PHP sessions. All visitor state is kept in cookies, so the plugin works on hosts where PHP sessions are disabled.
-* The previous PHP-session based line (versions with a `-session` suffix) is retired. Its final release is tagged `v1.2.6.1-session` in git and receives no further updates. See [Upgrading from the session version](#upgrading-from-the-session-version).
+* The previous PHP-session based line (versions with a `-session` suffix) is retired. Its final release is tagged `v1.2.6.2-session` in git and receives no further updates. See [Upgrading from the session version](#upgrading-from-the-session-version).
 * The "Dynamic Paywall key" setting can now be supplied through the `tulo_paywall_dynamic_key` filter (see [Paywall selection settings](#paywall-selection-settings)).
 * Fixed the `tpw_id` cookie being double base64-encoded when a session was refreshed.
 
@@ -36,7 +36,7 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 
 ## Upgrading from the session version
 
-Versions up to `1.2.6.1-session` stored visitor state in PHP sessions. From 1.3.0 everything is stored in cookies. No configuration or content changes are required; all `tulo_*` settings and the per-post restrictions are read unchanged.
+Versions up to `1.2.6.2-session` stored visitor state in PHP sessions. From 1.3.0 everything is stored in cookies. No configuration or content changes are required; all `tulo_*` settings and the per-post restrictions are read unchanged.
 
 1. Take a backup of the site.
 2. Replace the plugin folder `wp-content/plugins/payway-wordpress-sso2` with the new version (or update through the Plugins page).
