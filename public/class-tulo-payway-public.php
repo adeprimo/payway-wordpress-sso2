@@ -80,53 +80,59 @@ class Tulo_Payway_Server_Public {
         wp_add_inline_script( Tulo_Payway_Server::instance()->plugin_name, $this->get_local_storage());
     }
 
-    public function register_session() {
-        if( !session_id() ) {
-            session_start();
-        }
-    }
-
     public function check_session($wp) 
     {
         global $wp;
         global $post;
         if (is_admin()) 
             return;
-        
+        if ( wp_doing_ajax() )
+            return;
+        if (defined("REST_REQUEST") && REST_REQUEST )
+            return;
+            
         if (get_option("tulo_plugin_active") != "on") 
             return;
-
-        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
-        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
-            $this->common->write_log("!! whitelisted IP request, skipping session establishment.");
-            return true;
+            
+        if ($this->session->has_session_error()) {
+            $this->common->write_log("!! Skipping identification. Currently session identification problems");
+            return;
         }
-    
 
-        if (strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
-            if (get_query_var("tpw_session_refresh") != "") {
-                $this->common->write_log("!! forced session session refresh using query param");
-                $this->session->refresh();
-                $currentUrl = home_url( $wp->request );
-                $permalinkStructure = get_option( 'permalink_structure' );
-                if ($permalinkStructure == "plain" || $permalinkStructure == "") {
-                    $queryVars = $wp->query_vars;
-                    unset($queryVars['tpw_session_refresh']);
-                    $currentUrl = add_query_arg( $queryVars, home_url( $wp->request ) );
-                }
-                if (strpos($currentUrl, "?") === false) {
-                    $currentUrl .= "?tpw=".time();
-                } else {
-                    $currentUrl .= "&tpw=".time();
-                }
-                $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
-                header("Location: ".$currentUrl, true, 302);
-                die();
+        if ($this->session->should_request_be_excepted()) {
+            return;
+        }
+        
+        if (get_query_var("tpw_session_refresh") != "" || get_query_var("refresh_entitlements") == "true") {
+            $this->common->write_log("!! forced session refresh using query param");
+            $established = $this->session->established();
+            if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_NOEXIST) {
+                // we need to identify the user if the session is not established
+                // cookie could be corrupt or user has added refresh parameter manually
+                $this->common->write_log("!! forced refresh has no session established, identifying session.");
+                $this->session->identify();
             }
+
+            $this->common->write_log("!! forced refresh of session and entitlements");                    
+            $this->session->refresh(true);                    
+
+            // Redirect back to the same URL without the refresh params, plus a
+            // cache-busting tpw timestamp. Built from the request URI so query
+            // strings survive regardless of permalink structure (e.g. ?p=123).
+            $currentUrl = home_url( add_query_arg( array(
+                'tpw_session_refresh' => false,
+                'refresh_entitlements' => false,
+                'tpw' => time()
+            ), $_SERVER['REQUEST_URI'] ) );
+            $this->common->write_log("!! session has been refreshed, redirecting to: ".$currentUrl);
+            header("Location: ".$currentUrl, true, 302);
+            die();
         }
 
-        if ( isset($post->ID) && strpos($_SERVER["REQUEST_URI"], "favicon") === false) {
+        if ( isset($post->ID) ){
             $this->common->write_log("[check_session]");            
+            $this->common->write_log("Request URI: ".$_SERVER["REQUEST_URI"]);
+            $this->common->write_log("Request UA: ".$_SERVER["HTTP_USER_AGENT"]);
             $established = $this->session->established();
             $this->common->write_log("established status: ".$established);            
             if ($established == Tulo_Payway_API_SSO2::SESSION_ESTABLISHED_STATUS_WARM) {
@@ -146,7 +152,7 @@ class Tulo_Payway_Server_Public {
                 $status = $this->session->get_status();
                 if ($status == "loggedin" && $this->session->is_logged_in()) {                    
                     $this->common->write_log("logged in as: ".$this->session->get_user_name()." (".$this->session->get_user_email().")");
-                    $this->common->write_log($this->session->get_user_active_products());
+                    //$this->common->write_log($this->session->get_user_active_products());
                 } else if ($status == "anon") {
                     //$this->common->write_log("not logged in, user needs to login if accessing restricted content");                    
                 }
@@ -213,14 +219,12 @@ class Tulo_Payway_Server_Public {
             return true;
         }
 
-        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
-        if(in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
+        if ($this->session->should_request_be_excepted()) {
             return true;
         }
-        
+
         // If restrictions only require logged in user, return true if user is logged in
         if ($this->restrictions_require_login_only($restrictions) && $this->session->is_logged_in()) {
-            $this->common->write_log("!! restrictions require login only");
             return true;
         }
 
@@ -229,10 +233,12 @@ class Tulo_Payway_Server_Public {
             return false;
         }
 
+        $article_purchase_enabled = get_option('tulo_article_purchase_enabled') == "on";
+        if ($article_purchase_enabled && $this->check_article_acccess()) {
+            return true;
+        }
 
         $user_products = $this->session->get_user_active_products();
-        $this->common->write_log("User products: ".print_r($user_products, true));
-        $this->common->write_log("Restrictions: ".print_r($restrictions, true));
         foreach($restrictions as $restriction)
         {
             if ($restriction->productid == "tulo-loggedin") {
@@ -247,6 +253,15 @@ class Tulo_Payway_Server_Public {
             }
         }
         return false;
+    }
+
+    public function check_article_acccess() {
+        global $post;
+        $purchased_article_ids = $this->session->get_user_active_articles();
+        if (!is_array($purchased_article_ids)) {
+            return false;
+        }
+        return in_array((string)$post->ID, $purchased_article_ids, true);
     }
 
     public function post_class_filter($classes) {
@@ -272,10 +287,10 @@ class Tulo_Payway_Server_Public {
         $userEmail = "";
         $userCustomerNumber = "";
         $userProducts = '[]';
-
+        
         // set empty for now
         return '  if (window.dataLayer!==undefined) { dataLayer.push({"tulo": {"user" : { "id": "'.$userId.'", "email": "'.$userEmail.'", "customer_number": "'.$userCustomerNumber.'", "products":'.$userProducts.'}}}); }';
-
+                
         if ($this->session->is_logged_in()) {
             if (get_option('tulo_expose_account_id', false)) {
                 $userId = $this->session->get_user_id();
@@ -401,6 +416,7 @@ class Tulo_Payway_Server_Public {
 
     private function initialize_paywall($post_restrictions, $late_init = false)    
     {
+        global $post;
         if (is_admin()) 
             return;
 
@@ -410,8 +426,7 @@ class Tulo_Payway_Server_Public {
         $paywall = new Tulo_Paywall_Common();
         $debug = get_option("tulo_paywall_js_debug_enabled") == "on" ? "true" : "false";
 
-        $custom_variables = $paywall->get_custom_variables();
-        $this->common->write_log("custom variables: ".print_r($custom_variables, true));
+        $custom_variables = $paywall->get_custom_variables($post, $post_restrictions);
 
         $spinner_html = get_option("tulo_paywall_spinner_html");
         if ($spinner_html == "") {
@@ -424,8 +439,9 @@ class Tulo_Payway_Server_Public {
         }
 
         $jwtToken = "";
+        $onlyLoggedInRequired = $this->restrictions_require_login_only($post_restrictions);
         if (!$late_init) {
-            $jwtToken = $paywall->get_signature($post_restrictions);
+            $jwtToken = $paywall->get_signature($post_restrictions, $onlyLoggedInRequired);
         }
 
         $output .= '<script src="'.$paywall->get_paywall_js().'"></script>';
@@ -603,9 +619,10 @@ class Tulo_Payway_Server_Public {
     public function ajax_paywall_jwt() {        
         $restrictions = base64_decode(filter_input(INPUT_POST, 'restrictions'));
         $post_restrictions = unserialize($restrictions);
+        $onlyLoggedInRequired = $this->restrictions_require_login_only($post_restrictions);
         $this->common->write_log("<CLIENT> post restrictions unserialized: ".print_r($post_restrictions, true));
         $paywall = new Tulo_Paywall_Common();
-        $signature = $paywall->get_signature($post_restrictions);
+        $signature = $paywall->get_signature($post_restrictions, $onlyLoggedInRequired);
         $this->common->write_log("<CLIENT> generated signature: ".$signature);
         
         header('Content-Type: text/plain');
@@ -615,6 +632,7 @@ class Tulo_Payway_Server_Public {
 
     public function tulo_query_vars($qvars) {
         $qvars[] = "tpw_session_refresh";
+        $qvars[] = "refresh_entitlements";        
         return $qvars;
     }
 

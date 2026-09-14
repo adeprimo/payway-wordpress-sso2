@@ -23,7 +23,7 @@ use \Firebase\JWT\JWT;
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
- * @since      1.0.0
+ * @since      1.2.4.1
  * @package    Tulo_Payway_Server
  * @subpackage Tulo_Payway_Server/includes
  */
@@ -66,7 +66,7 @@ class Tulo_Payway_Server {
      public function __construct() {
 
           $this->plugin_name = 'payway-wordpress-sso2';
-          $this->version = '1.0.0';
+          $this->version = '1.2.4.1';
 
           $this->load_dependencies();
           $this->set_locale();
@@ -184,7 +184,17 @@ class Tulo_Payway_Server {
                $loggedin->productid = "tulo-loggedin";
                $loggedin->label = __("Visitor is logged in", "tulo");
                array_push($value, $loggedin);
+
+               if (get_option('tulo_article_purchase_enabled') == "on") {  
+                    // Article purchase
+                    $purchase = new stdClass();
+                    $purchase->productid = "tulo-article-purchase";
+                    $purchase->label = __("Single article purchase allowed?", "tulo");
+                    array_push($value, $purchase);
+               }
+
           }
+
 
           return $value;
      }
@@ -234,7 +244,6 @@ class Tulo_Payway_Server {
 
           $plugin_public = new Tulo_Payway_Server_Public( $this->get_version() );
           $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-          $this->loader->add_action( 'init', $plugin_public, 'register_session');
           $this->loader->add_action( 'wp', $plugin_public, 'check_session');
           $this->loader->add_filter( 'the_content', $plugin_public, 'content_filter' );
           $this->loader->add_filter( 'post_class', $plugin_public, 'post_class_filter' );

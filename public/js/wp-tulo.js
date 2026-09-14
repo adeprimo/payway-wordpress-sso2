@@ -104,7 +104,9 @@
                                     localStorage.removeItem('tulo_account_email');
 
                                 }
-                                window.location.reload();
+                                const urlParams = new URLSearchParams(window.location.search);
+                                urlParams.set('tpw', Date.now());
+                                window.location.search = urlParams;
                             } else {
                                 // Unknown error, output debug information to console
                                 console.error(xhr.status, xhr.statusText, xhr.response);

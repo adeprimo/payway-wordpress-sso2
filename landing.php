@@ -1,11 +1,13 @@
 <?php
 
+
 function write_log($log) {
-    if (true === WP_DEBUG) {
-        if (is_array($log) || is_object($log)) {
+    $debug_active = get_option('tulo_debug_log_active');
+    if (true === WP_DEBUG && $debug_active == "on") {
+            if (is_array($log) || is_object($log)) {
             error_log(print_r($log, true));
         } else {
-            error_log("[SSO2][Landing] ".$log);
+            error_log("[SSO2][LANDING] ".$log);
         }
     }
 }
@@ -23,17 +25,33 @@ $client_secret = get_option('tulo_server_secret');
 $session = new Tulo_Payway_Session();
 
 write_log("Return url: ".$redirect_url);
+write_log("Token: ".$token);
 
 try
 {
     $payload = $session->decode_jwt($token, $client_secret);
-    if (isset($payload)) {        
-        $session->register($payload);
+    if (isset($payload)) {             
+        if (isset($payload->err)) {
+            write_log("Error in JWT from Payway! Message: ".$payload->err);
+            $session->register_session_error($payload->err);
+            if (strpos($redirect_url, "tpw") === false) {
+                if (strpos($redirect_url, "?") === false) {
+                    $redirect_url .= "?tpw=".time();
+                } else {
+                    $redirect_url .= "&tpw=".time();
+                }
+            }        
+        } else {       
+            write_log("Decode OK, payload: ".json_encode($payload));     
+            $session->register($payload);
+        }
     }
+    write_log("Redirecting to: ".$redirect_url);
     header("Location: ".$redirect_url);    
-} catch(Firebase\JWT\ExpiredException $e) {
-    // we land here if the JWT token can not be decoded properly, in this case some claims have expired.
+} catch(Exception $e) {
+    // we land here if the JWT token can not be decoded properly, in this case some claims have expired.    
     write_log("Could not decode JWT from Payway! Message: ".$e->getMessage());
+    write_log("Token: ".$token);
 }
 
 die();

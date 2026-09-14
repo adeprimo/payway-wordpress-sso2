@@ -17,7 +17,7 @@ class Tulo_Paywall_Server_Common extends Tulo_Payway_Server_Common {
 class Tulo_Payway_Server_Common {
 
     const LOG_PREFIX = "SSO";
-
+    
     public function __construct() {
     }
 
@@ -33,10 +33,12 @@ class Tulo_Payway_Server_Common {
         return $url;    
     }
 
-    public function get_authentication_url() {
+    public function get_authentication_url($currentUrl="") {
         global $wp;
-        $currentUrl = home_url( $wp->request );
         $permalinkStructure = get_option( 'permalink_structure' );
+        if ($currentUrl == "") {
+            $currentUrl = home_url( $wp->request );
+        }
         if ($permalinkStructure == "plain") {
             $queryVars = $wp->query_vars;
             $queryVars['tpw_session_refresh'] = time();
@@ -44,13 +46,13 @@ class Tulo_Payway_Server_Common {
         } else {
             $currentUrl .= "?tpw_session_refresh=".time();
         } 
+
         $currentOrg = get_option('tulo_organisation_id');
         $authUrl = get_option('tulo_authentication_url');
         return str_replace("{currentOrganisation}", $currentOrg, str_replace("{currentUrl}", urlencode($currentUrl), $authUrl));
     }
 
     public function get_json_with_bearer($url, $token) {
-        $this->write_log("[get_json_with_bearer]");
         $ch = curl_init();
 
         curl_setopt_array($ch, array(
@@ -111,11 +113,12 @@ class Tulo_Payway_Server_Common {
     }
    
     public static function write_log($log) {
-        if (true === WP_DEBUG) {
+        $debug_active = get_option('tulo_debug_log_active');
+        if (true === WP_DEBUG && $debug_active == "on") {
             if (is_array($log) || is_object($log)) {
                 error_log(print_r($log, true));
             } else {
-                error_log("[".static::LOG_PREFIX."] ".$log);
+                error_log("[".static::LOG_PREFIX."] ".$log);                
             }
         }
     }

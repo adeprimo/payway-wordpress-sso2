@@ -17,6 +17,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
     update_option('tulo_paywall_enabled', isset($_POST["tulo_paywall_enabled"]) ? "on" : "" );
     update_option('tulo_paywall_clientside_enabled', isset($_POST["tulo_paywall_clientside_enabled"]) ? "on" : "" );
+    update_option('tulo_paywall_version', $_POST["tulo_paywall_version"]);
     update_option('tulo_paywall_error_header', $_POST["tulo_paywall_error_header"]);
     update_option('tulo_paywall_error_message', $_POST["tulo_paywall_error_message"]);
     //update_option('tulo_paywall_error_function', $_POST["tulo_paywall_error_function"]);
@@ -29,6 +30,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option('tulo_paywall_account_origin', $_POST["tulo_paywall_account_origin"]);
     update_option('tulo_paywall_css_enabled', isset($_POST["tulo_paywall_css_enabled"]) ? "on" :"");
     update_option('tulo_paywall_static_selector_key', $_POST["tulo_paywall_static_selector_key"]);
+    update_option('tulo_paywall_loggedin_selector_key', $_POST["tulo_paywall_loggedin_selector_key"]);
     update_option('tulo_paywall_dynamic_selector_key', $_POST["tulo_paywall_dynamic_selector_key"]);
     update_option('tulo_paywall_product_selector_key', isset($_POST["tulo_paywall_product_selector_key"]) ? "on" : "");
     update_option('tulo_paywall_traffic_source', $_POST["tulo_paywall_traffic_source"]);
@@ -179,6 +181,7 @@ function tulo_server_render_custom_variables()
             tulo_server_render_bool_option_setting(__("Client-side rendering enabled", "tulo"), "tulo_paywall_clientside_enabled", __("Check to render Paywall clientside to prevent signature caching issues.", "tulo"));
             tulo_server_render_text_option_setting(__("API Client id", "tulo"), "tulo_paywall_client_id", __("Paywall API user client id", "tulo"));
             tulo_server_render_text_option_setting(__("API Secret", "tulo"), "tulo_paywall_secret", __("Paywall API user secret", "tulo"));
+            tulo_server_render_text_option_setting(__("Paywall version", "tulo"), "tulo_paywall_version", __("Paywall version help", "tulo"));
         ?>
     </table>
     <hr/>
@@ -188,6 +191,7 @@ function tulo_server_render_custom_variables()
         <?php
             tulo_server_render_text_option_setting(__("Tulo Paywall title", "tulo"), "tulo_paywall_title", __("Tulo Payway title code where Paywall is configured", "tulo"));
             tulo_server_render_text_option_setting(__("Tulo Paywall Static Selector Key", "tulo"), "tulo_paywall_static_selector_key", __("If there are more than one Paywall active in Tulo, this static key will select which Paywall to select for presentation. If static and dynamic keys are left blank, Tulo will display the first Paywall created.", "tulo"));
+            tulo_server_render_text_option_setting(__("Tulo Paywall LoggedIn Selector Key", "tulo"), "tulo_paywall_loggedin_selector_key", __("If an article only requires a user to be logged in, it possible to fetch a specific paywall for these articles. Only used if a non-empty value is defined and article only requires visitor to be logged in.", "tulo"));
             tulo_server_render_text_option_setting(__("Tulo Paywall Dynamic Selector Key", "tulo"), "tulo_paywall_dynamic_selector_key", __("Enter the name of a session variable that holds the Paywall selection key, if no value is defined on the session variable, the static key will be used.", "tulo"));
             tulo_server_render_bool_option_setting(__("Tulo Paywall Product Selector Key", "tulo"), "tulo_paywall_product_selector_key", __("Use the locked article's required product code as selector, must map to a Paywall with matching key.", "tulo"));
 

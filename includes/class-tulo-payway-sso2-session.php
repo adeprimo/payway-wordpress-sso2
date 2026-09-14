@@ -37,6 +37,13 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
     public function get_user_active_products() {
         return $this->get_session_user_active_products();
     }
+    /**
+     * Ids (strings) of single articles the user has purchased, or null when there is no session.
+     * Since 1.3.0 only the ids are returned, not the full article objects from Payway.
+     */
+    public function get_user_active_articles() {
+        return $this->get_session_user_active_articles();
+    }
 
     public function user_has_subscription() {
         $products = $this->get_user_active_products();
@@ -47,6 +54,10 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         $this->register_basic_session($payload);
     }
 
+    public function register_session_error($error) {
+        $this->set_session_error($error);
+    }
+    
     public function established() {
         return $this->session_established();
     }
@@ -55,8 +66,8 @@ class Tulo_Payway_Session extends Tulo_Payway_API_SSO2 {
         return $this->session_needs_refresh();
     }
 
-    public function refresh() {
-        $this->refresh_session();
+    public function refresh($triggerNewTicket=false) {
+        $this->refresh_session($triggerNewTicket);
     }
 
     public function get_status() {
