@@ -373,7 +373,7 @@ class Tulo_Payway_API_SSO2 {
         $filteredUrl = $this->rewriteContinueUrl($continueUrl);
         $this->common->write_log(("Redirect url: ".$filteredUrl));
 
-        $url = sprintf("%s?t=%s&r=%s", $url, $token, $filteredUrl);
+        $url = sprintf("%s?t=%s&r=%s", $url, $token, rawurlencode($filteredUrl));
         header("Location: ".$url);
         die();
     }
