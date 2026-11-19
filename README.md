@@ -21,6 +21,8 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
   * Requests with a User-Agent that matched the bot list (for example `Googlebot`), requests with the header `Purpose: prefetch`, and URLs containing `favicon` were given access to restricted content. These requests now only skip SSO identification. Search engines therefore see the same content as other visitors without a subscription.
   * An empty entry in the `X-Forwarded-For` header, for example `X-Forwarded-For: ,`, gave access when the IP whitelist was empty or contained a blank row. Blank rows and invalid addresses in the whitelist are now ignored.
   * The HTTP header exception gave access when the header value setting was empty, and compared values loosely (for example, `1e2` matched `100`). The exception is now disabled while the value is empty, and the value must match exactly.
+  * The IP whitelist was matched against the `X-Forwarded-For`, `X-Forwarded`, `X-Cluster-Client-IP`, `Forwarded-For` and `Forwarded` headers from any client, so anyone could get access by sending a whitelisted address in one of them. `X-Forwarded-For` is now only used when the request comes from a trusted proxy, and the other four headers are no longer read.
+* New "Trusted proxies" setting under SSO Exceptions, see [Trusted proxies](#trusted-proxies). **Sites behind a load balancer, reverse proxy or CDN that use the IP whitelist must add the proxy addresses to this setting after updating**, or configure the web server to set `REMOTE_ADDR` to the visitor's address. Until then, whitelisted visitors behind the proxy do not get access.
 * `should_request_be_excepted()` is deprecated. It now returns the same result as `is_access_exception()`. Use `is_access_exception()` to decide access, or `should_skip_identification()` to decide whether to run SSO identification.
 * IPv6 addresses in the IP whitelist now match regardless of how they are written, for example `2001:DB8:0::1` and `2001:db8::1`.
 
@@ -139,6 +141,14 @@ You are logged in but don't have a subscription that is needed to view this cont
 #### Whitelist IP addresses
 
 Here you can add IP addresses that should have access to the content regardless login- and subscription-status. Add them one IP-address on each row. Address ranges, such as `10.0.0.0/24`, are not supported.
+
+The whitelist is matched against the address the request comes from (`REMOTE_ADDR`). If the site is behind a load balancer, reverse proxy or CDN, see [Trusted proxies](#trusted-proxies).
+
+#### Trusted proxies
+
+If the site is behind a load balancer, reverse proxy or CDN, `REMOTE_ADDR` is the proxy's address, not the visitor's. Add the IP addresses of these proxies here, one per row. If requests pass through several proxies, add all of them. For requests that come from a trusted proxy, the visitor's address is taken from the `X-Forwarded-For` header and is also matched against the whitelist. Leave the field empty if the site is not behind a proxy.
+
+If the web server already sets `REMOTE_ADDR` to the visitor's address (for example with Apache `mod_remoteip` or nginx `real_ip`), no trusted proxies are needed.
 
 #### HTTP header exception
 

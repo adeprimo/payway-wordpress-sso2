@@ -32,6 +32,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'update')
     update_option("tulo_cookie_domain", $_POST["tulo_cookie_domain"]);
     update_option("tulo_environment", $_POST["tulo_environment"]);
     update_option('tulo_whitelist_ip', $_POST["tulo_whitelist_ip"]);
+    update_option('tulo_trusted_proxies', sanitize_textarea_field(stripslashes($_POST["tulo_trusted_proxies"] ?? "")));
     update_option('tulo_except_header_name', $_POST["tulo_except_header_name"]);
     update_option('tulo_except_header_value', $_POST["tulo_except_header_value"]);
     update_option('tulo_expose_account_id', isset($_POST["tulo_expose_account_id"]) ? "on" : "");
@@ -267,6 +268,8 @@ function tulo_server_render_exceptions() {
     $headername_value = get_option($headername_key);
     $headervalue_key = 'tulo_except_header_value';
     $headervalue_value = get_option($headervalue_key);
+    $proxies_key = 'tulo_trusted_proxies';
+    $proxies_value = get_option($proxies_key);
  ?>
     <h2><?php _e('SSO Exceptions', 'tulo') ?></h2>
     <table class="form-table">
@@ -309,17 +312,22 @@ function tulo_server_render_exceptions() {
         </tr>
         <tr>
             <th scope="row">
-             <?php _e('IP address checks are done in the following order:', 'tulo'); ?>            
+                <label for="<?php echo $proxies_key; ?>">
+                    <?php _e('Trusted proxies', 'tulo'); ?>
+                    <i><?php _e('Separate the ip addresses with a new row', 'tulo'); ?></i>
+                </label>
             </th>
             <td>
-                <ol>
-                    <li>REMOTE_ADDR</li>
-                    <li>HTTP_X_FORWARDED_FOR (<?php _e('checks for multiple ip-addresses separated by comma', 'tulo');?>)</li>
-                    <li>HTTP_X_FORWARDED</li>
-                    <li>HTTP_X_CLUSTER_CLIENT_IP</li>
-                    <li>HTTP_FORWARDED_FOR</li>
-                    <li>HTTP_FORWARDED</li>
-                </ol>
+                <textarea name="<?php echo $proxies_key; ?>" id="<?php echo $proxies_key; ?>" class="tulo_trusted_proxies"><?php echo esc_textarea($proxies_value); ?></textarea>
+                <p class="description"><?php _e('IP addresses of your own load balancers, reverse proxies or CDN servers. Leave empty if the site is not behind a proxy.', 'tulo'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+             <?php _e('How IP addresses are checked', 'tulo'); ?>
+            </th>
+            <td>
+                <?php _e('Whitelisted IP addresses are matched against the connecting address (REMOTE_ADDR). If that address is a trusted proxy, the client address from X-Forwarded-For is matched as well.', 'tulo'); ?>
             </td>
         </tr>
     </table>

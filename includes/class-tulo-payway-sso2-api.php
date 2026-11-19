@@ -367,35 +367,39 @@ class Tulo_Payway_API_SSO2 {
     /**
      * Returns the IP addresses that identify the client of the current request.
      *
-     * The list contains REMOTE_ADDR, each address in the X-Forwarded-For header,
-     * and the addresses in the X-Forwarded, X-Cluster-Client-IP, Forwarded-For and
-     * Forwarded headers. Empty and invalid addresses are left out.
+     * The list always starts with REMOTE_ADDR. If REMOTE_ADDR is a trusted proxy,
+     * the client address from the X-Forwarded-For header is added.
      *
-     * @return string[] Normalized IP addresses.
+     * Each proxy appends the address it received the request from to
+     * X-Forwarded-For, so the header is read from right to left. Trusted proxies
+     * are skipped, and the first address that is not a trusted proxy is the client.
+     * Entries to the left of it are not used, because the client can set them.
+     * Reading stops at an entry that is not a valid IP address.
+     *
+     * @return string[] Normalized IP addresses. Empty if REMOTE_ADDR is missing or
+     *                  not a valid IP address.
      */
     public static function get_client_ips() {
-        $ips = array();
         $remote = self::normalize_ip(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "");
-        if ($remote !== "") {
-            $ips[] = $remote;
+        if ($remote === "") {
+            return array();
+        }
+        $ips = array($remote);
+
+        $trusted_proxies = Tulo_Payway_Server_Public::get_trusted_proxies();
+        if (!in_array($remote, $trusted_proxies, true) || empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            return $ips;
         }
 
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            // proxies conventionally write "client, proxy1, proxy2" with spaces
-            foreach (explode(',', (string) $_SERVER['HTTP_X_FORWARDED_FOR']) as $entry) {
-                $ip = self::normalize_ip($entry);
-                if ($ip !== "") {
-                    $ips[] = $ip;
-                }
+        $chain = array_reverse(explode(',', (string) $_SERVER['HTTP_X_FORWARDED_FOR']));
+        foreach ($chain as $entry) {
+            $ip = self::normalize_ip($entry);
+            if ($ip === "") {
+                break;
             }
-        }
-
-        foreach (array('HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED') as $header) {
-            if (!empty($_SERVER[$header])) {
-                $ip = self::normalize_ip($_SERVER[$header]);
-                if ($ip !== "") {
-                    $ips[] = $ip;
-                }
+            if (!in_array($ip, $trusted_proxies, true)) {
+                $ips[] = $ip;
+                break;
             }
         }
         return array_values(array_unique($ips));

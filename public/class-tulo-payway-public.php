@@ -206,6 +206,15 @@ class Tulo_Payway_Server_Public {
         return Tulo_Payway_API_SSO2::parse_ip_list(get_option('tulo_whitelist_ip'));
     }
 
+    /**
+     * Returns the IP addresses from the "Trusted proxies" setting.
+     *
+     * @return string[] Normalized IP addresses.
+     */
+    public static function get_trusted_proxies() {
+        return Tulo_Payway_API_SSO2::parse_ip_list(get_option('tulo_trusted_proxies'));
+    }
+
     public function has_access($post_id = null, $restrictions = null) {
 
         if (is_admin()) 
