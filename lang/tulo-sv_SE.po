@@ -401,6 +401,10 @@ msgstr ""
 "Header skall ha detta värde för att åsidosätta SSO identifiering och "
 "behörighetskontroll"
 
+#: admin/tulo-payway-server-settings.php
+msgid "The header exception is disabled while this value is empty."
+msgstr "Undantaget för header är avstängt så länge värdet är tomt."
+
 #: admin/tulo-payway-server-settings.php:301
 #: admin/tulo-payway-server-settings.php:336
 msgid "Whitelist IP Addresses"

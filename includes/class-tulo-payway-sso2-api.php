@@ -241,9 +241,18 @@ class Tulo_Payway_API_SSO2 {
         return array_values(array_unique($ids));
     }
 
-    public function should_request_be_excepted() {        
-
-        if (strpos($_SERVER["REQUEST_URI"], "favicon") !== false ) {
+    /**
+     * Determines whether SSO identification should be skipped for the current request.
+     *
+     * Identification is skipped for favicon requests, browser prefetch requests
+     * (header "Purpose: prefetch"), bots and access exceptions. This only controls
+     * the redirect to Payway. Access to restricted content is decided by
+     * is_access_exception() and the visitor's session.
+     *
+     * @return bool True if identification should be skipped.
+     */
+    public function should_skip_identification() {
+        if ($this->is_favicon_request()) {
             return true;
         }
 
@@ -252,75 +261,183 @@ class Tulo_Payway_API_SSO2 {
         }
 
         if ($this->isBot()) {
-            $this->common->write_log("bot detected, request excepted!");
+            $this->common->write_log("bot detected, skipping identification.");
             return true;
         }
 
-        //$this->common->write_log("SERVER: ".print_r($_SERVER, true));
+        return $this->is_access_exception();
+    }
 
-        $except_ip = false;
-        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
-        if (in_array($_SERVER['REMOTE_ADDR'], $whitelisted_ips, false)) {
-            $except_ip = true;
-        }
+    /**
+     * Determines whether the current request is an access exception.
+     *
+     * Kept for themes and plugins that call it. Same result as is_access_exception().
+     *
+     * @deprecated 1.3.2 Use is_access_exception() to decide access, or
+     *                   should_skip_identification() to decide whether to run
+     *                   SSO identification.
+     *
+     * @return bool True if the request is an access exception.
+     */
+    public function should_request_be_excepted() {
+        _deprecated_function(__METHOD__, '1.3.2', 'is_access_exception() or should_skip_identification()');
+        return $this->is_access_exception();
+    }
 
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $iplist = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            foreach ($iplist as $ip) {
-                // proxies conventionally write "client, proxy1, proxy2" with spaces
-                $ip = trim($ip);
-                if (in_array($ip, $whitelisted_ips, false)) {
-                    $except_ip = true;
-                }
-                if ($except_ip) {
-                    break;
-                }
-            }
-        }
-
-        if (!empty($_SERVER['HTTP_X_FORWARDED'])) {
-           if (in_array(trim($_SERVER['HTTP_X_FORWARDED']), $whitelisted_ips, false)) {
-                $except_ip = true;
-           }
-        }
-   
-        if (!empty($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
-            if (in_array(trim($_SERVER['HTTP_X_CLUSTER_CLIENT_IP']), $whitelisted_ips, false)) {
-                $except_ip = true;
-            }          
-        }
-
-        if (!empty($_SERVER['HTTP_FORWARDED_FOR'])) {
-            if (in_array(trim($_SERVER['HTTP_FORWARDED_FOR']), $whitelisted_ips, false)) {
-                $except_ip = true;
-            }
-        } 
-  
-        if (!empty($_SERVER['HTTP_FORWARDED'])) {
-            if (in_array(trim($_SERVER['HTTP_FORWARDED']), $whitelisted_ips, false)) {
-                $except_ip = true;
-
-            }        
-        }
-
-        if ($except_ip) {
+    /**
+     * Determines whether the current request gets access to restricted content
+     * regardless of login and subscription status.
+     *
+     * A request is an access exception if one of its client IP addresses (see
+     * get_client_ips()) is on the IP whitelist, or if it sends the configured
+     * bypass header with the configured value.
+     *
+     * @return bool True if the request is an access exception.
+     */
+    public function is_access_exception() {
+        if ($this->is_whitelisted_ip()) {
             $this->common->write_log("IP match, excepting this request from SSO.");
             return true;
         }
 
-        // check header?
-        if (get_option('tulo_except_header_name') != "") {
-            $header = get_option('tulo_except_header_name');
-            $value = get_option('tulo_except_header_value');
-            if (isset($_SERVER[$header])) {
-                if ($_SERVER[$header] == $value) {
-                    $this->common->write_log("Header value match, excepting this request from SSO.");
-                    return true;
-                }
-            } 
+        if ($this->has_bypass_header()) {
+            $this->common->write_log("Header value match, excepting this request from SSO.");
+            return true;
         }
-    
+
         return false;
+    }
+
+    /**
+     * Determines whether the current request is for a favicon file.
+     *
+     * Matches request paths ending in /favicon.ico, /favicon.png or /favicon.svg.
+     * The query string is ignored.
+     *
+     * @return bool True if the request path is a favicon file.
+     */
+    private function is_favicon_request() {
+        $uri = isset($_SERVER["REQUEST_URI"]) ? (string) $_SERVER["REQUEST_URI"] : "";
+        $path = parse_url($uri, PHP_URL_PATH);
+        return is_string($path) && preg_match('#/favicon\.(ico|png|svg)$#i', $path) === 1;
+    }
+
+    /**
+     * Determines whether one of the request's client IP addresses is on the IP
+     * whitelist.
+     *
+     * @return bool True if a client IP address is whitelisted.
+     */
+    private function is_whitelisted_ip() {
+        $whitelisted_ips = Tulo_Payway_Server_Public::get_whitelisted_ips();
+        if (empty($whitelisted_ips)) {
+            return false;
+        }
+        foreach (self::get_client_ips() as $ip) {
+            if (in_array($ip, $whitelisted_ips, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Determines whether the request sends the configured bypass header with the
+     * configured value.
+     *
+     * The header name setting is a $_SERVER key, for example HTTP_TULO_BYPASS. The
+     * check is disabled while the header name or the header value setting is empty.
+     * The value is compared with hash_equals(), which requires an exact match and
+     * takes the same time regardless of how much of the value matches.
+     *
+     * @return bool True if the header is present with the configured value.
+     */
+    private function has_bypass_header() {
+        $header = trim((string) get_option('tulo_except_header_name'));
+        $expected = (string) get_option('tulo_except_header_value');
+        if ($header === "" || $expected === "") {
+            return false;
+        }
+        if (!isset($_SERVER[$header]) || !is_string($_SERVER[$header])) {
+            return false;
+        }
+        return hash_equals($expected, $_SERVER[$header]);
+    }
+
+    /**
+     * Returns the IP addresses that identify the client of the current request.
+     *
+     * The list contains REMOTE_ADDR, each address in the X-Forwarded-For header,
+     * and the addresses in the X-Forwarded, X-Cluster-Client-IP, Forwarded-For and
+     * Forwarded headers. Empty and invalid addresses are left out.
+     *
+     * @return string[] Normalized IP addresses.
+     */
+    public static function get_client_ips() {
+        $ips = array();
+        $remote = self::normalize_ip(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "");
+        if ($remote !== "") {
+            $ips[] = $remote;
+        }
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // proxies conventionally write "client, proxy1, proxy2" with spaces
+            foreach (explode(',', (string) $_SERVER['HTTP_X_FORWARDED_FOR']) as $entry) {
+                $ip = self::normalize_ip($entry);
+                if ($ip !== "") {
+                    $ips[] = $ip;
+                }
+            }
+        }
+
+        foreach (array('HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED') as $header) {
+            if (!empty($_SERVER[$header])) {
+                $ip = self::normalize_ip($_SERVER[$header]);
+                if ($ip !== "") {
+                    $ips[] = $ip;
+                }
+            }
+        }
+        return array_values(array_unique($ips));
+    }
+
+    /**
+     * Normalizes an IP address.
+     *
+     * Removes surrounding whitespace and returns valid IPv4 and IPv6 addresses in
+     * canonical form, so that different notations of the same address compare
+     * equal (for example 2001:DB8:0::1 and 2001:db8::1).
+     *
+     * @param string $ip The IP address.
+     * @return string The address in canonical form, or an empty string if it is not
+     *                a valid IP address.
+     */
+    public static function normalize_ip($ip) {
+        $ip = trim((string) $ip);
+        if ($ip === "" || filter_var($ip, FILTER_VALIDATE_IP) === false) {
+            return "";
+        }
+        return inet_ntop(inet_pton($ip));
+    }
+
+    /**
+     * Parses a list of IP addresses with one address per line.
+     *
+     * Each line is normalized with normalize_ip(). Empty lines, invalid addresses
+     * and duplicates are left out.
+     *
+     * @param string $text The list, for example the value of a settings textarea.
+     * @return string[] Normalized IP addresses.
+     */
+    public static function parse_ip_list($text) {
+        $ips = array();
+        foreach (preg_split('/\r\n|\r|\n/', (string) $text) as $line) {
+            $ip = self::normalize_ip($line);
+            if ($ip !== "") {
+                $ips[] = $ip;
+            }
+        }
+        return array_values(array_unique($ips));
     }
 
     protected function session_established() {

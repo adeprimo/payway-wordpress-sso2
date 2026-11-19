@@ -398,6 +398,10 @@ msgstr "Header value for exception"
 msgid "Header should have this value to enable SSO bypass"
 msgstr "Header should have this value to enable SSO bypass"
 
+#: admin/tulo-payway-server-settings.php
+msgid "The header exception is disabled while this value is empty."
+msgstr "The header exception is disabled while this value is empty."
+
 #: admin/tulo-payway-server-settings.php:301
 #: admin/tulo-payway-server-settings.php:336
 msgid "Whitelist IP Addresses"

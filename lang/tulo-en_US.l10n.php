@@ -90,6 +90,7 @@ return array (
     'Full header name to check for SSO bypass. Example: "HTTP_TULO_BYPASS"' => 'Full header name to check for SSO bypass. Example: “HTTP_TULO_BYPASS”',
     'Header value for exception' => 'Header value for exception',
     'Header should have this value to enable SSO bypass' => 'Header should have this value to enable SSO bypass',
+    'The header exception is disabled while this value is empty.' => 'The header exception is disabled while this value is empty.',
     'Whitelist IP Addresses' => 'Whitelist IP Addresses',
     'Separate the ip addresses with a new row' => 'Separate the ip addresses with a new row',
     'IP address checks are done in the following order:' => 'IP address checks are done in the following order:',

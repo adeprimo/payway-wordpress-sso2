@@ -181,6 +181,10 @@ msgstr ""
 msgid "Separate the ip addresses with a new row"
 msgstr ""
 
+#: admin/tulo-payway-server-settings.php
+msgid "The header exception is disabled while this value is empty."
+msgstr ""
+
 #: admin/tulo-payway-server-settings.php:256
 msgid "Tulo Paywall is enabled on this website! See <a href=\""
 msgstr ""

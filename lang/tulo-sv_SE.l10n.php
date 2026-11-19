@@ -94,6 +94,7 @@ return array (
     'Full header name to check for SSO bypass. Example: "HTTP_TULO_BYPASS"' => 'HTTP header namn att kontrollera för undantag. Exempel: “HTTP_TULO_BYPASS”',
     'Header value for exception' => 'Header värde för undantag',
     'Header should have this value to enable SSO bypass' => 'Header skall ha detta värde för att åsidosätta SSO identifiering och behörighetskontroll',
+    'The header exception is disabled while this value is empty.' => 'Undantaget för header är avstängt så länge värdet är tomt.',
     'Whitelist IP Addresses' => 'Vitlista IP-adresser',
     'Separate the ip addresses with a new row' => 'Separera IP-adresser med en ny rad',
     'IP address checks are done in the following order:' => 'IP adress kontroller görs i följande ordning:',

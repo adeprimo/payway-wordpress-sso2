@@ -291,7 +291,8 @@ function tulo_server_render_exceptions() {
             </th>
             <td>
                 <input class="regular-text" type="text" name="<?php echo $headervalue_key; ?>" value="<?php echo $headervalue_value; ?>">
-                <i><?php _e('Header should have this value to enable SSO bypass', 'tulo'); ?></i>
+                <i><?php _e('Header should have this value to enable SSO bypass', 'tulo'); ?>.
+                <?php _e('The header exception is disabled while this value is empty.', 'tulo'); ?></i>
             </td>
         </tr>
             

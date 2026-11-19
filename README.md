@@ -15,6 +15,15 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 
 ## Changelog
 
+### Unreleased
+
+* Security: Fixed several ways to read restricted content without a subscription.
+  * Requests with a User-Agent that matched the bot list (for example `Googlebot`), requests with the header `Purpose: prefetch`, and URLs containing `favicon` were given access to restricted content. These requests now only skip SSO identification. Search engines therefore see the same content as other visitors without a subscription.
+  * An empty entry in the `X-Forwarded-For` header, for example `X-Forwarded-For: ,`, gave access when the IP whitelist was empty or contained a blank row. Blank rows and invalid addresses in the whitelist are now ignored.
+  * The HTTP header exception gave access when the header value setting was empty, and compared values loosely (for example, `1e2` matched `100`). The exception is now disabled while the value is empty, and the value must match exactly.
+* `should_request_be_excepted()` is deprecated. It now returns the same result as `is_access_exception()`. Use `is_access_exception()` to decide access, or `should_skip_identification()` to decide whether to run SSO identification.
+* IPv6 addresses in the IP whitelist now match regardless of how they are written, for example `2001:DB8:0::1` and `2001:db8::1`.
+
 ### 1.3.1
 
 * Upgraded the bundled `firebase/php-jwt` library from 6.4.0 to 7.1.1 to resolve CVE-2025-45769. The library now requires PHP 8.0, so the plugin's minimum PHP version is 8.0.
@@ -129,7 +138,13 @@ You are logged in but don't have a subscription that is needed to view this cont
 
 #### Whitelist IP addresses
 
-Here you can add IP addresses that should have access to the content regardless login- and subscription-status. Add them one IP-address on each row.
+Here you can add IP addresses that should have access to the content regardless login- and subscription-status. Add them one IP-address on each row. Address ranges, such as `10.0.0.0/24`, are not supported.
+
+#### HTTP header exception
+
+Requests that send a specific HTTP header with a specific value have access to the content in the same way as whitelisted IP addresses.
+
+Enter the header name as PHP sees it in `$_SERVER`: `HTTP_` followed by the header name in upper case, with dashes replaced by underscores. For example, the header `Tulo-Bypass` is entered as `HTTP_TULO_BYPASS`. Both the name and the value must be filled in. The value works like a password, so use a long, random value and keep it secret.
 
 #### Available shortcodes to use in restriction handling
 

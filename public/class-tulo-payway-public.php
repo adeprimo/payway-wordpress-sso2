@@ -99,7 +99,7 @@ class Tulo_Payway_Server_Public {
             return;
         }
 
-        if ($this->session->should_request_be_excepted()) {
+        if ($this->session->should_skip_identification()) {
             return;
         }
         
@@ -197,14 +197,13 @@ class Tulo_Payway_Server_Public {
         return $restrictions;
     }
 
+    /**
+     * Returns the IP addresses from the "Whitelist IP Addresses" setting.
+     *
+     * @return string[] Normalized IP addresses.
+     */
     public static function get_whitelisted_ips() {
-        $ips = explode("\n", get_option('tulo_whitelist_ip'));
-
-        foreach ($ips as $key => $value) {
-        $ips[$key] = trim($value);
-        }
-
-        return $ips;
+        return Tulo_Payway_API_SSO2::parse_ip_list(get_option('tulo_whitelist_ip'));
     }
 
     public function has_access($post_id = null, $restrictions = null) {
@@ -219,7 +218,7 @@ class Tulo_Payway_Server_Public {
             return true;
         }
 
-        if ($this->session->should_request_be_excepted()) {
+        if ($this->session->is_access_exception()) {
             return true;
         }
 
