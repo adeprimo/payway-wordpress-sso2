@@ -58,3 +58,8 @@ textarea[name="tulo_variables_val"]
 table.tulo-variables {
     width:100px;
 }
+textarea.tulo_trusted_proxies
+{
+    width:80%;
+    height:150px;
+}

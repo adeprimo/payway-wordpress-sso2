@@ -15,6 +15,8 @@
 
 if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
+    // Reject forged or expired submissions before saving anything (dies with WordPress' "link expired" page).
+    check_admin_referer('tulo_paywall_settings');
     update_option('tulo_paywall_enabled', isset($_POST["tulo_paywall_enabled"]) ? "on" : "" );
     update_option('tulo_paywall_clientside_enabled', isset($_POST["tulo_paywall_clientside_enabled"]) ? "on" : "" );
     update_option('tulo_paywall_lite_enabled', isset($_POST["tulo_paywall_lite_enabled"]) ? "on" : "" );
@@ -171,7 +173,7 @@ function tulo_server_render_custom_variables()
 <div class="wrap" ng-app="tulo.admin">
     <h1><?php esc_html_e( 'Tulo Paywall settings', 'tulo'); ?></h1>
     <form name="form" action="" method="post" id="tulo-paywall-options">
-    <?php wp_nonce_field('options-options') ?>
+    <?php wp_nonce_field('tulo_paywall_settings') ?>
     <input type="hidden" name="action" value="update" />
     
     <h2><?php esc_html_e( 'Paywall basic settings', 'tulo'); ?></h1>

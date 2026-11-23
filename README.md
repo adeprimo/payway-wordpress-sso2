@@ -15,6 +15,21 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 
 ## Changelog
 
+### 1.3.2
+
+* Security: Fixed several ways to read restricted content without a subscription.
+  * Requests with a User-Agent that matched the bot list (for example `Googlebot`), requests with the header `Purpose: prefetch`, and URLs containing `favicon` were given access to restricted content. These requests now only skip SSO identification. Search engines therefore see the same content as other visitors without a subscription. **If a crawler or other robot needs to read restricted content, let it send the [HTTP header exception](#http-header-exception) or add its address to the IP whitelist.**
+  * An empty entry in the `X-Forwarded-For` header, for example `X-Forwarded-For: ,`, gave access when the IP whitelist was empty or contained a blank row. Blank rows and invalid addresses in the whitelist are now ignored.
+  * The HTTP header exception gave access when the header value setting was empty, and compared values loosely (for example, `1e2` matched `100`). The exception is now disabled while the value is empty, and the value must match exactly.
+  * The IP whitelist was matched against the `X-Forwarded-For`, `X-Forwarded`, `X-Cluster-Client-IP`, `Forwarded-For` and `Forwarded` headers from any client, so anyone could get access by sending a whitelisted address in one of them. `X-Forwarded-For` is now only used when the request comes from a trusted proxy, and the other four headers are no longer read.
+* Security: The Tulo Payway and Tulo Paywall settings pages now verify the form's security token (nonce) before saving. Before, another website could make a logged-in administrator's browser change the plugin settings, for example the IP whitelist or the HTTP header exception.
+* Security: `landing.php` redirected to any URL in its `r` parameter, so a link on the site's own domain could send visitors to another website. It now only redirects to the site itself, or to the host set with the `tulo_sso_redirect_host` filter, and falls back to the front page otherwise.
+* Fixed: query parameters after the first one (for example `utm_source`) were lost when a new visitor was sent through SSO identification. The return URL is now encoded.
+* New "Trusted proxies" setting under SSO Exceptions, see [Trusted proxies](#trusted-proxies). **Sites behind a load balancer, reverse proxy or CDN that use the IP whitelist must add the proxy addresses to this setting after updating**, or configure the web server to set `REMOTE_ADDR` to the visitor's address. Until then, whitelisted visitors behind the proxy do not get access.
+* `should_request_be_excepted()` is deprecated. It now returns the same result as `is_access_exception()`. Use `is_access_exception()` to decide access, or `should_skip_identification()` to decide whether to run SSO identification.
+* IPv6 addresses in the IP whitelist now match regardless of how they are written, for example `2001:DB8:0::1` and `2001:db8::1`.
+* The IP whitelist and the trusted proxies setting accept CIDR ranges, for example `10.0.0.0/24` or `2001:db8::/32`.
+
 ### 1.3.1
 
 * Upgraded the bundled `firebase/php-jwt` library from 6.4.0 to 7.1.1 to resolve CVE-2025-45769. The library now requires PHP 8.0, so the plugin's minimum PHP version is 8.0.
@@ -129,7 +144,21 @@ You are logged in but don't have a subscription that is needed to view this cont
 
 #### Whitelist IP addresses
 
-Here you can add IP addresses that should have access to the content regardless login- and subscription-status. Add them one IP-address on each row.
+Here you can add IP addresses that should have access to the content regardless login- and subscription-status. Add one entry per row: a single address, such as `203.0.113.5`, or an address range in CIDR notation, such as `203.0.113.0/24` or `2001:db8::/32`.
+
+The whitelist is matched against the address the request comes from (`REMOTE_ADDR`). If the site is behind a load balancer, reverse proxy or CDN, see [Trusted proxies](#trusted-proxies).
+
+#### Trusted proxies
+
+If the site is behind a load balancer, reverse proxy or CDN, `REMOTE_ADDR` is the proxy's address, not the visitor's. Add the IP addresses of these proxies here, one per row. CIDR ranges are allowed, so a CDN can be added with its published ranges (for example Cloudflare's list at https://www.cloudflare.com/ips/). If requests pass through several proxies, add all of them. For requests that come from a trusted proxy, the visitor's address is taken from the `X-Forwarded-For` header and is also matched against the whitelist. Leave the field empty if the site is not behind a proxy.
+
+If the web server already sets `REMOTE_ADDR` to the visitor's address (for example with Apache `mod_remoteip` or nginx `real_ip`), no trusted proxies are needed.
+
+#### HTTP header exception
+
+Requests that send a specific HTTP header with a specific value have access to the content in the same way as whitelisted IP addresses.
+
+Enter the header name as PHP sees it in `$_SERVER`: `HTTP_` followed by the header name in upper case, with dashes replaced by underscores. For example, the header `Tulo-Bypass` is entered as `HTTP_TULO_BYPASS`. Both the name and the value must be filled in. The value works like a password, so use a long, random value and keep it secret.
 
 #### Available shortcodes to use in restriction handling
 

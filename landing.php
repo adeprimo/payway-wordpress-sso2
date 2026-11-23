@@ -27,6 +27,33 @@ $session = new Tulo_Payway_Session();
 write_log("Return url: ".$redirect_url);
 write_log("Token: ".$token);
 
+// Only redirect back to this site. identify_session() builds the return url from the
+// current host, which a site can change with the "tulo_sso_redirect_host" filter, so that
+// host is allowed as well. Anything else (other hosts, "//host", non-http schemes) falls
+// back to the front page, so landing.php cannot be used as an open redirect.
+$allowed_redirect_hosts = function ($hosts) {
+    $candidates = array(
+        home_url(),
+        site_url(),
+        "http://" . apply_filters("tulo_sso_redirect_host", isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : ""),
+    );
+    foreach ($candidates as $candidate) {
+        $host = parse_url($candidate, PHP_URL_HOST);
+        if (is_string($host) && $host !== "") {
+            $hosts[] = strtolower($host);
+        }
+    }
+    return array_unique($hosts);
+};
+add_filter('allowed_redirect_hosts', $allowed_redirect_hosts);
+$requested_url = is_string($redirect_url) ? $redirect_url : "";
+$fallback_url = home_url('/');
+$redirect_url = $requested_url === "" ? $fallback_url : wp_validate_redirect($requested_url, $fallback_url);
+remove_filter('allowed_redirect_hosts', $allowed_redirect_hosts);
+if ($redirect_url === $fallback_url && $requested_url !== $fallback_url) {
+    write_log("Return url rejected, not on this site: ".$requested_url);
+}
+
 try
 {
     $payload = $session->decode_jwt($token, $client_secret);

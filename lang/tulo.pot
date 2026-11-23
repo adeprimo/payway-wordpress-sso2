@@ -181,6 +181,30 @@ msgstr ""
 msgid "Separate the ip addresses with a new row"
 msgstr ""
 
+#: admin/tulo-payway-server-settings.php
+msgid "The header exception is disabled while this value is empty."
+msgstr ""
+
+#: admin/tulo-payway-server-settings.php
+msgid "One entry per row: a single address or a CIDR range, for example 10.0.0.0/24."
+msgstr ""
+
+#: admin/tulo-payway-server-settings.php
+msgid "Trusted proxies"
+msgstr ""
+
+#: admin/tulo-payway-server-settings.php
+msgid "IP addresses of your own load balancers, reverse proxies or CDN servers. Leave empty if the site is not behind a proxy."
+msgstr ""
+
+#: admin/tulo-payway-server-settings.php
+msgid "How IP addresses are checked"
+msgstr ""
+
+#: admin/tulo-payway-server-settings.php
+msgid "Whitelisted IP addresses are matched against the connecting address (REMOTE_ADDR). If that address is a trusted proxy, the client address from X-Forwarded-For is matched as well."
+msgstr ""
+
 #: admin/tulo-payway-server-settings.php:256
 msgid "Tulo Paywall is enabled on this website! See <a href=\""
 msgstr ""

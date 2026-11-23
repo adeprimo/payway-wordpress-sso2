@@ -401,6 +401,30 @@ msgstr ""
 "Header skall ha detta värde för att åsidosätta SSO identifiering och "
 "behörighetskontroll"
 
+#: admin/tulo-payway-server-settings.php
+msgid "The header exception is disabled while this value is empty."
+msgstr "Undantaget för header är avstängt så länge värdet är tomt."
+
+#: admin/tulo-payway-server-settings.php
+msgid "One entry per row: a single address or a CIDR range, for example 10.0.0.0/24."
+msgstr "En post per rad: en enskild adress eller ett CIDR-intervall, till exempel 10.0.0.0/24."
+
+#: admin/tulo-payway-server-settings.php
+msgid "Trusted proxies"
+msgstr "Betrodda proxyservrar"
+
+#: admin/tulo-payway-server-settings.php
+msgid "IP addresses of your own load balancers, reverse proxies or CDN servers. Leave empty if the site is not behind a proxy."
+msgstr "IP-adresser till era egna lastbalanserare, omvända proxyservrar eller CDN-servrar. Lämna tomt om sajten inte ligger bakom en proxy."
+
+#: admin/tulo-payway-server-settings.php
+msgid "How IP addresses are checked"
+msgstr "Hur IP-adresser kontrolleras"
+
+#: admin/tulo-payway-server-settings.php
+msgid "Whitelisted IP addresses are matched against the connecting address (REMOTE_ADDR). If that address is a trusted proxy, the client address from X-Forwarded-For is matched as well."
+msgstr "Vitlistade IP-adresser jämförs med den anslutande adressen (REMOTE_ADDR). Om den adressen är en betrodd proxy jämförs även klientadressen från X-Forwarded-For."
+
 #: admin/tulo-payway-server-settings.php:301
 #: admin/tulo-payway-server-settings.php:336
 msgid "Whitelist IP Addresses"
