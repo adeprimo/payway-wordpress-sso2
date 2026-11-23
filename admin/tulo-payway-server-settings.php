@@ -20,6 +20,8 @@ $tab = isset($_GET['tab']) ? $_GET['tab'] : $default_tab;
 
 if(isset($_POST['action']) && $_POST['action'] == 'update')
 {
+    // Reject forged or expired submissions before saving anything (dies with WordPress' "link expired" page).
+    check_admin_referer('tulo_payway_settings');
     update_option('tulo_plugin_active', isset($_POST["tulo_plugin_active"]) ? "on" : "");
     update_option('tulo_debug_log_active', isset($_POST["tulo_debug_log_active"]) ? "on" : "");
     update_option('tulo_article_purchase_enabled', isset($_POST["tulo_article_purchase_enabled"]) ? "on" : "");
@@ -377,7 +379,7 @@ function tulo_server_render_whitelist_ips() {
 
 
   <form name="form" action="" method="post" id="tulo-server-options">
-  <?php wp_nonce_field('options-options') ?>
+  <?php wp_nonce_field('tulo_payway_settings') ?>
   <input type="hidden" name="action" value="update" />
   <table class="form-table">
       <?php
