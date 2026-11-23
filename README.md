@@ -15,10 +15,10 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 
 ## Changelog
 
-### Unreleased
+### 1.3.2
 
 * Security: Fixed several ways to read restricted content without a subscription.
-  * Requests with a User-Agent that matched the bot list (for example `Googlebot`), requests with the header `Purpose: prefetch`, and URLs containing `favicon` were given access to restricted content. These requests now only skip SSO identification. Search engines therefore see the same content as other visitors without a subscription.
+  * Requests with a User-Agent that matched the bot list (for example `Googlebot`), requests with the header `Purpose: prefetch`, and URLs containing `favicon` were given access to restricted content. These requests now only skip SSO identification. Search engines therefore see the same content as other visitors without a subscription. **If a crawler or other robot needs to read restricted content, let it send the [HTTP header exception](#http-header-exception) or add its address to the IP whitelist.**
   * An empty entry in the `X-Forwarded-For` header, for example `X-Forwarded-For: ,`, gave access when the IP whitelist was empty or contained a blank row. Blank rows and invalid addresses in the whitelist are now ignored.
   * The HTTP header exception gave access when the header value setting was empty, and compared values loosely (for example, `1e2` matched `100`). The exception is now disabled while the value is empty, and the value must match exactly.
   * The IP whitelist was matched against the `X-Forwarded-For`, `X-Forwarded`, `X-Cluster-Client-IP`, `Forwarded-For` and `Forwarded` headers from any client, so anyone could get access by sending a whitelisted address in one of them. `X-Forwarded-For` is now only used when the request comes from a trusted proxy, and the other four headers are no longer read.
