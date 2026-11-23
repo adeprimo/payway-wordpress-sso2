@@ -403,6 +403,10 @@ msgid "The header exception is disabled while this value is empty."
 msgstr "The header exception is disabled while this value is empty."
 
 #: admin/tulo-payway-server-settings.php
+msgid "One entry per row: a single address or a CIDR range, for example 10.0.0.0/24."
+msgstr "One entry per row: a single address or a CIDR range, for example 10.0.0.0/24."
+
+#: admin/tulo-payway-server-settings.php
 msgid "Trusted proxies"
 msgstr "Trusted proxies"
 

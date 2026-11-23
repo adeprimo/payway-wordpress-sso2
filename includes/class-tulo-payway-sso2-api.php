@@ -324,7 +324,7 @@ class Tulo_Payway_API_SSO2 {
 
     /**
      * Determines whether one of the request's client IP addresses is on the IP
-     * whitelist.
+     * whitelist, either as a single address or inside a CIDR range.
      *
      * @return bool True if a client IP address is whitelisted.
      */
@@ -334,7 +334,7 @@ class Tulo_Payway_API_SSO2 {
             return false;
         }
         foreach (self::get_client_ips() as $ip) {
-            if (in_array($ip, $whitelisted_ips, true)) {
+            if (self::ip_matches_list($ip, $whitelisted_ips)) {
                 return true;
             }
         }
@@ -372,7 +372,8 @@ class Tulo_Payway_API_SSO2 {
      *
      * Each proxy appends the address it received the request from to
      * X-Forwarded-For, so the header is read from right to left. Trusted proxies
-     * are skipped, and the first address that is not a trusted proxy is the client.
+     * (single addresses or CIDR ranges) are skipped, and the first address that is
+     * not a trusted proxy is the client.
      * Entries to the left of it are not used, because the client can set them.
      * Reading stops at an entry that is not a valid IP address.
      *
@@ -387,7 +388,7 @@ class Tulo_Payway_API_SSO2 {
         $ips = array($remote);
 
         $trusted_proxies = Tulo_Payway_Server_Public::get_trusted_proxies();
-        if (!in_array($remote, $trusted_proxies, true) || empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        if (!self::ip_matches_list($remote, $trusted_proxies) || empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             return $ips;
         }
 
@@ -397,7 +398,7 @@ class Tulo_Payway_API_SSO2 {
             if ($ip === "") {
                 break;
             }
-            if (!in_array($ip, $trusted_proxies, true)) {
+            if (!self::ip_matches_list($ip, $trusted_proxies)) {
                 $ips[] = $ip;
                 break;
             }
@@ -425,23 +426,104 @@ class Tulo_Payway_API_SSO2 {
     }
 
     /**
-     * Parses a list of IP addresses with one address per line.
+     * Normalizes an IP address or a CIDR range.
      *
-     * Each line is normalized with normalize_ip(). Empty lines, invalid addresses
-     * and duplicates are left out.
+     * A single address is returned as by normalize_ip(). A range such as
+     * 10.0.0.0/24 or 2001:db8::/32 is returned as "<network>/<prefix>", with the
+     * network address in canonical form and its host bits cleared, so
+     * 10.0.0.7/24 becomes 10.0.0.0/24. The prefix must be a whole number from 0 to
+     * 32 for IPv4 and from 0 to 128 for IPv6.
      *
-     * @param string $text The list, for example the value of a settings textarea.
-     * @return string[] Normalized IP addresses.
+     * @param string $entry The address or range.
+     * @return string The address or range in canonical form, or an empty string if
+     *                it is not valid.
      */
-    public static function parse_ip_list($text) {
-        $ips = array();
-        foreach (preg_split('/\r\n|\r|\n/', (string) $text) as $line) {
-            $ip = self::normalize_ip($line);
-            if ($ip !== "") {
-                $ips[] = $ip;
+    public static function normalize_ip_entry($entry) {
+        $entry = trim((string) $entry);
+        if (strpos($entry, '/') === false) {
+            return self::normalize_ip($entry);
+        }
+        list($address, $prefix) = explode('/', $entry, 2);
+        $address = self::normalize_ip($address);
+        if ($address === "" || !preg_match('/^\d{1,3}$/', trim($prefix))) {
+            return "";
+        }
+        $prefix = (int) trim($prefix);
+        $network = inet_pton($address);
+        if ($prefix > strlen($network) * 8) {
+            return "";
+        }
+        return inet_ntop(self::apply_prefix($network, $prefix)) . "/" . $prefix;
+    }
+
+    /**
+     * Determines whether an IP address matches an entry in a list from
+     * parse_ip_list(). An entry matches if it is the same address, or a CIDR
+     * range that contains the address. IPv4 addresses never match IPv6 entries
+     * and the other way round.
+     *
+     * @param string   $ip   A normalized IP address (see normalize_ip()).
+     * @param string[] $list Normalized addresses and ranges.
+     * @return bool True if the address matches an entry.
+     */
+    public static function ip_matches_list($ip, $list) {
+        if ($ip === "" || empty($list)) {
+            return false;
+        }
+        $binary = inet_pton($ip);
+        foreach ($list as $entry) {
+            if (strpos($entry, '/') === false) {
+                if ($entry === $ip) {
+                    return true;
+                }
+                continue;
+            }
+            list($network, $prefix) = explode('/', $entry, 2);
+            $network = inet_pton($network);
+            if (strlen($network) === strlen($binary)
+                && self::apply_prefix($binary, (int) $prefix) === $network) {
+                return true;
             }
         }
-        return array_values(array_unique($ips));
+        return false;
+    }
+
+    /**
+     * Clears all bits after the first $prefix bits of a binary address from
+     * inet_pton().
+     *
+     * @param string $binary The address in binary form.
+     * @param int    $prefix The number of bits to keep.
+     * @return string The masked address in binary form.
+     */
+    private static function apply_prefix($binary, $prefix) {
+        $result = "";
+        for ($i = 0; $i < strlen($binary); $i++) {
+            $bits = max(0, min(8, $prefix - $i * 8));
+            $mask = $bits === 0 ? 0 : (0xFF << (8 - $bits)) & 0xFF;
+            $result .= chr(ord($binary[$i]) & $mask);
+        }
+        return $result;
+    }
+
+    /**
+     * Parses a list of IP addresses and CIDR ranges with one entry per line.
+     *
+     * Each line is normalized with normalize_ip_entry(). Empty lines, invalid
+     * entries and duplicates are left out.
+     *
+     * @param string $text The list, for example the value of a settings textarea.
+     * @return string[] Normalized addresses and ranges.
+     */
+    public static function parse_ip_list($text) {
+        $entries = array();
+        foreach (preg_split('/\r\n|\r|\n/', (string) $text) as $line) {
+            $entry = self::normalize_ip_entry($line);
+            if ($entry !== "") {
+                $entries[] = $entry;
+            }
+        }
+        return array_values(array_unique($entries));
     }
 
     protected function session_established() {

@@ -95,6 +95,7 @@ return array (
     'Header value for exception' => 'Header värde för undantag',
     'Header should have this value to enable SSO bypass' => 'Header skall ha detta värde för att åsidosätta SSO identifiering och behörighetskontroll',
     'The header exception is disabled while this value is empty.' => 'Undantaget för header är avstängt så länge värdet är tomt.',
+    'One entry per row: a single address or a CIDR range, for example 10.0.0.0/24.' => 'En post per rad: en enskild adress eller ett CIDR-intervall, till exempel 10.0.0.0/24.',
     'Trusted proxies' => 'Betrodda proxyservrar',
     'IP addresses of your own load balancers, reverse proxies or CDN servers. Leave empty if the site is not behind a proxy.' => 'IP-adresser till era egna lastbalanserare, omvända proxyservrar eller CDN-servrar. Lämna tomt om sajten inte ligger bakom en proxy.',
     'How IP addresses are checked' => 'Hur IP-adresser kontrolleras',

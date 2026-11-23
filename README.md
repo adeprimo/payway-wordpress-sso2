@@ -25,6 +25,7 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 * New "Trusted proxies" setting under SSO Exceptions, see [Trusted proxies](#trusted-proxies). **Sites behind a load balancer, reverse proxy or CDN that use the IP whitelist must add the proxy addresses to this setting after updating**, or configure the web server to set `REMOTE_ADDR` to the visitor's address. Until then, whitelisted visitors behind the proxy do not get access.
 * `should_request_be_excepted()` is deprecated. It now returns the same result as `is_access_exception()`. Use `is_access_exception()` to decide access, or `should_skip_identification()` to decide whether to run SSO identification.
 * IPv6 addresses in the IP whitelist now match regardless of how they are written, for example `2001:DB8:0::1` and `2001:db8::1`.
+* The IP whitelist and the trusted proxies setting accept CIDR ranges, for example `10.0.0.0/24` or `2001:db8::/32`.
 
 ### 1.3.1
 
@@ -140,13 +141,13 @@ You are logged in but don't have a subscription that is needed to view this cont
 
 #### Whitelist IP addresses
 
-Here you can add IP addresses that should have access to the content regardless login- and subscription-status. Add them one IP-address on each row. Address ranges, such as `10.0.0.0/24`, are not supported.
+Here you can add IP addresses that should have access to the content regardless login- and subscription-status. Add one entry per row: a single address, such as `203.0.113.5`, or an address range in CIDR notation, such as `203.0.113.0/24` or `2001:db8::/32`.
 
 The whitelist is matched against the address the request comes from (`REMOTE_ADDR`). If the site is behind a load balancer, reverse proxy or CDN, see [Trusted proxies](#trusted-proxies).
 
 #### Trusted proxies
 
-If the site is behind a load balancer, reverse proxy or CDN, `REMOTE_ADDR` is the proxy's address, not the visitor's. Add the IP addresses of these proxies here, one per row. If requests pass through several proxies, add all of them. For requests that come from a trusted proxy, the visitor's address is taken from the `X-Forwarded-For` header and is also matched against the whitelist. Leave the field empty if the site is not behind a proxy.
+If the site is behind a load balancer, reverse proxy or CDN, `REMOTE_ADDR` is the proxy's address, not the visitor's. Add the IP addresses of these proxies here, one per row. CIDR ranges are allowed, so a CDN can be added with its published ranges (for example Cloudflare's list at https://www.cloudflare.com/ips/). If requests pass through several proxies, add all of them. For requests that come from a trusted proxy, the visitor's address is taken from the `X-Forwarded-For` header and is also matched against the whitelist. Leave the field empty if the site is not behind a proxy.
 
 If the web server already sets `REMOTE_ADDR` to the visitor's address (for example with Apache `mod_remoteip` or nginx `real_ip`), no trusted proxies are needed.
 

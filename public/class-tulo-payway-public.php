@@ -198,18 +198,19 @@ class Tulo_Payway_Server_Public {
     }
 
     /**
-     * Returns the IP addresses from the "Whitelist IP Addresses" setting.
+     * Returns the IP addresses and CIDR ranges from the "Whitelist IP Addresses"
+     * setting. Match against it with Tulo_Payway_API_SSO2::ip_matches_list().
      *
-     * @return string[] Normalized IP addresses.
+     * @return string[] Normalized addresses and ranges.
      */
     public static function get_whitelisted_ips() {
         return Tulo_Payway_API_SSO2::parse_ip_list(get_option('tulo_whitelist_ip'));
     }
 
     /**
-     * Returns the IP addresses from the "Trusted proxies" setting.
+     * Returns the IP addresses and CIDR ranges from the "Trusted proxies" setting.
      *
-     * @return string[] Normalized IP addresses.
+     * @return string[] Normalized addresses and ranges.
      */
     public static function get_trusted_proxies() {
         return Tulo_Payway_API_SSO2::parse_ip_list(get_option('tulo_trusted_proxies'));

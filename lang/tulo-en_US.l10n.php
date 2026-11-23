@@ -91,6 +91,7 @@ return array (
     'Header value for exception' => 'Header value for exception',
     'Header should have this value to enable SSO bypass' => 'Header should have this value to enable SSO bypass',
     'The header exception is disabled while this value is empty.' => 'The header exception is disabled while this value is empty.',
+    'One entry per row: a single address or a CIDR range, for example 10.0.0.0/24.' => 'One entry per row: a single address or a CIDR range, for example 10.0.0.0/24.',
     'Trusted proxies' => 'Trusted proxies',
     'IP addresses of your own load balancers, reverse proxies or CDN servers. Leave empty if the site is not behind a proxy.' => 'IP addresses of your own load balancers, reverse proxies or CDN servers. Leave empty if the site is not behind a proxy.',
     'How IP addresses are checked' => 'How IP addresses are checked',

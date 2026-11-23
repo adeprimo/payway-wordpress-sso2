@@ -307,7 +307,8 @@ function tulo_server_render_exceptions() {
                 </label>
             </th>
             <td>
-                <textarea name="<?php echo $whitelist_key; ?>" class="tulo_whitelist_ip"><?php echo $whitelist_value; ?></textarea>                
+                <textarea name="<?php echo $whitelist_key; ?>" class="tulo_whitelist_ip"><?php echo $whitelist_value; ?></textarea>
+                <p class="description"><?php _e('One entry per row: a single address or a CIDR range, for example 10.0.0.0/24.', 'tulo'); ?></p>
             </td>
         </tr>
         <tr>
@@ -320,6 +321,7 @@ function tulo_server_render_exceptions() {
             <td>
                 <textarea name="<?php echo $proxies_key; ?>" id="<?php echo $proxies_key; ?>" class="tulo_trusted_proxies"><?php echo esc_textarea($proxies_value); ?></textarea>
                 <p class="description"><?php _e('IP addresses of your own load balancers, reverse proxies or CDN servers. Leave empty if the site is not behind a proxy.', 'tulo'); ?></p>
+                <p class="description"><?php _e('One entry per row: a single address or a CIDR range, for example 10.0.0.0/24.', 'tulo'); ?></p>
             </td>
         </tr>
         <tr>
