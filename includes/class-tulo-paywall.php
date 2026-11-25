@@ -273,20 +273,20 @@ class Tulo_Paywall_Common {
         return $variables;
     }
 
+    /**
+     * Paywall code from the paywall keys of the post's restricted products.
+     * A product without a paywall key contributes nothing (no fallback to the
+     * product id), so an empty result lets the Paywall service pick its default.
+     */
     private function get_product_codes($post_restrictions) {
-        $restrictions = array();
+        $keys = array();
         $this->common->write_log("Getting product code for restrictions: ".print_r($post_restrictions, true));
         if (isset($post_restrictions) && is_array($post_restrictions)) {
-            foreach($post_restrictions as $restriction) { 
-                if ($restriction->productid == "tulo-article-purchase")
-                    continue;
-                if (isset($restriction->paywallkey))
-                    array_push($restrictions, $restriction->paywallkey);
-                else
-                    array_push($restrictions, $restriction->productid);
+            foreach($post_restrictions as $restriction) {
+                if (isset($restriction->paywallkey) && trim($restriction->paywallkey) !== "")
+                    array_push($keys, trim($restriction->paywallkey));
             }
-            return join(".", $restrictions);
         }
-        return "";
+        return join(".", $keys);
     }
 }

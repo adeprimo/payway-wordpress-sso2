@@ -15,6 +15,10 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 
 ## Changelog
 
+### Unreleased
+
+* Changed: with "Product Paywall key" enabled, a product without a `paywall key` no longer falls back to its product code. An empty paywall code is sent, so the Paywall service selects its default Paywall.
+
 ### 1.3.2
 
 * Security: Fixed several ways to read restricted content without a subscription.
@@ -297,7 +301,7 @@ add_filter('tulo_paywall_dynamic_key', function ($value, $name, $post_restrictio
 > If all of the above settings are left empty/unchecked, the first active Paywall created will be selected and displayed.
     
 > [!NOTE]
-> If "Product Paywall key" is checked - From this version of the plugin it is now possible to define a `paywall key` for the tulo product that can be created as a part of the setup of the plugin. This means that multiple tulo products can reference the same Paywall if needed. However, if no `paywall key` has been defined on the tulo product, the `product key` will be used when selecting the Paywall. If an article/page requires multiple products, the product codes/paywall keys will be joined in a string separated with ".". For example: `productA.productB`.
+> If "Product Paywall key" is checked - From this version of the plugin it is now possible to define a `paywall key` for the tulo product that can be created as a part of the setup of the plugin. This means that multiple tulo products can reference the same Paywall if needed. If no `paywall key` has been defined on the tulo product, an empty paywall code is sent and the Paywall service selects its default Paywall (earlier versions sent the `product key` instead). If an article/page requires multiple products, the non-empty paywall keys are joined in a string separated with ".". For example: `paywallA.paywallB`.
 
 > [!WARNING]
 > Please note that if you already have assigned "tulo restrictions" for articles based on previous versions of the plugin, the "tulo restrictions" needs to be updated if you wish to use `paywall keys` as a selector for the Paywall.
