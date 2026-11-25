@@ -15,7 +15,7 @@ From version 1.2.0 the plugin now also supports [Tulo Paywall](https://docs.worl
 
 ## Changelog
 
-### Unreleased
+### 1.3.3
 
 * Changed: with "Product Paywall key" enabled, a product without a `paywall key` no longer falls back to its product code. An empty paywall code is sent, so the Paywall service selects its default Paywall.
 
